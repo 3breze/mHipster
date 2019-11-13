@@ -1,2 +1,4 @@
-com/oul/mHipster/TestGeneratorService.class
-com/oul/mHipster/MyMojo.class
+com\oul\mHipster\MyMojo.class
+com\oul\mHipster\Customer.class
+com\oul\mHipster\TryConfig.class
+com\oul\mHipster\TestGeneratorService.class
