@@ -45,11 +45,13 @@ public class MyMojo extends AbstractMojo {
     public Maconfig test() {
         try {
 
+//            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
             File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
             JAXBContext jaxbContext = JAXBContext.newInstance(Maconfig.class);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            return (Maconfig) jaxbUnmarshaller.unmarshal(file);
+            Maconfig maconfig = (Maconfig) jaxbUnmarshaller.unmarshal(file);
+            return maconfig;
 
         } catch (JAXBException e) {
             e.printStackTrace();
