@@ -1,7 +1,5 @@
 package com.oul.mHipster;
 
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -10,16 +8,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
 
-@Mojo(name="hello")
+@Mojo(name = "hello")
 public class MyMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         TestGeneratorService testGeneratorService = new TestGeneratorService();
-        String name = test();
+        Maconfig maconfig = test();
 //        TypeSpec person = testGeneratorService.emit();
 //
 //        List<JavaFile> javaFileList =  testGeneratorService.layerItUp(person);
@@ -34,22 +29,31 @@ public class MyMojo extends AbstractMojo {
 //        javaFileList.forEach( javaFile -> {
 ////
 //        });
-        getLog().info( name);
+        getLog().info(maconfig.getType());
+        getLog().info(maconfig.getLayers());
+        for (Entity entity : maconfig.getEntities()) {
+            getLog().info(entity.getName());
+            for (Attribute attribute : entity.getAttributes()) {
+                getLog().info(attribute.getType() + " - " + attribute.getValue());
+            }
+        }
+//        maconfig.getEntities().forEach(entity -> getLog().info(entity.getName()));
+//        maconfig.getEntities().forEach(entity -> entity.getAttributes().forEach(attribute ->
+//                getLog().info(attribute.getType() + " - " + attribute.getValue())));
     }
 
-    public String test(){
+    public Maconfig test() {
         try {
 
-            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\config.xml");
-            JAXBContext jaxbContext = JAXBContext.newInstance(Customer.class);
+            File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
+            JAXBContext jaxbContext = JAXBContext.newInstance(Maconfig.class);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            Customer customer = (Customer) jaxbUnmarshaller.unmarshal(file);
-            return customer.getName();
+            return (Maconfig) jaxbUnmarshaller.unmarshal(file);
 
         } catch (JAXBException e) {
             e.printStackTrace();
         }
-        return "nema ime";
+        return new Maconfig();
     }
 }

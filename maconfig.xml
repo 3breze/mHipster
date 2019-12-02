@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<maconfig type="full">
+    <layers>all</layers>
+    <entities>
+        <entity name="Human">
+            <attribute type="Long">Id</attribute>
+            <attribute type="String">name</attribute>
+        </entity>
+    </entities>
+</maconfig>

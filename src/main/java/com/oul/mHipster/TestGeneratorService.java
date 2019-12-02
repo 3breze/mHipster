@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestGeneratorService {
+    
     public TypeSpec emit() {
         FieldSpec defaultName = FieldSpec
                 .builder(String.class, "DEFAULT_NAME")
