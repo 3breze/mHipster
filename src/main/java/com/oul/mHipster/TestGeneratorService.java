@@ -9,6 +9,7 @@ import javax.lang.model.element.Modifier;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TestGeneratorService {
@@ -19,7 +20,7 @@ public class TestGeneratorService {
         this.maconfig = maconfig;
     }
 
-    public void build(Maconfig maconfig) {
+    public void build() {
         for (Entity entity : maconfig.getEntities()) {
             TypeSpec typeSpec = buildEntity(entity);
             List<JavaFile> javaFileList = layerItUp(typeSpec);
@@ -35,30 +36,33 @@ public class TestGeneratorService {
         }
     }
 
+//    public Class<T> getClassForType(String type){
+//        switch (type){
+//            case "String":
+//                return String.class;
+//                break;
+//        }
+//
+//    }
 
-    public TypeSpec buildEntity(Entity entity) {
+    private TypeSpec buildEntity(Entity entity) {
 
-        TypeSpec person = TypeSpec
+        List<FieldSpec> fieldSpecList = new ArrayList<>();
+        for (Attribute attribute : entity.getAttributes()) {
+            fieldSpecList.add(FieldSpec
+                    .builder(String.class, attribute.getValue())
+                    .addModifiers(Modifier.PRIVATE)
+                    .build());
+        }
+
+        return TypeSpec
                 .classBuilder(entity.getName())
                 .addModifiers(Modifier.PUBLIC)
-                .addMethod(MethodSpec
-                        .methodBuilder("getName")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(String.class)
-                        .addStatement("return this.name")
-                        .build())
-                .addMethod(MethodSpec
-                        .methodBuilder("setName")
-                        .addParameter(String.class, "name")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(String.class)
-                        .addStatement("this.name = name")
-                        .build())
+                .addFields(fieldSpecList)
                 .build();
-        return person;
     }
 
-    public List<JavaFile> layerItUp(TypeSpec entityClazz) {
+    private List<JavaFile> layerItUp(TypeSpec entityClazz) {
         List<Layer> layers = maconfig.getLayers();
         List<JavaFile> javaFileList = new ArrayList<>();
         for (Layer layer : layers) {

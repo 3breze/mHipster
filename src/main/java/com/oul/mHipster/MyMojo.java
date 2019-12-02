@@ -13,8 +13,9 @@ import java.io.File;
 public class MyMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
-//        TestGeneratorService testGeneratorService = new TestGeneratorService();
         Maconfig maconfig = test();
+        TestGeneratorService testGeneratorService = new TestGeneratorService(maconfig);
+        testGeneratorService.build();
 //        TypeSpec person = testGeneratorService.emit();
 
 //        List<JavaFile> javaFileList =  testGeneratorService.layerItUp(person);
