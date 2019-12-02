@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <maconfig type="full">
-    <layers>all</layers>
+    <groupName>com.oul</groupName>
+    <artifactName>projekto</artifactName>
+    <layers>
+        <layer>api</layer>
+        <layer>domain</layer>
+        <layer>domain.dto.request</layer>
+        <layer>domain.dto.response</layer>
+        <layer>service</layer>
+        <layer>service.impl</layer>
+        <layer>dao</layer>
+    </layers>
+
     <entities>
         <entity name="Human">
             <attribute type="Long">Id</attribute>
             <attribute type="String">name</attribute>
+        </entity>
+        <entity name="Machine">
+            <attribute type="Long">Id</attribute>
+            <attribute type="String">codeName</attribute>
+            <attribute type="Long">numero</attribute>
         </entity>
     </entities>
 </maconfig>

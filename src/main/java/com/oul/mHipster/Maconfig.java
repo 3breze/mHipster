@@ -8,7 +8,12 @@ import java.util.List;
 public class Maconfig {
 
     private String type;
-    private String layers;
+    private String groupName;
+    private String artifactName;
+
+    @XmlElementWrapper(name = "layers")
+    @XmlElement(name = "layer")
+    private List<Layer> layers;
 
     @XmlElementWrapper(name = "entities")
     @XmlElement(name = "entity")
@@ -23,11 +28,30 @@ public class Maconfig {
         this.type = type;
     }
 
-    public String getLayers() {
+    public String getGroupName() {
+        return groupName;
+    }
+
+    @XmlValue
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getArtifactName() {
+        return artifactName;
+    }
+
+    @XmlValue
+    public void setArtifactName(String artifactName) {
+        this.artifactName = artifactName;
+    }
+
+    public List<Layer> getLayers() {
         return layers;
     }
 
-    public void setLayers(String layers) {
+    @XmlTransient
+    public void setLayers(List<Layer> layers) {
         this.layers = layers;
     }
 

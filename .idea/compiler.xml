@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="mHipster-maven-plugin" target="11" />
+      <module name="mHipster-maven-plugin" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -13,10 +13,10 @@ import java.io.File;
 public class MyMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
-        TestGeneratorService testGeneratorService = new TestGeneratorService();
+//        TestGeneratorService testGeneratorService = new TestGeneratorService();
         Maconfig maconfig = test();
 //        TypeSpec person = testGeneratorService.emit();
-//
+
 //        List<JavaFile> javaFileList =  testGeneratorService.layerItUp(person);
 //        File myFile = new File("./src/main/java");
 //        for(JavaFile javaFile:javaFileList){
@@ -30,7 +30,9 @@ public class MyMojo extends AbstractMojo {
 ////
 //        });
         getLog().info(maconfig.getType());
-        getLog().info(maconfig.getLayers());
+        for (Layer layer : maconfig.getLayers()) {
+            getLog().info(layer.getName());
+        }
         for (Entity entity : maconfig.getEntities()) {
             getLog().info(entity.getName());
             for (Attribute attribute : entity.getAttributes()) {
@@ -44,14 +46,12 @@ public class MyMojo extends AbstractMojo {
 
     public Maconfig test() {
         try {
-
-//            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
-            File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
+            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
+//            File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
             JAXBContext jaxbContext = JAXBContext.newInstance(Maconfig.class);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            Maconfig maconfig = (Maconfig) jaxbUnmarshaller.unmarshal(file);
-            return maconfig;
+            return (Maconfig) jaxbUnmarshaller.unmarshal(file);
 
         } catch (JAXBException e) {
             e.printStackTrace();

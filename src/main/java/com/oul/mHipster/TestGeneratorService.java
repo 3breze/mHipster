@@ -6,31 +6,41 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestGeneratorService {
-    
-    public TypeSpec emit() {
-        FieldSpec defaultName = FieldSpec
-                .builder(String.class, "DEFAULT_NAME")
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("\"Alice\"")
-                .build();
 
-        MethodSpec sumOfTen = MethodSpec
-                .methodBuilder("sumOfTen")
-                .addStatement("int sum = 0")
-                .beginControlFlow("for (int i = 0; i <= 10; i++)")
-                .addStatement("sum += i")
-                .endControlFlow()
-                .build();
+    private Maconfig maconfig;
 
+    public TestGeneratorService(Maconfig maconfig) {
+        this.maconfig = maconfig;
+    }
+
+    public void build(Maconfig maconfig) {
+        for (Entity entity : maconfig.getEntities()) {
+            TypeSpec typeSpec = buildEntity(entity);
+            List<JavaFile> javaFileList = layerItUp(typeSpec);
+            File myFile = new File("./src/main/java");
+            for (JavaFile javaFile : javaFileList) {
+                try {
+//                    javaFile.writeTo(myFile);
+                    javaFile.writeTo(System.out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    public TypeSpec buildEntity(Entity entity) {
 
         TypeSpec person = TypeSpec
-                .classBuilder("Person")
+                .classBuilder(entity.getName())
                 .addModifiers(Modifier.PUBLIC)
-                .addField(defaultName)
                 .addMethod(MethodSpec
                         .methodBuilder("getName")
                         .addModifiers(Modifier.PUBLIC)
@@ -44,33 +54,20 @@ public class TestGeneratorService {
                         .returns(String.class)
                         .addStatement("this.name = name")
                         .build())
-                .addMethod(sumOfTen)
                 .build();
         return person;
     }
 
     public List<JavaFile> layerItUp(TypeSpec entityClazz) {
+        List<Layer> layers = maconfig.getLayers();
         List<JavaFile> javaFileList = new ArrayList<>();
-        JavaFile domainClazz = JavaFile
-                .builder("com.oul.projectName.domain", entityClazz)
-                .indent("    ")
-                .build();
-        javaFileList.add(domainClazz);
-        JavaFile apiClazz = JavaFile
-                .builder("com.oul.projectName.api", entityClazz)
-                .indent("    ")
-                .build();
-        javaFileList.add(apiClazz);
-        JavaFile serviceClazz = JavaFile
-                .builder("com.oul.projectName.service", entityClazz)
-                .indent("    ")
-                .build();
-        javaFileList.add(serviceClazz);
-        JavaFile daoClazz = JavaFile
-                .builder("com.oul.projectName.dao", entityClazz)
-                .indent("    ")
-                .build();
-        javaFileList.add(daoClazz);
+        for (Layer layer : layers) {
+            String packageName = String.join(".", maconfig.getGroupName(), maconfig.getArtifactName(), layer.getName());
+            javaFileList.add(JavaFile
+                    .builder(packageName, entityClazz)
+                    .indent("    ")
+                    .build());
+        }
         return javaFileList;
     }
 }
