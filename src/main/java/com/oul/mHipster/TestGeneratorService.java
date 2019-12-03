@@ -2,6 +2,7 @@ package com.oul.mHipster;
 
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
@@ -56,7 +57,6 @@ public class TestGeneratorService {
                     .addModifiers(Modifier.PRIVATE)
                     .build());
         }
-
         return TypeSpec
                 .classBuilder(entity.getName())
                 .addModifiers(Modifier.PUBLIC)
@@ -87,5 +87,15 @@ public class TestGeneratorService {
             }
         }
         return javaFileList;
+    }
+
+    void serviceBuilder(){
+        MethodSpec sumOfTen = MethodSpec
+                .methodBuilder("HumanServiceImpl")
+                .addStatement("find")
+                .beginControlFlow("for (int i = 0; i <= 10; i++)")
+                .addStatement("sum += i")
+                .endControlFlow()
+                .build();
     }
 }

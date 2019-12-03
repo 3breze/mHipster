@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<layers>
+    <layer name="api">
+        <sufix>Api</sufix>
+        <type>conc</type>
+
+    </layer>
+    <layer name="dao">
+        <sufix>Dao</sufix>
+        <type>inter</type>
+    </layer>
+    <layer name="service">
+        <sufix>Service</sufix>
+        <type>inter</type>
+        <methods>
+            <findAll>
+                <methodSig></methodSig>
+                <methodBody>
+                    Page&lt;${domain}&gt; page = ${dao}.findAll(predicate, pageable);
+                    return new PageImpl&lt;&gt;(
+                    page.stream().map(${resClazz}::new).collect(Collectors.toList()), pageable,
+                    page.getTotalElements());
+                </methodBody>
+            </findAll>
+            <findBy></findBy>
+            <save></save>
+            <delete></delete>
+            <update></update>
+        </methods>
+    </layer>
+    <layer name="service.impl">
+        <sufix>ServiceImpl</sufix>
+        <type>conc</type>
+    </layer>
+    <layer name="domain.dto.response">
+        <sufix>ResponseDto</sufix>
+        <type>conc</type>
+    </layer>
+    <layer name="domain.dto.request">
+        <sufix>RequestDto</sufix>
+        <type>conc</type>
+    </layer>
+    <layer name="domain">
+        <sufix></sufix>
+        <type>conc</type>
+    </layer>
+</layers>

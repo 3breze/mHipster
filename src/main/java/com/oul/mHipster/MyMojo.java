@@ -13,20 +13,18 @@ import java.io.File;
 public class MyMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
-        Maconfig maconfig = test();
+        Maconfig maconfig = readConfig();
         TestGeneratorService testGeneratorService = new TestGeneratorService(maconfig);
         testGeneratorService.build();
     }
 
-    private Maconfig test() {
+    private Maconfig readConfig() {
         try {
-            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
-//            File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
             JAXBContext jaxbContext = JAXBContext.newInstance(Maconfig.class);
-
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
+//          File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
             return (Maconfig) jaxbUnmarshaller.unmarshal(file);
-
         } catch (JAXBException e) {
             e.printStackTrace();
         }
