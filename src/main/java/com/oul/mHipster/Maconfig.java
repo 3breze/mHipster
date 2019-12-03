@@ -8,7 +8,9 @@ import java.util.List;
 public class Maconfig {
 
     private String type;
+    @XmlElement
     private String groupName;
+    @XmlElement
     private String artifactName;
 
     @XmlElementWrapper(name = "layers")
@@ -32,7 +34,7 @@ public class Maconfig {
         return groupName;
     }
 
-    @XmlValue
+    @XmlTransient
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
@@ -41,7 +43,7 @@ public class Maconfig {
         return artifactName;
     }
 
-    @XmlValue
+    @XmlTransient
     public void setArtifactName(String artifactName) {
         this.artifactName = artifactName;
     }

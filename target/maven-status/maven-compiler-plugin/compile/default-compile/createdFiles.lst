@@ -1,5 +1,6 @@
 com\oul\mHipster\Maconfig.class
 com\oul\mHipster\Attribute.class
+com\oul\mHipster\TestGeneratorService$1.class
 com\oul\mHipster\Entity.class
 com\oul\mHipster\Layer.class
 com\oul\mHipster\MyMojo.class

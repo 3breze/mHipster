@@ -2,19 +2,28 @@ package com.oul.mHipster;
 
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TestGeneratorService {
 
     private Maconfig maconfig;
+
+    private Map<String, String> layerNamingConv = new HashMap<String, String>() {{
+        put("api", "Api");
+        put("dao", "Dao");
+        put("service", "Service");
+        put("service.impl", "ServiceImpl");
+        put("domain.dto.response", "ResponseDto");
+        put("domain.dto.request", "RequestDto");
+    }};
 
     public TestGeneratorService(Maconfig maconfig) {
         this.maconfig = maconfig;
@@ -29,21 +38,14 @@ public class TestGeneratorService {
                 try {
 //                    javaFile.writeTo(myFile);
                     javaFile.writeTo(System.out);
+                    System.out.println("------------------------");
+                    System.out.println();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
-
-//    public Class<T> getClassForType(String type){
-//        switch (type){
-//            case "String":
-//                return String.class;
-//                break;
-//        }
-//
-//    }
 
     private TypeSpec buildEntity(Entity entity) {
 
@@ -63,14 +65,26 @@ public class TestGeneratorService {
     }
 
     private List<JavaFile> layerItUp(TypeSpec entityClazz) {
+
         List<Layer> layers = maconfig.getLayers();
         List<JavaFile> javaFileList = new ArrayList<>();
         for (Layer layer : layers) {
             String packageName = String.join(".", maconfig.getGroupName(), maconfig.getArtifactName(), layer.getName());
-            javaFileList.add(JavaFile
-                    .builder(packageName, entityClazz)
-                    .indent("    ")
-                    .build());
+            if (layer.getName().equals("domain")) {
+                javaFileList.add(JavaFile
+                        .builder(packageName, entityClazz)
+                        .indent("    ")
+                        .build());
+            } else {
+                String name = String.join("", entityClazz.name, layerNamingConv.get(layer.getName()));
+                TypeSpec typeSpec = TypeSpec.classBuilder(name)
+                        .addModifiers(Modifier.PUBLIC)
+                        .build();
+                javaFileList.add(JavaFile
+                        .builder(packageName, typeSpec)
+                        .indent("    ")
+                        .build());
+            }
         }
         return javaFileList;
     }

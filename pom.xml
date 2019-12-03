@@ -68,8 +68,8 @@
                 <configuration>
                     <verbose>true</verbose>
                     <fork>true</fork>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>9</source>
+                    <target>9</target>
                 </configuration>
             </plugin>
         </plugins>
