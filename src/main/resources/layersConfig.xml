@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<layersConfig>
+    <layers>
+        <layer name="api">
+            <namingSuffix>Api</namingSuffix>
+            <type>concrete</type>
+        </layer>
+        <layer name="dao">
+            <namingSuffix>Dao</namingSuffix>
+            <type>interface</type>
+        </layer>
+        <layer name="service.impl">
+            <namingSuffix>ServiceImpl</namingSuffix>
+            <type>concrete</type>
+            <methods>
+                <method type="findAll">
+                    <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable) {
+                    </methodSig>
+                    <methodBody>
+                        Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
+                        return new PageImpl&lt;&gt;(
+                        page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,
+                        page.getTotalElements());
+                    </methodBody>
+                </method>
+                <method type="findById">
+                    <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
+                    <methodBody></methodBody>
+                </method>
+                <method type="save"></method>
+                <method type="update">
+                    <methodSig>public Boolean delete(Long id) {</methodSig>
+                    <methodBody></methodBody>
+                </method>
+                <method type="delete"></method>
+            </methods>
+        </layer>
+        <layer name="service">
+            <namingSuffix>Service</namingSuffix>
+            <type>interface</type>
+            <methods>
+                <method type="findAll">
+                    <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable);
+                    </methodSig>
+                </method>
+                <method type="findById"></method>
+                <method type="save"></method>
+                <method type="update"></method>
+                <method type="delete"></method>
+            </methods>
+        </layer>
+        <layer name="domain.dto.response">
+            <namingSuffix>ResponseDto</namingSuffix>
+            <type>concrete</type>
+        </layer>
+        <layer name="domain.dto.request">
+            <namingSuffix>RequestDto</namingSuffix>
+            <type>concrete</type>
+        </layer>
+        <layer name="domain">
+            <namingSuffix></namingSuffix>
+            <type>concrete</type>
+        </layer>
+    </layers>
+</layersConfig>

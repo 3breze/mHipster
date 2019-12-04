@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<maconfig type="full">
+    <groupName>com.oul</groupName>
+    <artifactName>projekto</artifactName>
+    <entities>
+        <entity name="Human">
+            <attribute type="Long">Id</attribute>
+            <attribute type="String">name</attribute>
+        </entity>
+        <entity name="Machine">
+            <attribute type="Long">Id</attribute>
+            <attribute type="String">codeName</attribute>
+            <attribute type="Long">numero</attribute>
+        </entity>
+    </entities>
+</maconfig>

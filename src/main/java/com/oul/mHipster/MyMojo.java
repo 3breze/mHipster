@@ -12,37 +12,29 @@ import java.io.File;
 @Mojo(name = "gen")
 public class MyMojo extends AbstractMojo {
 
-    public void execute() throws MojoExecutionException {
-        Maconfig maconfig = readConfig();
-        LayersConfig layersConfig = readLayersConfig();
+    //    private String maconfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml";
+    private String maconfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/maconfig.xml";
+    //    private String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\layersConfig.xml";
+    private String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
 
+    public void execute() throws MojoExecutionException {
+
+        Maconfig maconfig = null;
+        LayersConfig layersConfig = null;
+        try {
+            maconfig = readConfig(Maconfig.class);
+            layersConfig = readConfig(LayersConfig.class);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
         TestGeneratorService testGeneratorService = new TestGeneratorService(maconfig, layersConfig);
         testGeneratorService.build();
     }
 
-    private Maconfig readConfig() {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Maconfig.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\maconfig.xml");
-//          File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/maconfig.xml");
-            return (Maconfig) jaxbUnmarshaller.unmarshal(file);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return new Maconfig();
-    }
-
-    private LayersConfig readLayersConfig() {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(LayersConfig.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\layersConfig.xml");
-//          File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/layersConfig.xml");
-            return (LayersConfig) jaxbUnmarshaller.unmarshal(file);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return new LayersConfig();
+    private <T> T readConfig(Class<T> clazz) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        String pathname = clazz.equals(Maconfig.class) ? maconfig : layersConfig;
+        return (T) jaxbUnmarshaller.unmarshal(new File(pathname));
     }
 }
