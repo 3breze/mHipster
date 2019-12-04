@@ -2,16 +2,6 @@
 <maconfig type="full">
     <groupName>com.oul</groupName>
     <artifactName>projekto</artifactName>
-    <layers>
-        <layer>api</layer>
-        <layer>domain</layer>
-        <layer>domain.dto.request</layer>
-        <layer>domain.dto.response</layer>
-        <layer>service</layer>
-        <layer>service.impl</layer>
-        <layer>dao</layer>
-    </layers>
-
     <entities>
         <entity name="Human">
             <attribute type="Long">Id</attribute>

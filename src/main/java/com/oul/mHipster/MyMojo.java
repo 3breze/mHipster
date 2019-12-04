@@ -14,7 +14,9 @@ public class MyMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         Maconfig maconfig = readConfig();
-        TestGeneratorService testGeneratorService = new TestGeneratorService(maconfig);
+        LayersConfig layersConfig = readLayersConfig();
+
+        TestGeneratorService testGeneratorService = new TestGeneratorService(maconfig, layersConfig);
         testGeneratorService.build();
     }
 
@@ -29,5 +31,18 @@ public class MyMojo extends AbstractMojo {
             e.printStackTrace();
         }
         return new Maconfig();
+    }
+
+    private LayersConfig readLayersConfig() {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(LayersConfig.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            File file = new File("C:\\Users\\jovan\\Documents\\mi\\mHipster\\layersConfig.xml");
+//          File file = new File("/Users/mihajlo/Documents/best_in_class/mHipster/layersConfig.xml");
+            return (LayersConfig) jaxbUnmarshaller.unmarshal(file);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return new LayersConfig();
     }
 }

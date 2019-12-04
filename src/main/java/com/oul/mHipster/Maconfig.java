@@ -12,11 +12,6 @@ public class Maconfig {
     private String groupName;
     @XmlElement
     private String artifactName;
-
-    @XmlElementWrapper(name = "layers")
-    @XmlElement(name = "layer")
-    private List<Layer> layers;
-
     @XmlElementWrapper(name = "entities")
     @XmlElement(name = "entity")
     private List<Entity> entities = new ArrayList<>();
@@ -46,15 +41,6 @@ public class Maconfig {
     @XmlTransient
     public void setArtifactName(String artifactName) {
         this.artifactName = artifactName;
-    }
-
-    public List<Layer> getLayers() {
-        return layers;
-    }
-
-    @XmlTransient
-    public void setLayers(List<Layer> layers) {
-        this.layers = layers;
     }
 
     public List<Entity> getEntities() {

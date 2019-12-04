@@ -9,25 +9,16 @@ import javax.lang.model.element.Modifier;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TestGeneratorService {
 
     private Maconfig maconfig;
+    private LayersConfig layersConfig;
 
-    private Map<String, String> layerNamingConv = new HashMap<String, String>() {{
-        put("api", "Api");
-        put("dao", "Dao");
-        put("service", "Service");
-        put("service.impl", "ServiceImpl");
-        put("domain.dto.response", "ResponseDto");
-        put("domain.dto.request", "RequestDto");
-    }};
-
-    public TestGeneratorService(Maconfig maconfig) {
+    public TestGeneratorService(Maconfig maconfig, LayersConfig layersConfig) {
         this.maconfig = maconfig;
+        this.layersConfig = layersConfig;
     }
 
     public void build() {
@@ -36,14 +27,14 @@ public class TestGeneratorService {
             List<JavaFile> javaFileList = layerItUp(typeSpec);
             File myFile = new File("./src/main/java");
             for (JavaFile javaFile : javaFileList) {
-                try {
-//                    javaFile.writeTo(myFile);
-                    javaFile.writeTo(System.out);
-                    System.out.println("------------------------");
-                    System.out.println();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+////                    javaFile.writeTo(myFile);
+//                    javaFile.writeTo(System.out);
+//                    System.out.println("------------------------");
+//                    System.out.println();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
@@ -66,7 +57,7 @@ public class TestGeneratorService {
 
     private List<JavaFile> layerItUp(TypeSpec entityClazz) {
 
-        List<Layer> layers = maconfig.getLayers();
+        List<Layer> layers = layersConfig.getLayers();
         List<JavaFile> javaFileList = new ArrayList<>();
         for (Layer layer : layers) {
             String packageName = String.join(".", maconfig.getGroupName(), maconfig.getArtifactName(), layer.getName());
@@ -76,7 +67,14 @@ public class TestGeneratorService {
                         .indent("    ")
                         .build());
             } else {
-                String name = String.join("", entityClazz.name, layerNamingConv.get(layer.getName()));
+                String name = String.join("", entityClazz.name, layer.getNamingSuffix());
+                if (layer.getName().equals("service.impl")) {
+                    for (Method method : layer.getMethods()) {
+                        System.out.println(method.getType());
+                        System.out.println(method.getMethodSig());
+                        System.out.println(method.getMethodBody());
+                    }
+                }
                 TypeSpec typeSpec = TypeSpec.classBuilder(name)
                         .addModifiers(Modifier.PUBLIC)
                         .build();
@@ -89,7 +87,7 @@ public class TestGeneratorService {
         return javaFileList;
     }
 
-    void serviceBuilder(){
+    void serviceBuilder() {
         MethodSpec sumOfTen = MethodSpec
                 .methodBuilder("HumanServiceImpl")
                 .addStatement("find")
