@@ -17,15 +17,21 @@
                     <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable) {
                     </methodSig>
                     <methodBody>
-                        Page&lt;${domain}&gt; page = ${dao}.findAll(predicate, pageable);
+                        Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
                         page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,
                         page.getTotalElements());
                     </methodBody>
                 </method>
-                <method type="findById"></method>
+                <method type="findById">
+                    <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
+                    <methodBody></methodBody>
+                </method>
                 <method type="save"></method>
-                <method type="update"></method>
+                <method type="update">
+                    <methodSig>public Boolean delete(Long id) {</methodSig>
+                    <methodBody></methodBody>
+                </method>
                 <method type="delete"></method>
             </methods>
         </layer>
