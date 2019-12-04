@@ -23,15 +23,25 @@
                         page.getTotalElements());
                     </methodBody>
                 </method>
-                <method type="findBy"></method>
+                <method type="findById"></method>
                 <method type="save"></method>
-                <method type="delete"></method>
+                <method type="update"></method>
                 <method type="delete"></method>
             </methods>
         </layer>
         <layer name="service">
             <namingSuffix>Service</namingSuffix>
             <type>interface</type>
+            <methods>
+                <method type="findAll">
+                    <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable);
+                    </methodSig>
+                </method>
+                <method type="findById"></method>
+                <method type="save"></method>
+                <method type="update"></method>
+                <method type="delete"></method>
+            </methods>
         </layer>
         <layer name="domain.dto.response">
             <namingSuffix>ResponseDto</namingSuffix>
