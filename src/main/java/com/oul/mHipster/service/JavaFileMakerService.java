@@ -13,9 +13,9 @@ public class JavaFileMakerService {
         for (JavaFile javaFile : javaFileList) {
             try {
 //                javaFile.writeTo(myFile);
+                System.out.println("------------------------");
                 javaFile.writeTo(System.out);
                 System.out.println("------------------------");
-                System.out.println();
             } catch (IOException e) {
                 e.printStackTrace();
             }

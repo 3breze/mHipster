@@ -32,6 +32,8 @@ public class MyMojo extends AbstractMojo {
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+
+        String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), "domain");
         TestGeneratorService testGeneratorService = new TestGeneratorService(entityBuilderConfig, layersConfig);
         testGeneratorService.build();
     }

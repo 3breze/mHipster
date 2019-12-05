@@ -1,5 +1,7 @@
 package com.oul.mHipster;
 
+import com.oul.mHipster.domainApp.EntityBuilderConfig;
+
 import java.util.HashMap;
 
 public class Util {
@@ -15,6 +17,10 @@ public class Util {
 
     public static String getValue(String key) {
         return map.get(key);
+    }
+
+    public static void applyEntityConfig(EntityBuilderConfig entityBuilderConfig){
+        String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), "domain");
     }
 
     public static void add(String[][] pairs) {

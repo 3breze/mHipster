@@ -19,14 +19,16 @@ public class EntityBuilderServiceImpl {
     private JavaFileMakerService javaFileMakerService;
     private LayerGeneratorService layerGeneratorService;
 
-    public EntityBuilderServiceImpl(EntityBuilderConfig entityBuilderConfig, JavaFileMakerService javaFileMakerService) {
+    public EntityBuilderServiceImpl(EntityBuilderConfig entityBuilderConfig) {
         this.entityBuilderConfig = entityBuilderConfig;
-        this.javaFileMakerService = javaFileMakerService;
+        this.javaFileMakerService = new JavaFileMakerService();
     }
 
     public void buildEntity() {
         for (Entity entity : entityBuilderConfig.getEntities()) {
-            TypeSpec typeSpec = writeDomainClass(entity);
+            TypeSpec domainClass = writeDomainClass(entity);
+            TypeSpec dtoClass = writeDtoClass(entity);
+
 //            List<JavaFile> javaFileList = layerItUp(typeSpec);
 //            javaFileMakerService.makeJavaFiles(javaFileList);
         }
@@ -76,11 +78,5 @@ public class EntityBuilderServiceImpl {
                 .build();
     }
 
-    private MethodSpec buildGetter(Attribute attribute) {
-        String fieldName = attribute.getValue();
-        String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1).toLowerCase();
-        String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), "domain");
-        TypeName retType = ClassName.get(packageName, fieldName);
-        return MethodSpec.methodBuilder(getterName).returns(retType).build();
-    }
+
 }
