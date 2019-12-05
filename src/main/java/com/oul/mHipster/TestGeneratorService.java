@@ -1,9 +1,12 @@
 package com.oul.mHipster;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.oul.mHipster.domainApp.Attribute;
+import com.oul.mHipster.domainApp.Entity;
+import com.oul.mHipster.domainApp.EntityBuilderConfig;
+import com.oul.mHipster.domainConfig.Layer;
+import com.oul.mHipster.domainConfig.LayersConfig;
+import com.oul.mHipster.domainConfig.Method;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.io.File;
@@ -12,16 +15,16 @@ import java.util.List;
 
 public class TestGeneratorService {
 
-    private Maconfig maconfig;
+    private EntityBuilderConfig entityBuilderConfig;
     private LayersConfig layersConfig;
 
-    public TestGeneratorService(Maconfig maconfig, LayersConfig layersConfig) {
-        this.maconfig = maconfig;
+    public TestGeneratorService(EntityBuilderConfig entityBuilderConfig, LayersConfig layersConfig) {
+        this.entityBuilderConfig = entityBuilderConfig;
         this.layersConfig = layersConfig;
     }
 
     public void build() {
-        for (Entity entity : maconfig.getEntities()) {
+        for (Entity entity : entityBuilderConfig.getEntities()) {
             TypeSpec typeSpec = buildEntity(entity);
             List<JavaFile> javaFileList = layerItUp(typeSpec);
             File myFile = new File("./src/main/java");
@@ -59,7 +62,7 @@ public class TestGeneratorService {
         List<Layer> layers = layersConfig.getLayers();
         List<JavaFile> javaFileList = new ArrayList<>();
         for (Layer layer : layers) {
-            String packageName = String.join(".", maconfig.getGroupName(), maconfig.getArtifactName(), layer.getName());
+            String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), layer.getName());
             if (layer.getName().equals("domain")) {
                 javaFileList.add(JavaFile
                         .builder(packageName, entityClazz)
@@ -86,13 +89,4 @@ public class TestGeneratorService {
         return javaFileList;
     }
 
-    void serviceBuilder() {
-        MethodSpec sumOfTen = MethodSpec
-                .methodBuilder("HumanServiceImpl")
-                .addStatement("find")
-                .beginControlFlow("for (int i = 0; i <= 10; i++)")
-                .addStatement("sum += i")
-                .endControlFlow()
-                .build();
-    }
 }

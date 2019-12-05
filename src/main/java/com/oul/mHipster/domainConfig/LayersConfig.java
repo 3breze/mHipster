@@ -1,4 +1,4 @@
-package com.oul.mHipster;
+package com.oul.mHipster.domainConfig;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;

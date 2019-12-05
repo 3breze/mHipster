@@ -1,11 +1,11 @@
-package com.oul.mHipster;
+package com.oul.mHipster.domainApp;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
-public class Maconfig {
+public class EntityBuilderConfig {
 
     private String type;
     @XmlElement
