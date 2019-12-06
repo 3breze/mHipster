@@ -1,6 +1,7 @@
 package com.oul.mHipster.service;
 
-//import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.oul.mHipster.Util;
 import com.oul.mHipster.domain.TypeSpecWrapper;
 import com.oul.mHipster.domainApp.Attribute;
 import com.oul.mHipster.domainApp.Entity;
@@ -10,9 +11,9 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-//import lombok.Getter;
-//import lombok.NoArgsConstructor;
-//import lombok.Setter;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -78,18 +79,19 @@ public class EntityBuilderService {
             MethodSpec getterMethodSpec = poetHelperService.buildGetter(attribute);
             methodSpecList.add(getterMethodSpec);
         }
-//        AnnotationSpec jsonNonNullAnno = AnnotationSpec
-//                .builder(JsonInclude.class)
-//                .addMember("value", "JsonInclude.Include.NON_NULL")
-//                .build();
+        AnnotationSpec jsonNonNullAnno = AnnotationSpec
+                .builder(JsonInclude.class)
+                .addMember("value", "JsonInclude.Include.NON_NULL")
+                .build();
+        String suffix = Util.getValue("domain.dto.request");
+        String name = String.join("", entity.getName(), suffix);
         return TypeSpec
-                .classBuilder(entity.getName())
+                .classBuilder(name)
                 .addModifiers(Modifier.PUBLIC)
-//                .addAnnotation(jsonNonNullAnno)
+                .addAnnotation(jsonNonNullAnno)
                 .addFields(fieldSpecList)
                 .addMethods(methodSpecList)
                 .build();
     }
-
 
 }
