@@ -2,6 +2,7 @@ package com.oul.mHipster;
 
 import com.oul.mHipster.domainApp.EntityBuilderConfig;
 import com.oul.mHipster.domainConfig.LayersConfig;
+import com.oul.mHipster.service.EntityBuilderService;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -14,15 +15,12 @@ import java.io.File;
 @Mojo(name = "gen")
 public class MyMojo extends AbstractMojo {
 
-    private String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entityBuilderConfig.xml";
-    //    private String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entityBuilderConfig.xml";
-    private String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
-    //    private String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
+    //    private String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entityBuilderConfig.xml";
+    private String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entityBuilderConfig.xml";
+    //    private String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
+    private String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
 
     public void execute() throws MojoExecutionException {
-
-        String[][] arg = {{"key", "value"}, {"key", "value"}, {"key", "value"}};
-        Util.add(arg);
 
         EntityBuilderConfig entityBuilderConfig = null;
         LayersConfig layersConfig = null;
@@ -33,9 +31,10 @@ public class MyMojo extends AbstractMojo {
             e.printStackTrace();
         }
 
-        String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), "domain");
-        TestGeneratorService testGeneratorService = new TestGeneratorService(entityBuilderConfig, layersConfig);
-        testGeneratorService.build();
+        Util.applyLayersConfig(entityBuilderConfig, layersConfig);
+
+        EntityBuilderService entityBuilderService = new EntityBuilderService(entityBuilderConfig, layersConfig);
+        entityBuilderService.buildEntity();
     }
 
     private <T> T readConfig(Class<T> clazz) throws JAXBException {

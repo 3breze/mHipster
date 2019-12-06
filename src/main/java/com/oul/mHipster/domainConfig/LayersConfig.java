@@ -1,18 +1,26 @@
 package com.oul.mHipster.domainConfig;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
 public class LayersConfig {
 
+    private LombokSettings lombokSettings;
+
     @XmlElementWrapper(name = "layers")
     @XmlElement(name = "layer")
     private List<Layer> layers = new ArrayList<>();
+
+    public LombokSettings getLombokSettings() {
+        return lombokSettings;
+    }
+
+    @XmlTransient
+    public void setLombokSettings(LombokSettings lombokSettings) {
+        this.lombokSettings = lombokSettings;
+    }
 
     public List<Layer> getLayers() {
         return layers;

@@ -16,11 +16,11 @@ public class Layer {
     @XmlElement(name = "method")
     private List<Method> methods = new ArrayList<>();
 
-    @XmlAttribute
     public String getName() {
         return name;
     }
 
+    @XmlAttribute
     public void setName(String name) {
         this.name = name;
     }
