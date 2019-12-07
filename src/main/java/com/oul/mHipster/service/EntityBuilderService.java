@@ -7,13 +7,7 @@ import com.oul.mHipster.domainApp.Attribute;
 import com.oul.mHipster.domainApp.Entity;
 import com.oul.mHipster.domainApp.EntityBuilderConfig;
 import com.oul.mHipster.domainConfig.LayersConfig;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -54,7 +48,7 @@ public class EntityBuilderService {
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         for (Attribute attribute : entity.getAttributes()) {
             fieldSpecList.add(FieldSpec
-                    .builder(String.class, attribute.getValue())
+                    .builder(ClassName.bestGuess(attribute.getType()), attribute.getValue())
                     .addModifiers(Modifier.PRIVATE)
                     .build());
         }
@@ -73,7 +67,7 @@ public class EntityBuilderService {
         List<MethodSpec> methodSpecList = new ArrayList<>();
         for (Attribute attribute : entity.getAttributes()) {
             fieldSpecList.add(FieldSpec
-                    .builder(String.class, attribute.getValue())
+                    .builder(ClassName.bestGuess(attribute.getType()), attribute.getValue())
                     .addModifiers(Modifier.PRIVATE)
                     .build());
             MethodSpec getterMethodSpec = poetHelperService.buildGetter(attribute);
@@ -83,7 +77,7 @@ public class EntityBuilderService {
                 .builder(JsonInclude.class)
                 .addMember("value", "JsonInclude.Include.NON_NULL")
                 .build();
-        String suffix = Util.getValue("domain.dto.request");
+        String suffix = "RequestDto";
         String name = String.join("", entity.getName(), suffix);
         return TypeSpec
                 .classBuilder(name)
@@ -93,5 +87,6 @@ public class EntityBuilderService {
                 .addMethods(methodSpecList)
                 .build();
     }
+
 
 }
