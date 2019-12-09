@@ -1,7 +1,7 @@
 package com.oul.mHipster.service;
 
 import com.oul.mHipster.Util;
-import com.oul.mHipster.domain.TypeSpecWrapper;
+import com.oul.mHipster.domain.EntityModel;
 import com.squareup.javapoet.JavaFile;
 
 import java.io.File;
@@ -11,13 +11,13 @@ import java.util.List;
 
 public class JavaFileMakerService {
 
-    public void makeJavaFiles(List<TypeSpecWrapper> typeSpecWrapperList) {
+    public void makeJavaFiles(List<EntityModel> entityModelList) {
 
         List<JavaFile> javaFileList = new ArrayList<>();
-        for (TypeSpecWrapper typeSpecWrapper : typeSpecWrapperList) {
-            String packageName = Util.getValue(typeSpecWrapper.getLayer());
+        for (EntityModel entityModel : entityModelList) {
+            String packageName = Util.getValue(entityModel.getLayer());
             javaFileList.add(JavaFile
-                    .builder(packageName, typeSpecWrapper.getTypeSpec())
+                    .builder(packageName, entityModel.getTypeSpec())
                     .indent("    ")
                     .build());
         }

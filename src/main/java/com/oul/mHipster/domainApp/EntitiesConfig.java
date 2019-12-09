@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
-public class EntityBuilderConfig {
+public class EntitiesConfig {
 
     private String type;
     @XmlElement

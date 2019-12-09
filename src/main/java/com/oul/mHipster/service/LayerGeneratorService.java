@@ -1,6 +1,6 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.domain.TypeSpecWrapper;
+import com.oul.mHipster.domain.EntityModel;
 import com.oul.mHipster.domainApp.Entity;
 import com.oul.mHipster.domainConfig.Layer;
 import com.oul.mHipster.domainConfig.LayersConfig;
@@ -19,10 +19,10 @@ public class LayerGeneratorService {
         this.layersConfig = layersConfig;
     }
 
-    public List<TypeSpecWrapper> generateLayers(Entity entity) {
+    public List<EntityModel> generateLayers(Entity entity) {
 
         List<Layer> layers = layersConfig.getLayers();
-        List<TypeSpecWrapper> typeSpecWrapperList = new ArrayList<>();
+        List<EntityModel> entityModelList = new ArrayList<>();
         for (Layer layer : layers) {
             if (!layer.getName().contains("domain")) {
                 String name = String.join("", entity.getName(), layer.getNamingSuffix());
@@ -33,11 +33,11 @@ public class LayerGeneratorService {
                         System.out.println(method.getMethodBody());
                     }
                 }
-                typeSpecWrapperList.add(new TypeSpecWrapper(TypeSpec.classBuilder(name)
+                entityModelList.add(new EntityModel(TypeSpec.classBuilder(name)
                         .addModifiers(Modifier.PUBLIC)
                         .build(), layer.getName()));
             }
         }
-        return typeSpecWrapperList;
+        return entityModelList;
     }
 }

@@ -1,6 +1,6 @@
 package com.oul.mHipster;
 
-import com.oul.mHipster.domainApp.EntityBuilderConfig;
+import com.oul.mHipster.domainApp.EntitiesConfig;
 import com.oul.mHipster.domainConfig.Layer;
 import com.oul.mHipster.domainConfig.LayersConfig;
 
@@ -21,9 +21,9 @@ public class Util {
         return map.get(key);
     }
 
-    public static void applyLayersConfig(EntityBuilderConfig entityBuilderConfig, LayersConfig layersConfig){
-        for(Layer layer:layersConfig.getLayers()){
-            String packageName = String.join(".", entityBuilderConfig.getGroupName(), entityBuilderConfig.getArtifactName(), layer.getName());
+    public static void applyLayersConfig(EntitiesConfig entitiesConfig, LayersConfig layersConfig) {
+        for (Layer layer : layersConfig.getLayers()) {
+            String packageName = String.join(".", entitiesConfig.getGroupName(), entitiesConfig.getArtifactName(), layer.getName());
             map.put(layer.getName(), packageName);
         }
     }
