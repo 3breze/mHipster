@@ -1,7 +1,9 @@
 package com.oul.mHipster.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.oul.mHipster.Util;
 import com.oul.mHipster.domain.EntityModel;
+import com.oul.mHipster.domain.LayerName;
 import com.oul.mHipster.domainApp.Attribute;
 import com.oul.mHipster.domainApp.EntitiesConfig;
 import com.oul.mHipster.domainApp.Entity;
@@ -19,7 +21,6 @@ public class EntityBuilderService {
     private EntitiesConfig entitiesConfig;
     private PoetHelperService poetHelperService;
     private JavaFileMakerService javaFileMakerService;
-    private LayerGeneratorService layerGeneratorService;
     private LayersConfig layersConfig;
     private final GenerateLayerStrategyFactory generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
 
@@ -27,15 +28,10 @@ public class EntityBuilderService {
         this.entitiesConfig = entitiesConfig;
         this.layersConfig = layersConfig;
         this.poetHelperService = new PoetHelperService();
-        this.layerGeneratorService = new LayerGeneratorService(layersConfig);
         this.javaFileMakerService = new JavaFileMakerService();
     }
 
     public void buildEntityModel() {
-
-        //Kreiranje Liste EntityModela
-        // sibanje jedno po jednog u loop po layerima koji se pusta u Factory
-        //strategije su formata writeDomainClass
 
         Layer dtoResponseLayer = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("domain.dto.response")).findAny().orElse(null);
         Layer dtoRequestLayer = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("domain.dto.request")).findAny().orElse(null);
@@ -47,17 +43,20 @@ public class EntityBuilderService {
                         .build())
                 .collect(Collectors.toList());
 
-        entityModelList.forEach(entityModel -> layersConfig.getLayers().forEach(layer -> generateLayerStrategyFactory.getLayerStrategy(layer.getName(), entityModel)));
-        for (Entity entity : entitiesConfig.getEntities()) {
-            entityModelList.addAll(layerGeneratorService.generateLayers(entity));
-            javaFileMakerService.makeJavaFiles(entityModelList);
-        }
+        entityModelList.forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
+            GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
+            TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
+            //posto strategija resava packagename, moram da vratim i packagename, jer nmg da ga izvucem iz TypeSpeca
+            //wrapper oko typespec ili izvuci iz typepec, ili izmestiti packageName build u 39
+            entityModel.setTypeSpec(typeSpec);
+        }));
 
+        javaFileMakerService.makeJavaFiles(entityModelList);
     }
 
 
     private TypeSpec writeDomainClass(Entity entity) {
-
+        String packageName = Util.getValue(entityModel.getLayer());
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         for (Attribute attribute : entity.getAttributes()) {
             fieldSpecList.add(FieldSpec

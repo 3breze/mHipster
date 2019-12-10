@@ -8,30 +8,27 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JavaFileMakerService {
 
     public void makeJavaFiles(List<EntityModel> entityModelList) {
 
-        List<JavaFile> javaFileList = new ArrayList<>();
-        for (EntityModel entityModel : entityModelList) {
-            String packageName = Util.getValue(entityModel.getLayer());
-            javaFileList.add(JavaFile
-                    .builder(packageName, entityModel.getTypeSpec())
-                    .indent("    ")
-                    .build());
-        }
+        List<JavaFile> javaFileList = entityModelList.stream().map(entityModel -> JavaFile
+                .builder(entityModel.getPackageName(), entityModel.getTypeSpec())
+                .indent("    ")
+                .build()).collect(Collectors.toList());
 
-        File myFile = new File("./src/main/java");
-        for (JavaFile javaFile : javaFileList) {
+//        File myFile = new File("./src/main/java");
+
+        javaFileList.forEach(javaFile -> {
             try {
 //                javaFile.writeTo(myFile);
                 System.out.println("------------------------");
                 javaFile.writeTo(System.out);
-                System.out.println("------------------------");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        });
     }
 }
