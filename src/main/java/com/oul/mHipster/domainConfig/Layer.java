@@ -9,6 +9,8 @@ public class Layer {
 
     private String name;
     @XmlElement
+    private String packageName;
+    @XmlElement
     private String namingSuffix;
     @XmlElement
     private String type;
@@ -18,6 +20,15 @@ public class Layer {
 
     public String getName() {
         return name;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    @XmlTransient
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     @XmlAttribute

@@ -3,15 +3,18 @@
     <lombokSettings active="false">
     </lombokSettings>
     <layers>
-        <layer name="api">
+        <layer name="API">
+            <packageName>api</packageName>
             <namingSuffix>Api</namingSuffix>
             <type>concrete</type>
         </layer>
-        <layer name="dao">
+        <layer name="DAO">
+            <packageName>dao</packageName>
             <namingSuffix>Dao</namingSuffix>
             <type>interface</type>
         </layer>
-        <layer name="service.impl">
+        <layer name="SERVICE_IMPL">
+            <packageName>service.impl</packageName>
             <namingSuffix>ServiceImpl</namingSuffix>
             <type>concrete</type>
             <methods>
@@ -37,7 +40,8 @@
                 <method type="delete"></method>
             </methods>
         </layer>
-        <layer name="service">
+        <layer name="SERVICE">
+            <packageName>service</packageName>
             <namingSuffix>Service</namingSuffix>
             <type>interface</type>
             <methods>
@@ -51,15 +55,18 @@
                 <method type="delete"></method>
             </methods>
         </layer>
-        <layer name="domain.dto.response">
+        <layer name="RESPONSE_DTO">
+            <packageName>domain.dto.response</packageName>
             <namingSuffix>ResponseDto</namingSuffix>
             <type>concrete</type>
         </layer>
-        <layer name="domain.dto.request">
+        <layer name="REQUEST_DTO">
+            <packageName>domain.dto.request</packageName>
             <namingSuffix>RequestDto</namingSuffix>
             <type>concrete</type>
         </layer>
-        <layer name="domain">
+        <layer name="DOMAIN">
+            <packageName>domain</packageName>
             <namingSuffix></namingSuffix>
             <type>concrete</type>
         </layer>

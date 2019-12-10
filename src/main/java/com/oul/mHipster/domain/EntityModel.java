@@ -86,6 +86,10 @@ public class EntityModel {
         this.packageName = packageName;
     }
 
+    public static EntityModelBuilder builder() {
+        return new EntityModelBuilder();
+    }
+
     public static class EntityModelBuilder {
         private String className;
         private String instanceName;
@@ -97,8 +101,21 @@ public class EntityModel {
         private String layer;
         private String packageName;
 
-        public EntityModelBuilder className(String className) {
+        public EntityModelBuilder classAndInstanceName(String className) {
             this.className = className;
+            this.instanceName = className.substring(0, 1).toUpperCase() + className.substring(1);
+            return this;
+        }
+
+        public EntityModelBuilder requestClassAndInstanceName(String namingSuffix) {
+            this.requestDtoClassName = String.join("", className, namingSuffix);
+            this.requestDtoInstanceName = requestDtoClassName.substring(0, 1).toUpperCase() + requestDtoClassName.substring(1);
+            return this;
+        }
+
+        public EntityModelBuilder responseClassAndInstanceName(String namingSuffix) {
+            this.responseDtoClassName = String.join("", className, namingSuffix);
+            this.responseDtoInstanceName = responseDtoClassName.substring(0, 1).toUpperCase() + responseDtoClassName.substring(1);
             return this;
         }
 

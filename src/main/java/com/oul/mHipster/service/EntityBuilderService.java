@@ -3,8 +3,9 @@ package com.oul.mHipster.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.oul.mHipster.domain.EntityModel;
 import com.oul.mHipster.domainApp.Attribute;
-import com.oul.mHipster.domainApp.Entity;
 import com.oul.mHipster.domainApp.EntitiesConfig;
+import com.oul.mHipster.domainApp.Entity;
+import com.oul.mHipster.domainConfig.Layer;
 import com.oul.mHipster.domainConfig.LayersConfig;
 import com.squareup.javapoet.*;
 
@@ -20,6 +21,7 @@ public class EntityBuilderService {
     private JavaFileMakerService javaFileMakerService;
     private LayerGeneratorService layerGeneratorService;
     private LayersConfig layersConfig;
+    private final GenerateLayerStrategyFactory generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
 
     public EntityBuilderService(EntitiesConfig entitiesConfig, LayersConfig layersConfig) {
         this.entitiesConfig = entitiesConfig;
@@ -29,27 +31,24 @@ public class EntityBuilderService {
         this.javaFileMakerService = new JavaFileMakerService();
     }
 
-    public void buildEntity() {
+    public void buildEntityModel() {
 
         //Kreiranje Liste EntityModela
         // sibanje jedno po jednog u loop po layerima koji se pusta u Factory
         //strategije su formata writeDomainClass
 
-        List<EntityModel> entityModelList = entitiesConfig.getEntities().stream().map(entity -> {
-            EntityModel entityModel = new EntityModel();
-            entityModel.setClassName(entity.getName());
-            String fieldName = entity.getName();
+        Layer dtoResponseLayer = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("domain.dto.response")).findAny().orElse(null);
+        Layer dtoRequestLayer = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("domain.dto.request")).findAny().orElse(null);
 
-            fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-            entityModel.setInstanceName(entity.getName());
-        }).collect(Collectors.toList());
+        List<EntityModel> entityModelList = entitiesConfig.getEntities().stream().map(entity ->
+                new EntityModel.EntityModelBuilder().classAndInstanceName(entity.getName())
+                        .requestClassAndInstanceName(dtoRequestLayer.getNamingSuffix())
+                        .responseClassAndInstanceName(dtoResponseLayer.getNamingSuffix())
+                        .build())
+                .collect(Collectors.toList());
 
-        List<EntityModel> entityModelList = new ArrayList<>();
+        entityModelList.forEach(entityModel -> layersConfig.getLayers().forEach(layer -> generateLayerStrategyFactory.getLayerStrategy(layer.getName(), entityModel)));
         for (Entity entity : entitiesConfig.getEntities()) {
-            TypeSpec domainClass = writeDomainClass(entity);
-            TypeSpec dtoClass = writeDtoClass(entity);
-            entityModelList.add(new EntityModel(domainClass, "domain"));
-            entityModelList.add(new EntityModel(dtoClass, "domain.dto.request"));
             entityModelList.addAll(layerGeneratorService.generateLayers(entity));
             javaFileMakerService.makeJavaFiles(entityModelList);
         }

@@ -34,7 +34,7 @@ public class MyMojo extends AbstractMojo {
         Util.applyLayersConfig(entitiesConfig, layersConfig);
 
         EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
-        entityBuilderService.buildEntity();
+        entityBuilderService.buildEntityModel();
     }
 
     private <T> T readConfig(Class<T> clazz) throws JAXBException {
