@@ -25,19 +25,21 @@
                         Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
                         page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,
-                        page.getTotalElements());
+                        page.getTotalElements());}
                     </methodBody>
                 </method>
                 <method type="findById">
                     <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
-                    <methodBody></methodBody>
                 </method>
-                <method type="save"></method>
+                <method type="save">
+                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request}){</methodSig>
+                </method>
                 <method type="update">
-                    <methodSig>public Boolean delete(Long id) {</methodSig>
-                    <methodBody></methodBody>
+                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request}){</methodSig>
                 </method>
-                <method type="delete"></method>
+                <method type="delete">
+                    <methodSig>public Boolean delete(Long id) {</methodSig>
+                </method>
             </methods>
         </layer>
         <layer name="SERVICE">
@@ -49,10 +51,18 @@
                     <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable);
                     </methodSig>
                 </method>
-                <method type="findById"></method>
-                <method type="save"></method>
-                <method type="update"></method>
-                <method type="delete"></method>
+                <method type="findById">
+                    <methodSig>public ${responseClazz} findById(Long id);</methodSig>
+                </method>
+                <method type="save">
+                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request});</methodSig>
+                </method>
+                <method type="update">
+                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request});</methodSig>
+                </method>
+                <method type="delete">
+                    <methodSig>public Boolean delete(Long id);</methodSig>
+                </method>
             </methods>
         </layer>
         <layer name="RESPONSE_DTO">
