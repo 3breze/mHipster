@@ -1,5 +1,6 @@
 package com.oul.mHipster.domain;
 
+import com.oul.mHipster.domainApp.Entity;
 import com.squareup.javapoet.TypeSpec;
 
 public class EntityModel {
@@ -13,6 +14,7 @@ public class EntityModel {
     private TypeSpec typeSpec;
     private String layer;
     private String packageName;
+    private Entity entity;
 
     public String getClassName() {
         return className;
@@ -86,6 +88,14 @@ public class EntityModel {
         this.packageName = packageName;
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
     public static EntityModelBuilder builder() {
         return new EntityModelBuilder();
     }
@@ -100,6 +110,7 @@ public class EntityModel {
         private TypeSpec typeSpec;
         private String layer;
         private String packageName;
+        private Entity entity;
 
         public EntityModelBuilder classAndInstanceName(String className) {
             this.className = className;
@@ -119,6 +130,16 @@ public class EntityModel {
             return this;
         }
 
+        public EntityModelBuilder packageName(String packageName) {
+            this.packageName = packageName;
+            return this;
+        }
+
+        public EntityModelBuilder entity(Entity entity) {
+            this.entity = entity;
+            return this;
+        }
+
         public EntityModel build() {
             EntityModel entityModel = new EntityModel();
             entityModel.setClassName(className);
@@ -130,6 +151,7 @@ public class EntityModel {
             entityModel.setTypeSpec(typeSpec);
             entityModel.setLayer(layer);
             entityModel.setPackageName(packageName);
+            entityModel.setEntity(entity);
             return entityModel;
         }
     }
