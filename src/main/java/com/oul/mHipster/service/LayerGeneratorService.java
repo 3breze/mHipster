@@ -5,6 +5,7 @@ import com.oul.mHipster.domainApp.Entity;
 import com.oul.mHipster.domainConfig.Layer;
 import com.oul.mHipster.domainConfig.LayersConfig;
 import com.oul.mHipster.domainConfig.Method;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
@@ -31,11 +32,12 @@ public class LayerGeneratorService {
                         System.out.println(method.getType());
                         System.out.println(method.getMethodSig());
                         System.out.println(method.getMethodBody());
+//                        MethodSpec methodSpec = MethodSpec
+//                                .methodBuilder("sta")
+//                                .add
                     }
                 }
-                entityModelList.add(new EntityModel(TypeSpec.classBuilder(name)
-                        .addModifiers(Modifier.PUBLIC)
-                        .build(), layer.getName()));
+
             }
         }
         return entityModelList;

@@ -30,12 +30,19 @@
                 </method>
                 <method type="findById">
                     <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
+                    <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
+                        if (${optional}.isEmpty()) {
+                        throw new ResourceNotFoundException("${domainClazz} not found!");
+                        }
+                        ${domainClazz} ${domain} = ${optional}.get();
+                        return new ${responseClazz}(${domain});
+                    </methodBody>
                 </method>
                 <method type="save">
-                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request}){</methodSig>
+                    <methodSig>public ${responseClazz} save(${requestClazz} ${request}){</methodSig>
                 </method>
                 <method type="update">
-                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request}){</methodSig>
+                    <methodSig>public ${responseClazz} update(${requestClazz} ${request}){</methodSig>
                 </method>
                 <method type="delete">
                     <methodSig>public Boolean delete(Long id) {</methodSig>
@@ -55,10 +62,10 @@
                     <methodSig>public ${responseClazz} findById(Long id);</methodSig>
                 </method>
                 <method type="save">
-                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request});</methodSig>
+                    <methodSig>public ${responseClazz} save(${requestClazz} ${request});</methodSig>
                 </method>
                 <method type="update">
-                    <methodSig>public CustomerResponseDto save(${requestClazz} ${request});</methodSig>
+                    <methodSig>public ${responseClazz} update(${requestClazz} ${request});</methodSig>
                 </method>
                 <method type="delete">
                     <methodSig>public Boolean delete(Long id);</methodSig>
