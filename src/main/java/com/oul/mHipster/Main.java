@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class Main {
@@ -23,6 +23,8 @@ public class Main {
         typeToValue.put("Long", "id");
 
         TypeName domainClass = ClassName.get("com.whatever.domain", "Customer");
+
+        TypeName requestDtoClass = ClassName.get("com.whatever.domain.request", "CustomerRequestDto");
 
         TypeName responseDtoClass = ClassName.get("com.whatever.domain.response", "CustomerResponseDto");
 
@@ -39,25 +41,31 @@ public class Main {
 
 
         CodeBlock throwException = CodeBlock.builder()
-                .addStatement("Optional<$T> $L = $L.findById(id);",domainClass,map.get("optional"), map.get("dao"))
+                .addStatement("Optional<$T> $L = $L.findById(id)", domainClass, map.get("optional"), map.get("dao"))
                 .beginControlFlow("if ($L.isEmpty())", map.get("optional"))
-                .addStatement("throw new $T($S$T)", resourceNotFoundClass, "not found!", resourceNotFoundClass)
+                .addStatement("throw new $T(\"$T $L\")", resourceNotFoundClass, resourceNotFoundClass, "not found!")
                 .endControlFlow()
+                .addStatement("$T $L = $L.get()", domainClass, map.get("domain"), map.get("optional"))
                 .build();
         String throwExceptionInject = throwException.toString();
 
 
         StringBuffer sb1 = new StringBuffer();
         typeToValue.values().forEach(e -> sb1.append(".").append(e).append("(customerRequestDto.get")
-                .append(e.substring(0, 1).toUpperCase()).append(e.substring(1)).append(").build();"));
+                .append(e.substring(0, 1).toUpperCase()).append(e.substring(1)).append("())"));
         CodeBlock lombokBuilder = CodeBlock.builder()
-                .addStatement("$T.builder()$L", domainClass, sb1.toString())
+                .addStatement("$T $L = $T.builder()$L.build()", domainClass, "customer", domainClass, sb1.toString())
                 .build();
         String lombokInject = lombokBuilder.toString();
 
         map.put("builderInject", lombokInject);
-        map.put("findByIdInject", throwExceptionInject);
+//        map.put("findByIdInject", throwExceptionInject);
+        map.put("findByIdInject", "xxx");
 
+//        CodeBlock.builder()
+//                .addStatement("$T.builder()", domainClass)
+//                .addStatement(".$L($L.get$L)")
+//                .build();
 
         String regex = "\\$\\{(.*?)}";
 
@@ -66,14 +74,10 @@ public class Main {
 //                "                        page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,\n" +
 //                "                        page.getTotalElements())";
 
-        String methodBody = "Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);\n" +
-                "                        if (${optional}.isEmpty()) {\n" +
-                "                        throw new ResourceNotFoundException(\"${domainClazz} not found!\");\n" +
-                "                        }\n" +
-                "                        ${domainClazz} ${domain} = ${optional}.get();\n" +
-                "                        ${builderInject}\n" +
-                "                        ${dao}.save(${domain})\n" +
-                "                        return new ${responseClazz}(${domain})";
+        String methodBody = "${findByIdInject}\n" +
+                "${builderInject}\n" +
+                "${dao}.save(${domain})\n" +
+                "return new ${responseClazz}(${domain})";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(methodBody);
@@ -88,60 +92,68 @@ public class Main {
         String codeBlock1 = codeBlock.replaceAll("&lt;", "<");
         String codeBlock2 = codeBlock1.replaceAll("&gt;", ">");
 
+        // Dao za klasu i m2m i m2o domain service
+        List<ParameterSpec> parameterSpecsList = typeToValue.entrySet().stream().map(entry -> ParameterSpec
+                .builder(ClassName.bestGuess(entry.getKey()), entry.getValue())
+                .build()).collect(Collectors.toList());
 
-        List<ParameterSpec> parameterSpecsList = new ArrayList<>();
-        for (Map.Entry<String, String> entry : typeToValue.entrySet()) {
-            parameterSpecsList.add(ParameterSpec
-                    .builder(ClassName.bestGuess(entry.getKey()), entry.getValue())
-                    .build());
-
-
-            // u zavisnosti od m2m i m2o veza
-            // treba da autowire service drugih entita a ne dao
-            FieldSpec customerDao = FieldSpec
-                    .builder(ClassName.get("com.whatever.dao", "CustomerDao"), "customerDao")
-                    .addModifiers(Modifier.PRIVATE)
-                    .addAnnotation(Autowired.class)
-                    .build();
-
-            TypeName requestDtoClass = ClassName.get("com.whatever.domain.request", "CustomerRequestDto");
-            ParameterSpec param = ParameterSpec
-                    .builder(requestDtoClass,
-                            "customerRequestDto")
-                    .build();
+        // u zavisnosti od m2m i m2o veza
+        // treba da autowire service drugih entita a ne dao
+        FieldSpec customerDao = FieldSpec
+                .builder(ClassName.get("com.whatever.dao", "CustomerDao"), "customerDao")
+                .addModifiers(Modifier.PRIVATE)
+                .build();
 
 
-            MethodSpec constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).addParameters(parameterSpecsList).build();
+        ParameterSpec param = ParameterSpec
+                .builder(requestDtoClass,
+                        "customerRequestDto")
+                .build();
+
+        CodeBlock.Builder builder = CodeBlock.builder();
+        typeToValue.values().forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+//        CodeBlock.of("$T $L = $T.builder()$L.build()",domainClass, "customer",domainClass, );
 
 
-            TypeSpec serviceClass = TypeSpec
-                    .classBuilder("CustomerServiceImpl")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(Service.class)
-                    .addField(customerDao)
-                    .addMethod(constructor)
-                    .addMethod(MethodSpec
-                            .methodBuilder("save")
-                            .addModifiers(Modifier.PUBLIC)
-                            .addAnnotation(Override.class)
-                            .addParameter(param)
-                            .addStatement(codeBlock2)
-                            .returns(responseDtoClass)
-                            .build())
-                    .build();
-
-            JavaFile javaFile = JavaFile
-                    .builder("lol.kek", serviceClass)
-                    .indent("    ")
-                    .build();
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                .addAnnotation(Autowired.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameters(parameterSpecsList)
+                .addCode(builder.build())
+                .build();
 
 
-            try {
-                javaFile.writeTo(System.out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        TypeSpec serviceClass = TypeSpec
+                .classBuilder("CustomerServiceImpl")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Service.class)
+                .addField(customerDao)
+                .addMethod(constructor)
+                .addMethod(MethodSpec
+                        .methodBuilder("save")
+                        .addCode(throwException)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .addParameter(param)
+                        .addStatement(codeBlock2)
+                        .returns(responseDtoClass)
+                        .build())
+                .build();
 
+        JavaFile javaFile = JavaFile
+                .builder("lol.kek", serviceClass)
+                .indent("    ")
+                .build();
+
+        try {
+            javaFile.writeTo(System.out);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 }
