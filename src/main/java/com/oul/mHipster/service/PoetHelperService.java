@@ -15,4 +15,8 @@ public class PoetHelperService {
         return MethodSpec.methodBuilder(getterName).returns(ClassName.bestGuess(attribute.getType())).addModifiers(Modifier.PUBLIC).build();
     }
 
+    public String buildGetterName(String field){
+        return "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
+    }
+
 }

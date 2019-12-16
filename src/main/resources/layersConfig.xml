@@ -25,24 +25,32 @@
                         Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
                         page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,
-                        page.getTotalElements());}
+                        page.getTotalElements())
                     </methodBody>
                 </method>
                 <method type="findById">
                     <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
-                    <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
-                        if (${optional}.isEmpty()) {
-                        throw new ResourceNotFoundException("${domainClazz} not found!");
-                        }
-                        ${domainClazz} ${domain} = ${optional}.get();
-                        return new ${responseClazz}(${domain});
+                    <methodBody>${findByIdInject}
+                        ${builderInject}
+                        ${dao}.save(${domain})
+                        return new ${responseClazz}(${domain})
                     </methodBody>
                 </method>
                 <method type="save">
                     <methodSig>public ${responseClazz} save(${requestClazz} ${request}){</methodSig>
+                    <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
+                        if (${optional}.isEmpty()) {
+                        throw new ResourceNotFoundException("${domainClazz} not found!");
+                        }
+                        ${domainClazz} ${domain} = ${optional}.get();</methodBody>
                 </method>
                 <method type="update">
                     <methodSig>public ${responseClazz} update(${requestClazz} ${request}){</methodSig>
+                    <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
+                        if (${optional}.isEmpty()) {
+                        throw new ResourceNotFoundException("${domainClazz} not found!");
+                        }
+                        ${domainClazz} ${domain} = ${optional}.get();</methodBody>
                 </method>
                 <method type="delete">
                     <methodSig>public Boolean delete(Long id) {</methodSig>
