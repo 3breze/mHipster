@@ -51,7 +51,6 @@ public class Main {
 
         // LOMBOK BUILDER
         StringBuffer builderStingBuffer = new StringBuffer();
-
         typeToValue.values().forEach(e -> builderStingBuffer.append(".").append(e).append("(customerRequestDto.get")
                 .append(e.substring(0, 1).toUpperCase()).append(e.substring(1)).append("())"));
         CodeBlock lombokBuilder = CodeBlock.builder()
@@ -62,7 +61,6 @@ public class Main {
         map.put("builderInject", "xox");
         map.put("findByIdInject", "xxx");
 
-        String regex = "\\$\\{(.*?)}";
 
 //        String methodBody = "Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);\n" +
 //                "                        return new PageImpl&lt;&gt;(\n" +
@@ -74,6 +72,7 @@ public class Main {
                 "${dao}.save(${domain})\n" +
                 "return new ${responseClazz}(${domain})";
 
+        String regex = "\\$\\{(.*?)}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(methodBody);
         StringBuffer sb = new StringBuffer();
@@ -107,6 +106,16 @@ public class Main {
 
         CodeBlock.Builder builder = CodeBlock.builder();
         typeToValue.values().forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
+
+        // Jos jedna ex
+//        MethodSpec.Builder payloadInterpreterMethod = MethodSpec.methodBuilder("payloadInterpreter")
+//                .addModifiers(Modifier.PRIVATE)
+//                .addModifiers(Modifier.STATIC);
+//        if (condition) {
+//            payloadInterpreterMethod.addParameter(Response.class, "getResponse");
+//        } else {
+//            payloadInterpreterMethod.addParameter(CoapResponse.class, "getResponse");
+//        }
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addAnnotation(Autowired.class)
