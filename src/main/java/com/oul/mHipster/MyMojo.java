@@ -2,6 +2,7 @@ package com.oul.mHipster;
 
 import com.oul.mHipster.domainApp.EntitiesConfig;
 import com.oul.mHipster.domainConfig.LayersConfig;
+import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.service.EntityBuilderService;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -15,32 +16,25 @@ import java.io.File;
 @Mojo(name = "gen")
 public class MyMojo extends AbstractMojo {
 
-        private String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entitiesConfig.xml";
-//    private String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entitiesConfig.xml";
-        private String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
-//    private String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
-
     public void execute() throws MojoExecutionException {
-
-        EntitiesConfig entitiesConfig = null;
-        LayersConfig layersConfig = null;
         try {
-            entitiesConfig = readConfig(EntitiesConfig.class);
-            layersConfig = readConfig(LayersConfig.class);
+            EntitiesConfig entitiesConfig = readConfig(EntitiesConfig.class);
+            LayersConfig layersConfig = readConfig(LayersConfig.class);
+
+            Util.applyLayersConfig(entitiesConfig, layersConfig);
+
+            EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
+            entityBuilderService.buildEntityModel();
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new ConfigurationErrorException("Reading configuration failed!");
         }
-
-        Util.applyLayersConfig(entitiesConfig, layersConfig);
-
-        EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
-        entityBuilderService.buildEntityModel();
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T readConfig(Class<T> clazz) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        String pathname = clazz.equals(EntitiesConfig.class) ? entityBuilderConfig : layersConfig;
-        return (T) jaxbUnmarshaller.unmarshal(new File(pathname));
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        String pathname = clazz.equals(EntitiesConfig.class) ? Util.getEntityBuilderConfig() : Util.getLayersConfig();
+        return (T) unmarshaller.unmarshal(new File(pathname));
     }
 }

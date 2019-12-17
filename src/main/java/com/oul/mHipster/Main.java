@@ -39,7 +39,7 @@ public class Main {
         map.put("optional", "optionalCustomer");
         map.put("dao", "customerDao");
 
-
+        // FIND BY ID CODE BLOCK - za sopstveni entity na findById,update,delete; za m2m i m2o
         CodeBlock throwException = CodeBlock.builder()
                 .addStatement("Optional<$T> $L = $L.findById(id)", domainClass, map.get("optional"), map.get("dao"))
                 .beginControlFlow("if ($L.isEmpty())", map.get("optional"))
@@ -47,25 +47,20 @@ public class Main {
                 .endControlFlow()
                 .addStatement("$T $L = $L.get()", domainClass, map.get("domain"), map.get("optional"))
                 .build();
-        String throwExceptionInject = throwException.toString();
 
 
-        StringBuffer sb1 = new StringBuffer();
-        typeToValue.values().forEach(e -> sb1.append(".").append(e).append("(customerRequestDto.get")
+        // LOMBOK BUILDER
+        StringBuffer builderStingBuffer = new StringBuffer();
+
+        typeToValue.values().forEach(e -> builderStingBuffer.append(".").append(e).append("(customerRequestDto.get")
                 .append(e.substring(0, 1).toUpperCase()).append(e.substring(1)).append("())"));
         CodeBlock lombokBuilder = CodeBlock.builder()
-                .addStatement("$T $L = $T.builder()$L.build()", domainClass, "customer", domainClass, sb1.toString())
+                .addStatement("$T $L = $T.builder()$L.build()", domainClass, "customer", domainClass, builderStingBuffer.toString())
                 .build();
-        String lombokInject = lombokBuilder.toString();
 
-        map.put("builderInject", lombokInject);
-//        map.put("findByIdInject", throwExceptionInject);
+
+        map.put("builderInject", "xox");
         map.put("findByIdInject", "xxx");
-
-//        CodeBlock.builder()
-//                .addStatement("$T.builder()", domainClass)
-//                .addStatement(".$L($L.get$L)")
-//                .build();
 
         String regex = "\\$\\{(.*?)}";
 
@@ -112,11 +107,6 @@ public class Main {
 
         CodeBlock.Builder builder = CodeBlock.builder();
         typeToValue.values().forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-//        CodeBlock.of("$T $L = $T.builder()$L.build()",domainClass, "customer",domainClass, );
-
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addAnnotation(Autowired.class)
