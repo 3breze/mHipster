@@ -19,8 +19,7 @@
             <type>concrete</type>
             <methods>
                 <method type="findAll">
-                    <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable) {
-                    </methodSig>
+                    <methodSig>Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable)</methodSig>
                     <methodBody>
                         Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
@@ -29,31 +28,33 @@
                     </methodBody>
                 </method>
                 <method type="findById">
-                    <methodSig>public ${responseClazz} findById(Long id) {</methodSig>
+                    <methodSig>${responseClazz} findById(Long id)</methodSig>
                     <methodBody>${findByIdInject}
+                        return new ${responseClazz}(${domain})
+                    </methodBody>
+                </method>
+                <method type="save">
+                    <methodSig>${responseClazz} save(${requestClazz} ${request})</methodSig>
+                    <methodBody>${findByIdRelation}
                         ${builderInject}
                         ${dao}.save(${domain})
                         return new ${responseClazz}(${domain})
                     </methodBody>
                 </method>
-                <method type="save">
-                    <methodSig>public ${responseClazz} save(${requestClazz} ${request}){</methodSig>
-                    <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
-                        if (${optional}.isEmpty()) {
-                        throw new ResourceNotFoundException("${domainClazz} not found!");
-                        }
-                        ${domainClazz} ${domain} = ${optional}.get();</methodBody>
-                </method>
                 <method type="update">
-                    <methodSig>public ${responseClazz} update(${requestClazz} ${request}){</methodSig>
+                    <methodSig>${responseClazz} update(${requestClazz} ${request})</methodSig>
                     <methodBody>Optional&lt;${domainClazz}&gt; ${optional} = ${dao}.findById(id);
                         if (${optional}.isEmpty()) {
                         throw new ResourceNotFoundException("${domainClazz} not found!");
                         }
-                        ${domainClazz} ${domain} = ${optional}.get();</methodBody>
+                        ${domainClazz} ${domain} = ${optional}.get();
+                    </methodBody>
                 </method>
                 <method type="delete">
-                    <methodSig>public Boolean delete(Long id) {</methodSig>
+                    <methodSig>Boolean delete(Long id)</methodSig>
+                    <methodBody>${findByIdInject}
+                        ${dao}.delete(${domain})
+                    </methodBody>
                 </method>
             </methods>
         </layer>
