@@ -22,6 +22,11 @@ public class Layer {
         return name;
     }
 
+    @XmlAttribute
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getPackageName() {
         return packageName;
     }
@@ -29,11 +34,6 @@ public class Layer {
     @XmlTransient
     public void setPackageName(String packageName) {
         this.packageName = packageName;
-    }
-
-    @XmlAttribute
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getNamingSuffix() {

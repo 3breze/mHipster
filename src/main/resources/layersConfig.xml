@@ -19,9 +19,11 @@
             <type>concrete</type>
             <methods>
                 <method type="findAll">
-                    <methodSig returns="Page<responseClazz>">
-                        <parameter type="Predicate">predicate</parameter>
-                        <parameter type="Pageable">pageable</parameter>
+                    <methodSig returns="Page&lt;responseClazz&gt;">
+                        <parameters>
+                            <parameter type="Predicate">predicate</parameter>
+                            <parameter type="Pageable">pageable</parameter>
+                        </parameters>
                     </methodSig>
                     <methodBody>
                         Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
@@ -32,7 +34,9 @@
                 </method>
                 <method type="findById">
                     <methodSig returns="responseClazz">
-                        <parameter type="Long">Id</parameter>
+                        <parameters>
+                            <parameter type="Long">Id</parameter>
+                        </parameters>
                     </methodSig>
                     <methodBody>${findByIdInject}
                         return new ${responseClazz}(${domain})
@@ -40,8 +44,10 @@
                 </method>
                 <method type="save">
                     <methodSig returns="responseClazz">
-                        <parameter type="requestClazz">requestInst
-                        </parameter>
+                        <parameters>
+                            <parameter type="requestClazz">requestInst
+                            </parameter>
+                        </parameters>
                     </methodSig>
                     <methodBody>${findByIdRelation}
                         ${builderInject}
@@ -51,8 +57,10 @@
                 </method>
                 <method type="update">
                     <methodSig returns="responseClazz">
-                        <parameter type="requestClazz">requestInst
-                        </parameter>
+                        <parameters>
+                            <parameter type="requestClazz">requestInst
+                            </parameter>
+                        </parameters>
                     </methodSig>
                     <methodBody>${findByIdInject}
                         ${domainClazz} ${domainInst} = ${optionalInst}.get();
@@ -63,7 +71,9 @@
                 </method>
                 <method type="delete">
                     <methodSig returns="Boolean">
-                        <parameter type="Long">id</parameter>
+                        <parameters>
+                            <parameter type="Long">id</parameter>
+                        </parameters>
                     </methodSig>
                     <methodBody>${findByIdInject}
                         ${dao}.delete(${domainInst})
@@ -77,20 +87,42 @@
             <type>interface</type>
             <methods>
                 <method type="findAll">
-                    <methodSig>public Page&lt;${responseClazz}&gt; findAll(Predicate predicate, Pageable pageable);
+                    <methodSig returns="Page&lt;responseClazz&gt;">
+                        <parameters>
+                            <parameter type="Predicate">predicate</parameter>
+                            <parameter type="Pageable">pageable</parameter>
+                        </parameters>
                     </methodSig>
                 </method>
                 <method type="findById">
-                    <methodSig>public ${responseClazz} findById(Long id);</methodSig>
+                    <methodSig returns="responseClazz">
+                        <parameters>
+                            <parameter type="Long">Id</parameter>
+                        </parameters>
+                    </methodSig>
                 </method>
                 <method type="save">
-                    <methodSig>public ${responseClazz} save(${requestClazz} ${request});</methodSig>
+                    <methodSig returns="responseClazz">
+                        <parameters>
+                            <parameter type="requestClazz">requestInst
+                            </parameter>
+                        </parameters>
+                    </methodSig>
                 </method>
                 <method type="update">
-                    <methodSig>public ${responseClazz} update(${requestClazz} ${request});</methodSig>
+                    <methodSig returns="responseClazz">
+                        <parameters>
+                            <parameter type="requestClazz">requestInst
+                            </parameter>
+                        </parameters>
+                    </methodSig>
                 </method>
                 <method type="delete">
-                    <methodSig>public Boolean delete(Long id);</methodSig>
+                    <methodSig returns="Boolean">
+                        <parameters>
+                            <parameter type="Long">id</parameter>
+                        </parameters>
+                    </methodSig>
                 </method>
             </methods>
         </layer>

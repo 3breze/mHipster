@@ -23,10 +23,13 @@ public class MyMojo extends AbstractMojo {
 
             Util.applyLayersConfig(entitiesConfig, layersConfig);
 
-            EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
-            entityBuilderService.buildEntityModel();
+            layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method ->
+                    method.getMethodSig().getParameters().forEach(parameter -> System.out.println(parameter.getType() + " : " + parameter.getName()))));
+//            EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
+//            entityBuilderService.buildEntityModel();
         } catch (JAXBException e) {
-            throw new ConfigurationErrorException("Reading configuration failed!");
+            e.printStackTrace();
+//            throw new ConfigurationErrorException("Reading configuration failed!");
         }
     }
 
