@@ -9,10 +9,10 @@ import java.util.HashMap;
 
 public class Util {
 
-    //    private static String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entitiesConfig.xml";
-//    private static String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
-    private static String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
-    private static String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entitiesConfig.xml";
+        private static String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entitiesConfig.xml";
+    private static String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
+//    private static String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
+//    private static String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entitiesConfig.xml";
 
     private static final HashMap<LayerName, String> map = new HashMap<>();
     private static Util instance = new Util();
