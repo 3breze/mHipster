@@ -1,5 +1,6 @@
 package com.oul.mHipster;
 
+import ch.qos.logback.classic.BasicConfigurator;
 import com.oul.mHipster.domainApp.EntitiesConfig;
 import com.oul.mHipster.domainConfig.LayersConfig;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -11,6 +12,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import javax.persistence.Entity;
 import javax.xml.bind.JAXBContext;
@@ -35,51 +38,88 @@ public class MyMojo extends AbstractMojo {
     private PluginDescriptor descriptor;
 
     public void execute() throws MojoExecutionException {
+//        try {
+//            List<String> runtimeClasspathElements = project.getRuntimeClasspathElements();
+//            ClassRealm realm = descriptor.getClassRealm();
+//
+//            for (String element : runtimeClasspathElements) {
+//                System.out.println(element);
+//                File elementFile = new File(element);
+//                realm.addURL(elementFile.toURI().toURL());
+//            }
+//        } catch (MalformedURLException | DependencyResolutionRequiredException e) {
+//            e.printStackTrace();
+//        }
+
+
+        List classpathElements = null;
+        URL urls[] = null;
         try {
-
-            List<String> runtimeClasspathElements = project.getRuntimeClasspathElements();
-            ClassRealm realm = descriptor.getClassRealm();
-
-            for (String element : runtimeClasspathElements) {
-                File elementFile = new File(element);
-                realm.addURL(elementFile.toURI().toURL());
+            classpathElements = project.getRuntimeClasspathElements();
+            classpathElements.add(project.getBuild().getSourceDirectory());
+            urls = new URL[classpathElements.size()];
+            for (int i = 0; i < classpathElements.size(); ++i) {
+                System.out.println((String) classpathElements.get(i));
+                urls[i] = new File((String) classpathElements.get(i)).toURL();
             }
-
-
-        } catch (MalformedURLException | DependencyResolutionRequiredException e) {
+        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             e.printStackTrace();
         }
+        URLClassLoader loader = new URLClassLoader(urls);
 
-
-        List<String> classpathElements = null;
-        try {
-            classpathElements = project.getCompileClasspathElements();
-            List<URL> projectClasspathList = new ArrayList<URL>();
-            for (String element : classpathElements) {
-                try {
-                    projectClasspathList.add(new File(element).toURI().toURL());
-                } catch (MalformedURLException e) {
-                    throw new MojoExecutionException(element + " is an invalid classpath element", e);
-                }
-            }
-            System.out.println("project class paths: "+projectClasspathList);
-            URLClassLoader loader = new URLClassLoader(projectClasspathList.toArray(new URL[0]),Thread.currentThread().getContextClassLoader());
-            // ... and now you can pass the above classloader to Reflections
-//            Set<Method> getters = getAllMethods(Layer.class,
-//                    withModifier(Modifier.PUBLIC), withPrefix("get"), withParametersCount(0));
-            Reflections reflections = new Reflections(loader);
-
-            Set<Class<?>> annotated =
-                    reflections.getTypesAnnotatedWith(Entity.class);
-            for (Class<?> aClass : annotated) {
-                System.out.println("jedan");
-                System.out.println(toStringa(aClass));
-            }
-            System.out.println(!annotated.isEmpty() ? "yee" : "naa");
-
-        } catch (DependencyResolutionRequiredException e) {
-            throw new MojoExecutionException("Dependency resolution failed", e);
+        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(urls).addClassLoader(loader));
+//        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Entity.class);
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Entity.class);
+        for (Class<?> aClass : annotated) {
+            System.out.println("jedan");
+            System.out.println(toStringa(aClass));
         }
+        System.out.println(!annotated.isEmpty() ? "yee" : "naa");
+//        try {
+//
+//            List<String> runtimeClasspathElements = project.getRuntimeClasspathElements();
+//            ClassRealm realm = descriptor.getClassRealm();
+//
+//            for (String element : runtimeClasspathElements) {
+//                File elementFile = new File(element);
+//                realm.addURL(elementFile.toURI().toURL());
+//            }
+//
+//
+//        } catch (MalformedURLException | DependencyResolutionRequiredException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        List<String> classpathElements = null;
+//        try {
+//            classpathElements = project.getCompileClasspathElements();
+//            List<URL> projectClasspathList = new ArrayList<URL>();
+//            for (String element : classpathElements) {
+//                try {
+//                    projectClasspathList.add(new File(element).toURI().toURL());
+//                } catch (MalformedURLException e) {
+//                    throw new MojoExecutionException(element + " is an invalid classpath element", e);
+//                }
+//            }
+//            System.out.println("project class paths: "+projectClasspathList);
+//            URLClassLoader loader = new URLClassLoader(projectClasspathList.toArray(new URL[0]),Thread.currentThread().getContextClassLoader());
+//            // ... and now you can pass the above classloader to Reflections
+////            Set<Method> getters = getAllMethods(Layer.class,
+////                    withModifier(Modifier.PUBLIC), withPrefix("get"), withParametersCount(0));
+//            Reflections reflections = new Reflections(loader);
+//
+//            Set<Class<?>> annotated =
+//                    reflections.getTypesAnnotatedWith(Entity.class);
+//            for (Class<?> aClass : annotated) {
+//                System.out.println("jedan");
+//                System.out.println(toStringa(aClass));
+//            }
+//            System.out.println(!annotated.isEmpty() ? "yee" : "naa");
+//
+//        } catch (DependencyResolutionRequiredException e) {
+//            throw new MojoExecutionException("Dependency resolution failed", e);
+//        }
 
 
         try {
