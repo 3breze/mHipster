@@ -62,7 +62,7 @@ public class MyMojo extends AbstractMojo {
                     throw new MojoExecutionException(element + " is an invalid classpath element", e);
                 }
             }
-            System.out.println(projectClasspathList);
+            System.out.println("project class paths: "+projectClasspathList);
             URLClassLoader loader = new URLClassLoader(projectClasspathList.toArray(new URL[0]),Thread.currentThread().getContextClassLoader());
             // ... and now you can pass the above classloader to Reflections
 //            Set<Method> getters = getAllMethods(Layer.class,
@@ -112,14 +112,9 @@ public class MyMojo extends AbstractMojo {
         //print field names paired with their values
         for (Field field : fields) {
             result.append("  ");
-            try {
-                result.append(field.getName());
-                result.append(": ");
-                //requires access to private field:
-                result.append(field.get(this));
-            } catch (IllegalAccessException ex) {
-                System.out.println(ex);
-            }
+            result.append(field.getName());
+            result.append(": ");
+            result.append(field.getType());
             result.append(newLine);
         }
         result.append("}");
