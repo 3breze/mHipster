@@ -1,8 +1,10 @@
 package com.oul.mHipster;
 
-import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.service.EntityMapper;
+import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
+import com.oul.mHipster.service.EntityModelBuilderService;
 import com.oul.mHipster.util.Util;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -13,7 +15,6 @@ import org.apache.maven.project.MavenProject;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 
-import javax.persistence.Entity;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -23,6 +24,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mojo(name = "gen")
 public class MyMojo extends AbstractMojo {
@@ -31,26 +33,27 @@ public class MyMojo extends AbstractMojo {
     private MavenProject project;
 
     public void execute() throws MojoExecutionException {
-        ConfigurationBuilder configurationBuilder = createConfigurationBuilder();
 
-        Reflections reflections = new Reflections(configurationBuilder);
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Entity.class);
-        EntityMapper entityMapper = new EntityMapper();
-        for (Class<?> aClass : annotated) {
-            entityMapper.buildEntity(aClass);
-        }
+
+        MavenInfoWrapper mavenInfoWrapper = new MavenInfoWrapper(project);
 
         try {
 
             LayersConfig layersConfig = readConfig();
+            Util.applyLayersConfig(layersConfig, mavenInfoWrapper);
+            EntityModelBuilderService entityModelBuilderService = new EntityModelBuilderService(layersConfig);
 
-            Util.applyLayersConfig(layersConfig);
+            ConfigurationBuilder configurationBuilder = createConfigurationBuilder();
 
-//            EntityBuilderService entityBuilderService = new EntityBuilderService(entitiesConfig, layersConfig);
-//            entityBuilderService.buildEntityModel();
+            Reflections reflections = new Reflections(configurationBuilder);
+            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
+            List<Entity> entityModelList = annotated.stream().map(entityModelBuilderService::entityMapper).collect(Collectors.toList());
+
+            entityModelBuilderService.buildLayers(entityModelList);
         } catch (JAXBException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");
         }
+
     }
 
     private ConfigurationBuilder createConfigurationBuilder() {

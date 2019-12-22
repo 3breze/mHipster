@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
-public class MethodSig {
+public class MethodSignature {
 
     private String returns;
     @XmlElementWrapper(name = "parameters")

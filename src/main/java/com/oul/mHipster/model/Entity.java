@@ -1,5 +1,9 @@
 package com.oul.mHipster.model;
 
+import com.oul.mHipster.util.ClassUtils;
+import com.oul.mHipster.util.Util;
+import com.squareup.javapoet.TypeSpec;
+
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +14,7 @@ public class Entity {
     private String optionalName;
     private Map<String, LayerClass> layers;
     private List<Attribute> attributes;
+    private TypeSpec typeSpec;
 
     public String getClassName() {
         return className;
@@ -59,18 +64,40 @@ public class Entity {
         this.attributes = attributes;
     }
 
-    public static EntityBuilder builder() {
-        return new EntityBuilder();
+    public TypeSpec getTypeSpec() {
+        return typeSpec;
     }
 
-    public static class EntityBuilder {
+    public void setTypeSpec(TypeSpec typeSpec) {
+        this.typeSpec = typeSpec;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
         private String className;
         private String instanceName;
         private String packageName;
         private String optionalName;
         private Map<String, LayerClass> layers;
         private List<Attribute> attributes;
+        private TypeSpec typeSpec;
 
+        public Builder infoFields(Class<?> clazz) {
+            String className = ClassUtils.getClassName(clazz);
+            this.className = className;
+            this.instanceName = Util.instanceNameBuilder(className);
+            this.packageName = ClassUtils.getPackageName(clazz);
+            this.optionalName = Util.optionalNameBuilder(className);
+            return this;
+        }
+
+        public Builder attributes(List<Attribute> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
 
         public Entity build() {
             Entity entity = new Entity();
@@ -80,6 +107,7 @@ public class Entity {
             entity.setOptionalName(optionalName);
             entity.setLayers(layers);
             entity.setAttributes(attributes);
+            entity.setTypeSpec(typeSpec);
             return entity;
         }
     }

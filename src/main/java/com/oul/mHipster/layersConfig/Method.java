@@ -10,7 +10,7 @@ public class Method {
 
     private String type;
     @XmlElement
-    private MethodSig methodSig;
+    private MethodSignature methodSignature;
     @XmlElement
     private String methodBody;
 
@@ -23,13 +23,13 @@ public class Method {
         this.type = type;
     }
 
-    public MethodSig getMethodSig() {
-        return methodSig;
+    public MethodSignature getMethodSignature() {
+        return methodSignature;
     }
 
     @XmlTransient
-    public void setMethodSig(MethodSig methodSig) {
-        this.methodSig = methodSig;
+    public void setMethodSignature(MethodSignature methodSignature) {
+        this.methodSignature = methodSignature;
     }
 
     public String getMethodBody() {

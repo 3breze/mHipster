@@ -1,37 +1,40 @@
 package com.oul.mHipster.util;
 
-import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.layersConfig.Layer;
 import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.layersConfig.wrapper.LayerInfoWrapper;
+import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
 
 import java.util.HashMap;
 
 public class Util {
 
-        private static String entityBuilderConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/entitiesConfig.xml";
-    private static String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
-//    private static String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
-//    private static String entityBuilderConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\entitiesConfig.xml";
-
-    private static final HashMap<LayerName, String> map = new HashMap<>();
     private static Util instance = new Util();
+    private static final HashMap<LayerName, LayerInfoWrapper> layerInfoMap = new HashMap<>();
+    private static String layersConfig = "/Users/mihajlo/Documents/best_in_class/mHipster/src/main/resources/layersConfig.xml";
+    //    private static String layersConfig = "C:\\Users\\jovan\\Documents\\mi\\mHipster\\src\\main\\resources\\layersConfig.xml";
 
-    private Util() {
+    public static void applyLayersConfig(LayersConfig layersConfig, MavenInfoWrapper mavenInfoWrapper) {
+        layersConfig.getLayers().forEach(layer -> {
+            String packageName = String.join(".", mavenInfoWrapper.getName(), layer.getName());
+            layerInfoMap.put(LayerName.valueOf(layer.getName()), new LayerInfoWrapper(layer.getNamingSuffix(), packageName));
+        });
+    }
+
+    public static String instanceNameBuilder(String className) {
+        return className.substring(0, 1).toUpperCase() + className.substring(1);
+    }
+
+    public static String optionalNameBuilder(String className) {
+        return "optional" + className;
     }
 
     public static Util getInstance() {
         return instance;
     }
 
-    public static String getValue(LayerName key) {
-        return map.get(key);
-    }
-
-    public static void applyLayersConfig(LayersConfig layersConfig) {
-        for (Layer layer : layersConfig.getLayers()) {
-//            String packageName = String.join(".", entitiesConfig.getGroupName(), entitiesConfig.getArtifactName(), layer.getName());
-//            map.put(LayerName.valueOf(layer.getName()), packageName);
-        }
+    public static LayerInfoWrapper getValue(LayerName key) {
+        return layerInfoMap.get(key);
     }
 
     public static String getLayersConfig() {
@@ -42,11 +45,4 @@ public class Util {
         Util.layersConfig = layersConfig;
     }
 
-    public static String getEntityBuilderConfig() {
-        return entityBuilderConfig;
-    }
-
-    public static void setEntityBuilderConfig(String entityBuilderConfig) {
-        Util.entityBuilderConfig = entityBuilderConfig;
-    }
 }

@@ -1,14 +1,14 @@
 package com.oul.mHipster.model;
 
 public class Attribute {
-    private String type;
+    private Class<?> type;
     private String value;
 
-    public String getType() {
+    public Class<?> getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Class<?> type) {
         this.type = type;
     }
 

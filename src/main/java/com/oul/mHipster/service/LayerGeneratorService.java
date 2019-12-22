@@ -27,7 +27,7 @@ public class LayerGeneratorService {
                 if (layer.getName().equals("service.impl")) {
                     for (Method method : layer.getMethods()) {
                         System.out.println(method.getType());
-                        System.out.println(method.getMethodSig());
+                        System.out.println(method.getMethodSignature());
                         System.out.println(method.getMethodBody());
 //                        MethodSpec methodSpec = MethodSpec
 //                                .methodBuilder("sta")
