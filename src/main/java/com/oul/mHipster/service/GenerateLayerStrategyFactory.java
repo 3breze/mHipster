@@ -1,6 +1,7 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.domain.LayerName;
+import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.service.generatorImpl.*;
 
 public class GenerateLayerStrategyFactory {
 

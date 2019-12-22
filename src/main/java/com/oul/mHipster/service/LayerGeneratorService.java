@@ -1,14 +1,11 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.domain.EntityModel;
-import com.oul.mHipster.domainApp.Entity;
-import com.oul.mHipster.domainConfig.Layer;
-import com.oul.mHipster.domainConfig.LayersConfig;
-import com.oul.mHipster.domainConfig.Method;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.oul.mHipster.todelete.OldShitModel;
+import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.layersConfig.Layer;
+import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layersConfig.Method;
 
-import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +17,13 @@ public class LayerGeneratorService {
         this.layersConfig = layersConfig;
     }
 
-    public List<EntityModel> generateLayers(Entity entity) {
+    public List<OldShitModel> generateLayers(Entity entity) {
 
         List<Layer> layers = layersConfig.getLayers();
-        List<EntityModel> entityModelList = new ArrayList<>();
+        List<OldShitModel> oldShitModelList = new ArrayList<>();
         for (Layer layer : layers) {
             if (!layer.getName().contains("domain")) {
-                String name = String.join("", entity.getName(), layer.getNamingSuffix());
+                String name = String.join("", entity.getClassName(), layer.getNamingSuffix());
                 if (layer.getName().equals("service.impl")) {
                     for (Method method : layer.getMethods()) {
                         System.out.println(method.getType());
@@ -40,6 +37,6 @@ public class LayerGeneratorService {
 
             }
         }
-        return entityModelList;
+        return oldShitModelList;
     }
 }

@@ -1,6 +1,6 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.domainApp.Attribute;
+import com.oul.mHipster.model.Attribute;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 

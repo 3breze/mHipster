@@ -1,20 +1,17 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.Util;
-import com.oul.mHipster.domain.EntityModel;
+import com.oul.mHipster.todelete.OldShitModel;
 import com.squareup.javapoet.JavaFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JavaFileMakerService {
 
-    public void makeJavaFiles(List<EntityModel> entityModelList) {
+    public void makeJavaFiles(List<OldShitModel> oldShitModelList) {
 
-        List<JavaFile> javaFileList = entityModelList.stream().map(entityModel -> JavaFile
+        List<JavaFile> javaFileList = oldShitModelList.stream().map(entityModel -> JavaFile
                 .builder(entityModel.getPackageName(), entityModel.getTypeSpec())
                 .indent("    ")
                 .build()).collect(Collectors.toList());

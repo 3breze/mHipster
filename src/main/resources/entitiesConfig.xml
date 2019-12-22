@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<entitiesConfig type="full">
+<sourceDomainLayer type="full">
     <groupName>com.oul</groupName>
     <artifactName>projekto</artifactName>
     <entities>
@@ -13,4 +13,4 @@
             <attribute type="Long">numero</attribute>
         </entity>
     </entities>
-</entitiesConfig>
+</sourceDomainLayer>
