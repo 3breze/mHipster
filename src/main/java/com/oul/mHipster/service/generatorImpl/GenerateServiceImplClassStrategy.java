@@ -28,8 +28,17 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     @Override
     public TypeSpec generate(Entity entity) {
+
+        /**
+         *  Mislio sam da iz atributa domenskih klasa izbacim relacije ka drugim entitetima, te da njih svedem na
+         * prakticno flag (sa info o owneru i tipu relacije) kako bi ih koristio za ${builderInject} fillere u konfoguraciji
+         */
+
         Map<String, LayerClass> layerMap = entity.getLayers();
 
+        /**
+         *  Izmesticu u poetHelper mada ne znam kako da ih izvlacim a da ne budu opet u nekoj mapi rezultati
+         */
         TypeName domainClass = ClassName.get(entity.getPackageName(), entity.getClassName());
         TypeName requestDtoClass = ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
                 layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName());
@@ -39,8 +48,11 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
 
+        /**
+         * Iteriram kroz Method Body
+         */
         layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method -> {
-            
+
         }));
 
 

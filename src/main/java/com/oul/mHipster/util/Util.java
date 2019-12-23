@@ -13,6 +13,11 @@ public class Util {
     private static final HashMap<LayerName, LayerInfoWrapper> layerInfoMap = new HashMap<>();
     private static LayersConfig config;
 
+    /**
+     * LayerConfig mi treba u strategijama, pa sam smestio ovde umesto da prosledjuje pi initu strategija
+     * satro da ne ne davim coupling, ali ne znam dal ovo ima rezona ovako kostiti
+      */
+
     public static void applyLayersConfig(LayersConfig layersConfig, MavenInfoWrapper mavenInfoWrapper) {
         config = layersConfig;
         layersConfig.getLayers().forEach(layer -> {

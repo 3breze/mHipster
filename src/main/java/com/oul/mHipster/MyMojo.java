@@ -34,6 +34,17 @@ public class MyMojo extends AbstractMojo {
 
         MavenInfoWrapper mavenInfoWrapper = new MavenInfoWrapper(project);
 
+        /**
+         * Ne znam dal da izmestam ovih par reflection poziva u neki servis
+         * Obrati paznju na sledece:
+         * - klase iz Util paketa (imam puno mesta gde radim sitne operacije nad stringovima,
+         * i ne znam gde da ih smestam a bizarno mi je da sve izmestam u pomocne klase npr. Entity builder - infoFields
+         * construktor. Takve stvari me izludjuju)
+         * - Entity model builder gde mesam informacije iz source domenskih klasa i configuracije, te klasa ima ulogu
+         * i mappera i neki string concat-a
+         * - pristup layerConfig-uraciji iz Strategija 
+         */
+
         try {
 
             // Read layers config
