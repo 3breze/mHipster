@@ -98,6 +98,11 @@ public class Entity {
             return this;
         }
 
+        public Builder typeSpec(TypeSpec typeSpec) {
+            this.typeSpec = typeSpec;
+            return this;
+        }
+
         public Entity build() {
             Entity entity = new Entity();
             entity.setClassName(className);

@@ -1,11 +1,11 @@
-package com.oul.mHipster.service;
+package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.generatorImpl.*;
 
 public class GenerateLayerStrategyFactory {
 
-    private final GenerateDomainClassStrategy generateDomainClassStrategy = new GenerateDomainClassStrategy();
     private final GenerateRequestDtoClassStrategy generateRequestDtoClassStrategy = new GenerateRequestDtoClassStrategy();
     private final GenerateResponseDtoClassStrategy generateResponseDtoClassStrategy = new GenerateResponseDtoClassStrategy();
     private final GenerateApiClassStrategy generateApiClassStrategy = new GenerateApiClassStrategy();
@@ -14,9 +14,8 @@ public class GenerateLayerStrategyFactory {
     private final GenerateDaoClassStrategy generateDaoClassStrategy = new GenerateDaoClassStrategy();
     private final UnknownLayerStrategy unknownLayerStrategy = new UnknownLayerStrategy();
 
-    public GenerateLayerStrategy getLayerStrategy(LayerName layerName) {
+    GenerateLayerStrategy getLayerStrategy(LayerName layerName) {
         switch (layerName) {
-            case DOMAIN: return generateDomainClassStrategy;
             case REQUEST_DTO: return generateRequestDtoClassStrategy;
             case RESPONSE_DTO: return generateResponseDtoClassStrategy;
             case API: return generateApiClassStrategy;

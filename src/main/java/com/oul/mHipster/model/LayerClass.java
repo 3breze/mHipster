@@ -5,6 +5,12 @@ public class LayerClass {
     private String instanceName;
     private String packageName;
 
+    public LayerClass(String className, String instanceName, String packageName) {
+        this.className = className;
+        this.instanceName = instanceName;
+        this.packageName = packageName;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -27,5 +33,14 @@ public class LayerClass {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    @Override
+    public String toString() {
+        return "LayerClass{" +
+                "className='" + className + '\'' +
+                ", instanceName='" + instanceName + '\'' +
+                ", packageName='" + packageName + '\'' +
+                '}';
     }
 }

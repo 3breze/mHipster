@@ -8,7 +8,6 @@ import javax.lang.model.element.Modifier;
 
 public class PoetHelperService {
 
-
     public MethodSpec buildGetter(Attribute attribute) {
         String fieldName = attribute.getValue();
         String getterName = buildGetterName(fieldName);

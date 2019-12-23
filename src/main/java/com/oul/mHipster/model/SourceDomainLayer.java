@@ -4,24 +4,20 @@ import java.util.List;
 
 public class SourceDomainLayer {
 
-    private String groupName;
-    private String artifactName;
+    private String rootPackageName;
     private List<Entity> entities;
 
-    public String getGroupName() {
-        return groupName;
+    public SourceDomainLayer(String rootPackageName, List<Entity> entities) {
+        this.rootPackageName = rootPackageName;
+        this.entities = entities;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public String getRootPackageName() {
+        return rootPackageName;
     }
 
-    public String getArtifactName() {
-        return artifactName;
-    }
-
-    public void setArtifactName(String artifactName) {
-        this.artifactName = artifactName;
+    public void setRootPackageName(String rootPackageName) {
+        this.rootPackageName = rootPackageName;
     }
 
     public List<Entity> getEntities() {

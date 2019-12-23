@@ -136,10 +136,5 @@
             <namingSuffix>RequestDto</namingSuffix>
             <type>concrete</type>
         </layer>
-        <layer name="DOMAIN">
-            <packageName>domain</packageName>
-            <namingSuffix></namingSuffix>
-            <type>concrete</type>
-        </layer>
     </layers>
 </layersConfig>

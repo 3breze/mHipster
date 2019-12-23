@@ -3,8 +3,10 @@ package com.oul.mHipster;
 import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.SourceDomainLayer;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
-import com.oul.mHipster.service.EntityModelBuilderService;
+import com.oul.mHipster.service.EntityModelBuilder;
+import com.oul.mHipster.service.impl.EntityModelBuilderImpl;
 import com.oul.mHipster.util.ClassUtils;
 import com.oul.mHipster.util.ConfigUtil;
 import com.oul.mHipster.util.Util;
@@ -44,9 +46,10 @@ public class MyMojo extends AbstractMojo {
             Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
 
             // Generate classes and layers
-            EntityModelBuilderService entityModelBuilderService = new EntityModelBuilderService(layersConfig);
-            List<Entity> entityModelList = annotated.stream().map(entityModelBuilderService::entityMapper).collect(Collectors.toList());
-            entityModelBuilderService.buildLayers(entityModelList);
+            EntityModelBuilder entityModelBuilder = new EntityModelBuilderImpl(layersConfig);
+            List<Entity> entityModelList = annotated.stream().map(entityModelBuilder::mapSourceToEntity).collect(Collectors.toList());
+            SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);
+            entityModelBuilder.buildLayers(sourceDomainLayer);
 
         } catch (JAXBException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");
