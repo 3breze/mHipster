@@ -14,6 +14,7 @@ public class GenerateLayerStrategyFactory {
     private final GenerateDaoClassStrategy generateDaoClassStrategy = new GenerateDaoClassStrategy();
     private final UnknownLayerStrategy unknownLayerStrategy = new UnknownLayerStrategy();
 
+
     GenerateLayerStrategy getLayerStrategy(LayerName layerName) {
         switch (layerName) {
             case REQUEST_DTO: return generateRequestDtoClassStrategy;

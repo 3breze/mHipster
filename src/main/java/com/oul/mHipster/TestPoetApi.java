@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class Main {
+public class TestPoetApi {
     public static void main(String[] args) {
 
         // MODEL

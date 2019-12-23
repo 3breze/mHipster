@@ -1,18 +1,91 @@
 package com.oul.mHipster.service.generatorImpl;
 
+import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.LayerClass;
 import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.PoetHelperService;
+import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
+
+    private PoetHelperService poetHelperService;
+    private LayersConfig layersConfig;
+
+    public GenerateServiceImplClassStrategy() {
+        this.poetHelperService = new PoetHelperService();
+        this.layersConfig = Util.getValue();
+    }
+
     @Override
     public TypeSpec generate(Entity entity) {
-//        entity.getClassName();
+        Map<String, LayerClass> layerMap = entity.getLayers();
+
+        TypeName domainClass = ClassName.get(entity.getPackageName(), entity.getClassName());
+        TypeName requestDtoClass = ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
+                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName());
+        TypeName responseDtoClass = ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
+                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName());
+
+        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
+
+
+        layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method -> {
+            
+        }));
+
+
+//        FieldSpec daoField = FieldSpec
+//                .builder(ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
+//                        layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()),
+//                        layerMap.get(LayerName.REQUEST_DTO.toString()).getInstanceName())
+//                .addModifiers(Modifier.PRIVATE)
+//                .build();
 //
-//        TypeSpec reqDtoClass = TypeSpec.classBuilder(oldShitModel.getRequestDtoClassName()).build();
-//        TypeName rere = ClassName.get("com.whatever.whatever", oldShitModel.getRequestDtoClassName());
+//        // CONSTRUCTOR
+//        List<ParameterSpec> parameterSpecsList = entity.getAttributes().stream().map(entry -> ParameterSpec
+//                .builder(ClassName.bestGuess(entry.getType().getName()), entry.getValue())
+//                .build()).collect(Collectors.toList());
 //
-//        MethodSpec.methodBuilder("save").addModifiers(Modifier.PUBLIC).returns(rere).build();
+//        CodeBlock.Builder builder = CodeBlock.builder();
+//        typeToValue.values().forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
+//
+//
+//
+//        MethodSpec constructor = MethodSpec.constructorBuilder()
+//                .addAnnotation(Autowired.class)
+//                .addModifiers(Modifier.PUBLIC)
+//                .addParameters(parameterSpecsList)
+//                .addCode(builder.build())
+//                .build();
+//
+//
+//        TypeSpec serviceClass = TypeSpec
+//                .classBuilder("CustomerServiceImpl")
+//                .addModifiers(Modifier.PUBLIC)
+//                .addAnnotation(Service.class)
+//                .addField(customerDao)
+//                .addMethod(constructor)
+//                .addMethod(MethodSpec
+//                        .methodBuilder("save")
+//                        .addCode(throwExceptionCodeBlock)
+//                        .addModifiers(Modifier.PUBLIC)
+//                        .addAnnotation(Override.class)
+//                        .addParameter(param)
+//                        .addStatement(codeBlock2)
+//                        .returns(responseDtoClass)
+//                        .build())
+//                .build();
+
         return null;
     }
 }

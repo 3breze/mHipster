@@ -11,20 +11,23 @@ public class Util {
 
     private static Util instance = new Util();
     private static final HashMap<LayerName, LayerInfoWrapper> layerInfoMap = new HashMap<>();
+    private static LayersConfig config;
 
     public static void applyLayersConfig(LayersConfig layersConfig, MavenInfoWrapper mavenInfoWrapper) {
+        config = layersConfig;
         layersConfig.getLayers().forEach(layer -> {
             String packageName = String.join(".", mavenInfoWrapper.getName(), layer.getName());
             layerInfoMap.put(LayerName.valueOf(layer.getName()), new LayerInfoWrapper(layer.getNamingSuffix(), packageName));
         });
+
     }
 
     public static Util getInstance() {
         return instance;
     }
 
-    public static LayerInfoWrapper getValue(LayerName key) {
-        return layerInfoMap.get(key);
+    public static LayersConfig getValue() {
+        return config;
     }
 
 }
