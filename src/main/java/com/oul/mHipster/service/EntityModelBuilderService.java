@@ -54,6 +54,7 @@ public class EntityModelBuilderService {
             Attribute attr = new Attribute();
             attr.setType(field.getType());
             attr.setValue(field.getName());
+            System.out.println("attr = " + attr.getValue()+" - "+attr.getType());
             attributes.add(attr);
         }
         builder.attributes(attributes);
@@ -62,22 +63,23 @@ public class EntityModelBuilderService {
 
     public void buildLayers(List<Entity> entityModelList) {
 
-        List<OldShitModel> oldShitModelList = sourceDomainLayer.getEntities().stream().map(entity ->
-                new OldShitModel.EntityModelBuilder().classAndInstanceName(entity.getClassName())
-                        .requestClassAndInstanceName(domainSpecificLayersMap.get(REQUEST_DTO).getNamingSuffix())
-                        .responseClassAndInstanceName(domainSpecificLayersMap.get(RESPONSE_DTO).getNamingSuffix())
-                        .packageName(Util.getValue(DOMAIN))
-                        .entity(entity)
-                        .build())
-                .collect(Collectors.toList());
 
-        entityModelList.forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
-            GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
-            TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
-            entityModel.setTypeSpec(typeSpec);
-        }));
+//        List<OldShitModel> oldShitModelList = sourceDomainLayer.getEntities().stream().map(entity ->
+//                new OldShitModel.EntityModelBuilder().classAndInstanceName(entity.getClassName())
+//                        .requestClassAndInstanceName(domainSpecificLayersMap.get(REQUEST_DTO).getNamingSuffix())
+//                        .responseClassAndInstanceName(domainSpecificLayersMap.get(RESPONSE_DTO).getNamingSuffix())
+//                        .packageName(Util.getValue(DOMAIN))
+//                        .entity(entity)
+//                        .build())
+//                .collect(Collectors.toList());
 
-        javaFileMakerService.makeJavaFiles(oldShitModelList);
+//        entityModelList.forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
+//            GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
+//            TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
+//            entityModel.setTypeSpec(typeSpec);
+//        }));
+//
+//        javaFileMakerService.makeJavaFiles(oldShitModelList);
     }
 
 }

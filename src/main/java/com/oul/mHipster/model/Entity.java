@@ -1,7 +1,6 @@
 package com.oul.mHipster.model;
 
 import com.oul.mHipster.util.ClassUtils;
-import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.List;
@@ -88,9 +87,9 @@ public class Entity {
         public Builder infoFields(Class<?> clazz) {
             String className = ClassUtils.getClassName(clazz);
             this.className = className;
-            this.instanceName = Util.instanceNameBuilder(className);
+            this.instanceName = ClassUtils.instanceNameBuilder(className);
             this.packageName = ClassUtils.getPackageName(clazz);
-            this.optionalName = Util.optionalNameBuilder(className);
+            this.optionalName = ClassUtils.optionalNameBuilder(className);
             return this;
         }
 

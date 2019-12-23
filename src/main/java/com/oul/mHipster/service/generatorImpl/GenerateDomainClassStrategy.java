@@ -18,7 +18,7 @@ public class GenerateDomainClassStrategy implements GenerateLayerStrategy {
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         for (Attribute attribute : oldShitModel.getEntity().getAttributes()) {
             fieldSpecList.add(FieldSpec
-                    .builder(ClassName.bestGuess(attribute.getType()), attribute.getValue())
+                    .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getValue())
                     .addModifiers(Modifier.PRIVATE)
                     .build());
         }
