@@ -4,6 +4,12 @@ public class RelationAttribute extends Attribute {
     private String owner;
     private String relationType;
 
+    public RelationAttribute(Class<?> type, String value, String owner, String relationType) {
+        super(type, value);
+        this.owner = owner;
+        this.relationType = relationType;
+    }
+
     public String getOwner() {
         return owner;
     }

@@ -4,6 +4,11 @@ public class Attribute {
     private Class<?> type;
     private String value;
 
+    public Attribute(Class<?> type, String value) {
+        this.type = type;
+        this.value = value;
+    }
+
     public Class<?> getType() {
         return type;
     }

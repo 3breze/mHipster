@@ -42,7 +42,7 @@ public class MyMojo extends AbstractMojo {
          * construktor. Takve stvari me izludjuju)
          * - Entity model builder gde mesam informacije iz source domenskih klasa i configuracije, te klasa ima ulogu
          * i mappera i neki string concat-a
-         * - pristup layerConfig-uraciji iz Strategija 
+         * - pristup layerConfig-uraciji iz Strategija
          */
 
         try {

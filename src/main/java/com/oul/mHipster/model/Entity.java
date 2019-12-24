@@ -13,6 +13,7 @@ public class Entity {
     private String optionalName;
     private Map<String, LayerClass> layers;
     private List<Attribute> attributes;
+    private List<RelationAttribute> relationAttributes;
     private TypeSpec typeSpec;
 
     public String getClassName() {
@@ -63,6 +64,14 @@ public class Entity {
         this.attributes = attributes;
     }
 
+    public List<RelationAttribute> getRelationAttributes() {
+        return relationAttributes;
+    }
+
+    public void setRelationAttributes(List<RelationAttribute> relationAttributes) {
+        this.relationAttributes = relationAttributes;
+    }
+
     public TypeSpec getTypeSpec() {
         return typeSpec;
     }
@@ -82,6 +91,7 @@ public class Entity {
         private String optionalName;
         private Map<String, LayerClass> layers;
         private List<Attribute> attributes;
+        private List<RelationAttribute> relationAttributes;
         private TypeSpec typeSpec;
 
         public Builder infoFields(Class<?> clazz) {
@@ -98,6 +108,11 @@ public class Entity {
             return this;
         }
 
+        public Builder relationAttributes(List<RelationAttribute> relationAttributes) {
+            this.relationAttributes = relationAttributes;
+            return this;
+        }
+
         public Builder typeSpec(TypeSpec typeSpec) {
             this.typeSpec = typeSpec;
             return this;
@@ -111,6 +126,7 @@ public class Entity {
             entity.setOptionalName(optionalName);
             entity.setLayers(layers);
             entity.setAttributes(attributes);
+            entity.setRelationAttributes(relationAttributes);
             entity.setTypeSpec(typeSpec);
             return entity;
         }

@@ -48,20 +48,31 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
 
+        FieldSpec daoField = FieldSpec
+                .builder(ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
+                        layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()),
+                        layerMap.get(LayerName.REQUEST_DTO.toString()).getInstanceName())
+                .addModifiers(Modifier.PRIVATE)
+                .build();
+
+
+
+        TypeSpec serviceClass = TypeSpec
+                .classBuilder(layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Service.class)
+                .addFields(customerDao)
+                .addMethod(constructor)
         /**
          * Iteriram kroz Method Body
          */
         layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method -> {
 
+
         }));
 
 
-//        FieldSpec daoField = FieldSpec
-//                .builder(ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-//                        layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()),
-//                        layerMap.get(LayerName.REQUEST_DTO.toString()).getInstanceName())
-//                .addModifiers(Modifier.PRIVATE)
-//                .build();
+//
 //
 //        // CONSTRUCTOR
 //        List<ParameterSpec> parameterSpecsList = entity.getAttributes().stream().map(entry -> ParameterSpec
