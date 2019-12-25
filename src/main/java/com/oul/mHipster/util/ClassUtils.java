@@ -21,7 +21,7 @@ public class ClassUtils {
                 System.out.println(classpathElements.get(i));
                 urls[i] = new File(classpathElements.get(i)).toURL();
             }
-            return new URLClassLoader(urls);
+            return new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
 
         } catch (DependencyResolutionRequiredException | MalformedURLException e) {
             e.printStackTrace();

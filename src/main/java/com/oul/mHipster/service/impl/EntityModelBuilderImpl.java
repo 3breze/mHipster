@@ -37,6 +37,7 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
         builder.infoFields(clazz);
 
         Field[] fields = clazz.getDeclaredFields();
+
         Map<Boolean, List<Field>> isRelationAttributeMap = Arrays.stream(fields).collect(Collectors.partitioningBy(this::isRelation));
         builder.attributes(isRelationAttributeMap.get(false).stream().map(field ->
                 new Attribute(field.getType(), field.getName())).collect(Collectors.toList()));
@@ -52,7 +53,7 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
         Annotation annO2M = field.getAnnotation(OneToMany.class);
         Annotation annO2O = field.getAnnotation(OneToOne.class);
-        return (Stream.of(annM2M, annM2O, annO2M, annO2O).allMatch(Objects::isNull));
+        return (Stream.of(annM2M, annM2O, annO2M, annO2O).anyMatch(Objects::nonNull));
     }
 
 

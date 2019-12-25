@@ -25,4 +25,12 @@ public class RelationAttribute extends Attribute {
     public void setRelationType(String relationType) {
         this.relationType = relationType;
     }
+
+    @Override
+    public String toString() {
+        return "RelationAttribute{" +
+                "owner='" + owner + '\'' +
+                ", relationType='" + relationType + '\'' +
+                '}';
+    }
 }

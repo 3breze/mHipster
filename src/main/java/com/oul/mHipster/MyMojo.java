@@ -17,6 +17,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import javax.xml.bind.JAXBException;
 import java.net.URLClassLoader;
@@ -59,8 +60,12 @@ public class MyMojo extends AbstractMojo {
             // Generate classes and layers
             EntityModelBuilder entityModelBuilder = new EntityModelBuilderImpl(layersConfig);
             List<Entity> entityModelList = annotated.stream().map(entityModelBuilder::mapSourceToEntity).collect(Collectors.toList());
+            entityModelList.forEach(entity -> {
+                System.out.println(entity.getClassName() + " - attr:" + entity.getAttributes() + " \nrel:" + entity.getRelationAttributes());
+                System.out.println("--  --  --  --");
+            });
             SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);
-            entityModelBuilder.buildLayers(sourceDomainLayer);
+//            entityModelBuilder.buildLayers(sourceDomainLayer);
 
         } catch (JAXBException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");

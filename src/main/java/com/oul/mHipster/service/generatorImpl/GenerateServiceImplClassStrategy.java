@@ -1,7 +1,10 @@
 package com.oul.mHipster.service.generatorImpl;
 
+import com.oul.mHipster.layersConfig.Layer;
 import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layersConfig.Parameter;
 import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.layersConfig.wrapper.LayerInfoWrapper;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.LayerClass;
 import com.oul.mHipster.service.GenerateLayerStrategy;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,49 +32,42 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     @Override
     public TypeSpec generate(Entity entity) {
-
-        /**
-         *  Mislio sam da iz atributa domenskih klasa izbacim relacije ka drugim entitetima, te da njih svedem na
-         * prakticno flag (sa info o owneru i tipu relacije) kako bi ih koristio za ${builderInject} fillere u konfoguraciji
-         */
-
         Map<String, LayerClass> layerMap = entity.getLayers();
-
-        /**
-         *  Izmesticu u poetHelper mada ne znam kako da ih izvlacim a da ne budu opet u nekoj mapi rezultati
-         */
-        TypeName domainClass = ClassName.get(entity.getPackageName(), entity.getClassName());
-        TypeName requestDtoClass = ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName());
-        TypeName responseDtoClass = ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
-                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName());
-
+        Map<String, TypeName> typeNameMap = poetHelperService.createTypeNames(entity);
         CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
 
         FieldSpec daoField = FieldSpec
-                .builder(ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-                        layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()),
-                        layerMap.get(LayerName.REQUEST_DTO.toString()).getInstanceName())
+                .builder(typeNameMap.get("daoClass"), layerMap.get(LayerName.DAO.toString()).getClassName())
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
 
+        List<MethodSpec> methods = new ArrayList<>();
+        layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method -> {
+            List<ParameterSpec> parameters = new ArrayList<>();
+            method.getMethodSignature().getParameters().forEach(parameter -> {
+                parameters.add(ParameterSpec
+                        .builder(typeNameMap.get(parameter.getName()), parameter.getName())
+                        .build());
+            });
+
+            methods.add(MethodSpec.methodBuilder(method.getType())
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addParameters(parameters)
+                    .returns(typeNameMap.get(method.getMethodSignature().getReturns()))
+                    .build());
+        }));
 
         TypeSpec serviceClass = TypeSpec
                 .classBuilder(layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Service.class)
-                .addFields(customerDao)
-                .addMethod(constructor)
-        /**
-         * Iteriram kroz Method Body
-         */
-        layersConfig.getLayers().forEach(layer -> layer.getMethods().forEach(method -> {
-
-
-        }));
-
+                .addField(daoField)
+//                .addMethod(constructor)
+                .addMethods(methods)
+                .build();
 
 //
 //
