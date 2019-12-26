@@ -18,6 +18,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,31 +47,35 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
 
     private Attribute findRelation(Field field) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
-        if (annM2M != null) {
-            Class<? extends Annotation> type = annM2M.annotationType();
+        Annotation annO2M = field.getAnnotation(OneToMany.class);
+        if (annM2M != null || annO2M != null) {
+            Annotation annotation = annM2M != null ? annM2M : annO2M;
+            Class<? extends Annotation> type = annotation.annotationType();
             System.out.println("Values of " + type.getName());
 
             for (Method method : type.getDeclaredMethods()) {
                 Object value = null;
                 try {
-                    value = method.invoke(annM2M, (Object[]) null);
+                    value = method.invoke(annotation, (Object[]) null);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
                 System.out.println(" " + method.getName() + ": " + value);
             }
-            return new RelationAttribute(field.getType(), field.getName(), field.getType().toString(), RelationType.MANYTOMANY);
+            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+            Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
+            return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(), RelationType.MANYTOMANY);
         }
+
         List<Annotation> annotations = new ArrayList<>();
         annotations.add(field.getAnnotation(ManyToOne.class));
-        annotations.add(field.getAnnotation(OneToMany.class));
         annotations.add(field.getAnnotation(OneToOne.class));
         for (Annotation annotation : annotations) {
             if (annotation != null) {
                 Class<? extends Annotation> type = annotation.annotationType();
-                System.out.println(">>> " + type.getSimpleName());
+                // POGRESNO: treba da setujem clasu ciji je field (ManyToOne -> many je uvek owner)
                 return new RelationAttribute(field.getType(), field.getName(),
-                        field.getType().toString(), RelationType.valueOf(type.getSimpleName().toUpperCase()));
+                        field.getClass().getSimpleName(), RelationType.valueOf(type.getSimpleName().toUpperCase()));
             }
         }
         return new Attribute(field.getType(), field.getName());

@@ -30,8 +30,8 @@ public class RelationAttribute extends Attribute {
     public String toString() {
         return "RelationAttribute{" +
                 "type='" + super.getType() + '\'' +
-                "value='" + super.getValue() + '\'' +
-                "owner='" + owner + '\'' +
+                ",value='" + super.getValue() + '\'' +
+                ",owner='" + owner + '\'' +
                 ", relationType='" + relationType + '\'' +
                 '}';
     }
