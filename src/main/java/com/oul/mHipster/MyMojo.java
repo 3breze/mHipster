@@ -35,17 +35,6 @@ public class MyMojo extends AbstractMojo {
 
         MavenInfoWrapper mavenInfoWrapper = new MavenInfoWrapper(project);
 
-        /**
-         * Ne znam dal da izmestam ovih par reflection poziva u neki servis
-         * Obrati paznju na sledece:
-         * - klase iz Util paketa (imam puno mesta gde radim sitne operacije nad stringovima,
-         * i ne znam gde da ih smestam a bizarno mi je da sve izmestam u pomocne klase npr. Entity builder - infoFields
-         * construktor. Takve stvari me izludjuju)
-         * - Entity model builder gde mesam informacije iz source domenskih klasa i configuracije, te klasa ima ulogu
-         * i mappera i neki string concat-a
-         * - pristup layerConfig-uraciji iz Strategija
-         */
-
         try {
 
             // Read layers config
@@ -61,7 +50,7 @@ public class MyMojo extends AbstractMojo {
             EntityModelBuilder entityModelBuilder = new EntityModelBuilderImpl(layersConfig);
             List<Entity> entityModelList = annotated.stream().map(entityModelBuilder::mapSourceToEntity).collect(Collectors.toList());
             entityModelList.forEach(entity -> {
-                System.out.println(entity.getClassName() + " - attr:" + entity.getAttributes() + " \nrel:" + entity.getRelationAttributes());
+                System.out.println(entity.getClassName() + " - attr:" + entity.getAttributes());
                 System.out.println("--  --  --  --");
             });
             SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);

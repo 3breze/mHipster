@@ -7,6 +7,7 @@ com\oul\mHipster\util\Util.class
 com\oul\mHipster\service\generatorImpl\GenerateServiceClassStrategy.class
 com\oul\mHipster\layersConfig\LombokSettings.class
 com\oul\mHipster\layersConfig\Parameter.class
+com\oul\mHipster\model\RelationType.class
 com\oul\mHipster\service\generatorImpl\GenerateServiceImplClassStrategy.class
 com\oul\mHipster\service\impl\EntityModelBuilderImpl.class
 com\oul\mHipster\layersConfig\Method.class

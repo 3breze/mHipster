@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,23 +39,41 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
         builder.infoFields(clazz);
 
         Field[] fields = clazz.getDeclaredFields();
-
-        Map<Boolean, List<Field>> isRelationAttributeMap = Arrays.stream(fields).collect(Collectors.partitioningBy(this::isRelation));
-        builder.attributes(isRelationAttributeMap.get(false).stream().map(field ->
-                new Attribute(field.getType(), field.getName())).collect(Collectors.toList()));
-        builder.relationAttributes(isRelationAttributeMap.get(true).stream().map(field ->
-                new RelationAttribute(field.getType(), field.getName(), field.getType().toString(), "MMM"))
-                .collect(Collectors.toList()));
+        builder.attributes(Arrays.stream(fields).map(this::findRelation).collect(Collectors.toList()));
 
         return builder.build();
     }
 
-    private Boolean isRelation(Field field) {
-        Annotation annM2O = field.getAnnotation(ManyToOne.class);
+    private Attribute findRelation(Field field) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
-        Annotation annO2M = field.getAnnotation(OneToMany.class);
-        Annotation annO2O = field.getAnnotation(OneToOne.class);
-        return (Stream.of(annM2M, annM2O, annO2M, annO2O).anyMatch(Objects::nonNull));
+        if (annM2M != null) {
+            Class<? extends Annotation> type = annM2M.annotationType();
+            System.out.println("Values of " + type.getName());
+
+            for (Method method : type.getDeclaredMethods()) {
+                Object value = null;
+                try {
+                    value = method.invoke(annM2M, (Object[]) null);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(" " + method.getName() + ": " + value);
+            }
+            return new RelationAttribute(field.getType(), field.getName(), field.getType().toString(), RelationType.MANYTOMANY);
+        }
+        List<Annotation> annotations = new ArrayList<>();
+        annotations.add(field.getAnnotation(ManyToOne.class));
+        annotations.add(field.getAnnotation(OneToMany.class));
+        annotations.add(field.getAnnotation(OneToOne.class));
+        for (Annotation annotation : annotations) {
+            if (annotation != null) {
+                Class<? extends Annotation> type = annotation.annotationType();
+                System.out.println(">>> " + type.getSimpleName());
+                return new RelationAttribute(field.getType(), field.getName(),
+                        field.getType().toString(), RelationType.valueOf(type.getSimpleName().toUpperCase()));
+            }
+        }
+        return new Attribute(field.getType(), field.getName());
     }
 
 

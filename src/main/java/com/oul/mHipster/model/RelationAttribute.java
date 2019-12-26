@@ -2,9 +2,9 @@ package com.oul.mHipster.model;
 
 public class RelationAttribute extends Attribute {
     private String owner;
-    private String relationType;
+    private RelationType relationType;
 
-    public RelationAttribute(Class<?> type, String value, String owner, String relationType) {
+    public RelationAttribute(Class<?> type, String value, String owner, RelationType relationType) {
         super(type, value);
         this.owner = owner;
         this.relationType = relationType;
@@ -18,17 +18,19 @@ public class RelationAttribute extends Attribute {
         this.owner = owner;
     }
 
-    public String getRelationType() {
+    public RelationType getRelationType() {
         return relationType;
     }
 
-    public void setRelationType(String relationType) {
+    public void setRelationType(RelationType relationType) {
         this.relationType = relationType;
     }
 
     @Override
     public String toString() {
         return "RelationAttribute{" +
+                "type='" + super.getType() + '\'' +
+                "value='" + super.getValue() + '\'' +
                 "owner='" + owner + '\'' +
                 ", relationType='" + relationType + '\'' +
                 '}';
