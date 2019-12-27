@@ -40,45 +40,44 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
         builder.infoFields(clazz);
 
         Field[] fields = clazz.getDeclaredFields();
-        builder.attributes(Arrays.stream(fields).map(this::findRelation).collect(Collectors.toList()));
+        builder.attributes(Arrays.stream(fields).map(field -> findRelation(field, clazz)).collect(Collectors.toList()));
 
         return builder.build();
     }
 
-    private Attribute findRelation(Field field) {
+    private Attribute findRelation(Field field, Class clazz) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
         Annotation annO2M = field.getAnnotation(OneToMany.class);
-        if (annM2M != null || annO2M != null) {
-            Annotation annotation = annM2M != null ? annM2M : annO2M;
-            Class<? extends Annotation> type = annotation.annotationType();
-            System.out.println("Values of " + type.getName());
+        Annotation annO2O = field.getAnnotation(OneToOne.class);
+        Annotation annM2O = field.getAnnotation(ManyToOne.class);
+        //onaj drugi case:
+        //manytoone owner je uvek onaj drugi
+        //ako ima mappedBy owner je onaj drugi
 
-            for (Method method : type.getDeclaredMethods()) {
-                Object value = null;
-                try {
-                    value = method.invoke(annotation, (Object[]) null);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(" " + method.getName() + ": " + value);
-            }
-            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-            Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
-            return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(), RelationType.MANYTOMANY);
-        }
-
-        List<Annotation> annotations = new ArrayList<>();
-        annotations.add(field.getAnnotation(ManyToOne.class));
-        annotations.add(field.getAnnotation(OneToOne.class));
-        for (Annotation annotation : annotations) {
-            if (annotation != null) {
-                Class<? extends Annotation> type = annotation.annotationType();
-                // POGRESNO: treba da setujem clasu ciji je field (ManyToOne -> many je uvek owner)
-                return new RelationAttribute(field.getType(), field.getName(),
-                        field.getClass().getSimpleName(), RelationType.valueOf(type.getSimpleName().toUpperCase()));
-            }
-        }
+        //ti si owner:
+        //kad ti je mappedBy prazan i nisi manytoone
+        Stream.of(annM2M, annO2M, annO2O, annM2O).filter(Objects::nonNull).map(annotation -> resolveRelation(annotation,field,clazz));
+//        if (Objects.isNull(videoClubs))
         return new Attribute(field.getType(), field.getName());
+    }
+
+    public Attribute resolveRelation(Annotation annotation, Field field, Class clazz){
+        Class<? extends Annotation> type = annotation.annotationType();
+
+        for (Method method : type.getDeclaredMethods()) {
+            Object value = null;
+            try {
+                value = method.invoke(annotation, (Object[]) null);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            if (method.getName().equals("mappedBy") && value == null) {
+                return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(), RelationType.MANYTOMANY);
+            }
+        }
+        ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
+        return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(), RelationType.MANYTOMANY);
     }
 
 
