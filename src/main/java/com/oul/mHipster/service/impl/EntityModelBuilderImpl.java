@@ -19,7 +19,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,12 +58,13 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
 
         //ti si owner:
         //kad ti je mappedBy prazan i nisi manytoone
-        Stream.of(annM2M, annO2M, annO2O, annM2O).filter(Objects::nonNull).map(annotation -> resolveRelation(annotation,field,clazz));
-//        if (Objects.isNull(videoClubs))
-        return new Attribute(field.getType(), field.getName());
+        return Stream.of(annM2M, annO2M, annO2O, annM2O).filter(Objects::nonNull)
+                .map(annotation -> resolveRelation(annotation, field, clazz))
+                .findFirst()
+                .orElse(new Attribute(field.getType(), field.getName()));
     }
 
-    public Attribute resolveRelation(Annotation annotation, Field field, Class clazz){
+    private Attribute resolveRelation(Annotation annotation, Field field, Class clazz) {
         Class<? extends Annotation> type = annotation.annotationType();
 
         for (Method method : type.getDeclaredMethods()) {
@@ -71,13 +74,17 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            if (method.getName().equals("mappedBy") && value == null) {
-                return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(), RelationType.MANYTOMANY);
+            if (method.getName().equals("mappedBy") && value != "") {
+                ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+                Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
+                return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(),
+                        RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
+            } else if (method.getName().equals("mappedBy")) {
+                return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(),
+                        RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }
         }
-        ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-        Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
-        return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(), RelationType.MANYTOMANY);
+        return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(), RelationType.MANYTOONE);
     }
 
 
