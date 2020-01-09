@@ -74,12 +74,12 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            if (method.getName().equals("mappedBy") && value != "") {
+            if (method.getName().equals("mappedBy") && !value.equals("")) {
                 ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                 Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
                 return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(),
                         RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
-            } else if (method.getName().equals("mappedBy")) {
+            } else if (method.getName().equals("mappedBy") && value.equals("")) {
                 return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(),
                         RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }

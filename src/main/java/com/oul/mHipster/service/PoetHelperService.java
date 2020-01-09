@@ -36,6 +36,8 @@ public class PoetHelperService {
                 layerMap.get(LayerName.DAO.toString()).getClassName()));
         typeNameMap.put("apiClass", ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
                 layerMap.get(LayerName.API.toString()).getClassName()));
+        typeNameMap.put("serviceImplClass", ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
+                layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()));
         return typeNameMap;
     }
 

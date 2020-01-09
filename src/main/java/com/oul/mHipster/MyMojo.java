@@ -49,12 +49,12 @@ public class MyMojo extends AbstractMojo {
             // Generate classes and layers
             EntityModelBuilder entityModelBuilder = new EntityModelBuilderImpl(layersConfig);
             List<Entity> entityModelList = annotated.stream().map(entityModelBuilder::mapSourceToEntity).collect(Collectors.toList());
-            entityModelList.forEach(entity -> {
-                System.out.println(entity.getClassName() + " - attr:" + entity.getAttributes());
-                System.out.println("--  --  --  --");
-            });
+//            entityModelList.forEach(entity -> {
+//                System.out.println(entity.getClassName() + " - attr:" + entity.getAttributes());
+//                System.out.println("--  --  --  --");
+//            });
             SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);
-//            entityModelBuilder.buildLayers(sourceDomainLayer);
+            entityModelBuilder.buildLayers(sourceDomainLayer);
 
         } catch (JAXBException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");
