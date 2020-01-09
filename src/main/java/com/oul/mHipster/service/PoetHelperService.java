@@ -2,13 +2,14 @@ package com.oul.mHipster.service;
 
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.model.Attribute;
-import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.LayerClass;
+import com.oul.mHipster.model.*;
 import com.squareup.javapoet.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PoetHelperService {
@@ -28,9 +29,9 @@ public class PoetHelperService {
         Map<String, TypeName> typeNameMap = new HashMap<>();
 
         typeNameMap.put("domainClass", ClassName.get(entity.getPackageName(), entity.getClassName()));
-        typeNameMap.put("requestDtoClass", ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
+        typeNameMap.put("requestClazz", ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
                 layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()));
-        typeNameMap.put("responseDtoClass", ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
+        typeNameMap.put("responseClazz", ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
                 layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()));
         typeNameMap.put("daoClass", ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
                 layerMap.get(LayerName.DAO.toString()).getClassName()));
@@ -50,6 +51,40 @@ public class PoetHelperService {
                 .addStatement("throw new $T(\"$T $L\")", resourceNotFoundClass, resourceNotFoundClass, "not found!")
                 .endControlFlow()
                 .addStatement("$T $L = $L.get()", entity.getClassName(), entity.getInstanceName(), entity.getOptionalName())
+                .build();
+    }
+
+    public MethodSpec buildConstructor(Entity entity) {
+        Map<String, LayerClass> layerMap = entity.getLayers();
+        Map<String, TypeName> typeNameMap = createTypeNames(entity);
+        List<FieldSpec> fieldSpecList = new ArrayList<>();
+        List<ParameterSpec> parameterSpecsList = new ArrayList<>();
+
+        entity.getAttributes().parallelStream()
+                .filter(RelationAttribute.class::isInstance)
+                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
+                        ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
+                                ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
+                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
+                        ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
+                .forEach(attribute -> {
+                    fieldSpecList.add(FieldSpec
+                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
+                            .addModifiers(Modifier.PRIVATE)
+                            .build());
+                    parameterSpecsList.add(ParameterSpec
+                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
+                            .build());
+                });
+
+        CodeBlock.Builder builder = CodeBlock.builder();
+        fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
+
+        return MethodSpec.constructorBuilder()
+                .addAnnotation(Autowired.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameters(parameterSpecsList)
+                .addCode(builder.build())
                 .build();
     }
 

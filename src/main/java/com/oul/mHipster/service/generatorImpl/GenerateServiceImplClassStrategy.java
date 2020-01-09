@@ -40,42 +40,12 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         Map<String, TypeName> typeNameMap = poetHelperService.createTypeNames(entity);
 //        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
-        List<FieldSpec> fieldSpecList = new ArrayList<>();
-        List<ParameterSpec> parameterSpecsList = new ArrayList<>();
         FieldSpec daoField = FieldSpec
                 .builder(typeNameMap.get("daoClass"), layerMap.get(LayerName.DAO.toString()).getClassName())
                 .addModifiers(Modifier.PRIVATE)
                 .build();
-        fieldSpecList.add(daoField);
 
-        entity.getAttributes().parallelStream()
-                .filter(RelationAttribute.class::isInstance)
-                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
-                        ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
-                                ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
-                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
-                        ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
-                .forEach(attribute -> {
-                    fieldSpecList.add(FieldSpec
-                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
-                            .addModifiers(Modifier.PRIVATE)
-                            .build());
-                    parameterSpecsList.add(ParameterSpec
-                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
-                            .build());
-                });
-
-        // CONSTRUCTOR
-        CodeBlock.Builder builder = CodeBlock.builder();
-        fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
-
-        MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addAnnotation(Autowired.class)
-                .addModifiers(Modifier.PUBLIC)
-                .addParameters(parameterSpecsList)
-                .addCode(builder.build())
-                .build();
-
+        MethodSpec constructor = poetHelperService.buildConstructor(entity);
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("SERVICE_IMPL")).findFirst();
         if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
