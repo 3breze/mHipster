@@ -5,7 +5,9 @@ import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.SourceDomainLayer;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
+import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityModelBuilder;
+import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
 import com.oul.mHipster.service.impl.EntityModelBuilderImpl;
 import com.oul.mHipster.util.ClassUtils;
 import com.oul.mHipster.util.ConfigUtil;
@@ -54,6 +56,8 @@ public class MyMojo extends AbstractMojo {
 //                System.out.println("--  --  --  --");
 //            });
             SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);
+            EntityManagerFactory entityManagerFactory = EntityManagerFactoryImpl.getInstance();
+            entityManagerFactory.createEntityManager(sourceDomainLayer);
             entityModelBuilder.buildLayers(sourceDomainLayer);
 
         } catch (JAXBException e) {

@@ -91,7 +91,7 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
     @Override
     public void buildLayers(SourceDomainLayer sourceDomainLayer) {
         sourceDomainLayer.getEntities().forEach(entity -> {
-            Map<String, LayerClass> layersMap = buildLayerClass(entity, sourceDomainLayer);
+            Map<String, ClassNamingInfo> layersMap = buildLayerClass(entity, sourceDomainLayer);
             entity.setLayers(layersMap);
         });
 
@@ -105,12 +105,12 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
     }
 
     @Override
-    public Map<String, LayerClass> buildLayerClass(Entity entity, SourceDomainLayer sourceDomainLayer) {
+    public Map<String, ClassNamingInfo> buildLayerClass(Entity entity, SourceDomainLayer sourceDomainLayer) {
         return layersConfig.getLayers().stream().collect(Collectors.toMap(Layer::getName, layer -> {
             String className = entity.getClassName() + layer.getNamingSuffix();
             String instanceName = ClassUtils.instanceNameBuilder(className);
             String packageName = sourceDomainLayer.getRootPackageName() + "." + layer.getPackageName();
-            return new LayerClass(className, instanceName, packageName);
+            return new ClassNamingInfo(className, instanceName, packageName);
         }));
     }
 

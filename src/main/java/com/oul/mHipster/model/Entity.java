@@ -11,7 +11,7 @@ public class Entity {
     private String instanceName;
     private String packageName;
     private String optionalName;
-    private Map<String, LayerClass> layers;
+    private Map<String, ClassNamingInfo> layers;
     private List<Attribute> attributes;
     private TypeSpec typeSpec;
 
@@ -47,11 +47,11 @@ public class Entity {
         this.optionalName = optionalName;
     }
 
-    public Map<String, LayerClass> getLayers() {
+    public Map<String, ClassNamingInfo> getLayers() {
         return layers;
     }
 
-    public void setLayers(Map<String, LayerClass> layers) {
+    public void setLayers(Map<String, ClassNamingInfo> layers) {
         this.layers = layers;
     }
 
@@ -80,7 +80,7 @@ public class Entity {
         private String instanceName;
         private String packageName;
         private String optionalName;
-        private Map<String, LayerClass> layers;
+        private Map<String, ClassNamingInfo> layers;
         private List<Attribute> attributes;
         private TypeSpec typeSpec;
 

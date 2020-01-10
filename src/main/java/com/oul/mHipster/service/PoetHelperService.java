@@ -1,18 +1,24 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.model.*;
+import com.oul.mHipster.model.Attribute;
+import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PoetHelperService {
+
+    private EntityManagerFactory entityManagerFactory;
+
+    public PoetHelperService() {
+        this.entityManagerFactory = EntityManagerFactoryImpl.getInstance();
+    }
 
     public MethodSpec buildGetter(Attribute attribute) {
         String fieldName = attribute.getValue();
@@ -22,24 +28,6 @@ public class PoetHelperService {
 
     private String buildGetterName(String field) {
         return "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
-    }
-
-    public Map<String, TypeName> createTypeNames(Entity entity) {
-        Map<String, LayerClass> layerMap = entity.getLayers();
-        Map<String, TypeName> typeNameMap = new HashMap<>();
-
-        typeNameMap.put("domainClass", ClassName.get(entity.getPackageName(), entity.getClassName()));
-        typeNameMap.put("requestClazz", ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()));
-        typeNameMap.put("responseClazz", ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
-                layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()));
-        typeNameMap.put("daoClass", ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
-                layerMap.get(LayerName.DAO.toString()).getClassName()));
-        typeNameMap.put("apiClass", ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
-                layerMap.get(LayerName.API.toString()).getClassName()));
-        typeNameMap.put("serviceImplClass", ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
-                layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()));
-        return typeNameMap;
     }
 
     public CodeBlock buildFindByIdCodeBlock(Entity entity) {
@@ -54,28 +42,26 @@ public class PoetHelperService {
                 .build();
     }
 
+
     public MethodSpec buildConstructor(Entity entity) {
-        Map<String, LayerClass> layerMap = entity.getLayers();
-        Map<String, TypeName> typeNameMap = createTypeNames(entity);
+
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         List<ParameterSpec> parameterSpecsList = new ArrayList<>();
 
-        entity.getAttributes().parallelStream()
-                .filter(RelationAttribute.class::isInstance)
-                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
-                        ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
-                                ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
-                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
-                        ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
-                .forEach(attribute -> {
-                    fieldSpecList.add(FieldSpec
-                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
-                            .addModifiers(Modifier.PRIVATE)
-                            .build());
-                    parameterSpecsList.add(ParameterSpec
-                            .builder(typeNameMap.get("serviceImplClass"), layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName())
-                            .build());
-                });
+        List<Attribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
+        relationAttributes.forEach(attribute -> {
+
+            // javapoet za kreiranje constructora ce da koristi i api layer tako da ne moze uvek "servuceImplClass"
+            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "serviceImplClass");
+
+            fieldSpecList.add(FieldSpec
+                    .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
+                    .addModifiers(Modifier.PRIVATE)
+                    .build());
+            parameterSpecsList.add(ParameterSpec
+                    .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
+                    .build());
+        });
 
         CodeBlock.Builder builder = CodeBlock.builder();
         fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));

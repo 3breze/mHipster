@@ -1,11 +1,11 @@
 package com.oul.mHipster.model;
 
-public class LayerClass {
+public class ClassNamingInfo {
     private String className;
     private String instanceName;
     private String packageName;
 
-    public LayerClass(String className, String instanceName, String packageName) {
+    public ClassNamingInfo(String className, String instanceName, String packageName) {
         this.className = className;
         this.instanceName = instanceName;
         this.packageName = packageName;

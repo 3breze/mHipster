@@ -1,7 +1,7 @@
 package com.oul.mHipster.service;
 
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.LayerClass;
+import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.SourceDomainLayer;
 
 import java.util.Map;
@@ -12,5 +12,5 @@ public interface EntityModelBuilder {
 
     void buildLayers(SourceDomainLayer sourceDomainLayer);
 
-    Map<String, LayerClass> buildLayerClass(Entity entity, SourceDomainLayer sourceDomainLayer);
+    Map<String, ClassNamingInfo> buildLayerClass(Entity entity, SourceDomainLayer sourceDomainLayer);
 }
