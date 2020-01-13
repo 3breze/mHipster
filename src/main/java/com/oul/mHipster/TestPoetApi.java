@@ -138,7 +138,9 @@ public class TestPoetApi {
                         .addAnnotation(Override.class)
                         .addParameter(param)
                         .addStatement(codeBlock2)
-                        .returns(responseDtoClass)
+                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("Pageeelone"),
+                                responseDtoClass))
+//                        .returns(responseDtoClass)
                         .build())
                 .build();
 

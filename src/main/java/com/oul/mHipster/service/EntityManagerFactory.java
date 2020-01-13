@@ -16,7 +16,11 @@ public interface EntityManagerFactory {
 
     FieldTypeNameWrapper getProperty(String entityName, String layerName);
 
-    void createTypeNames();
+    FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName);
+
+    void createRelationTypeNames();
+
+    void createDependenciesTypeNames();
 
     List<Attribute> findRelationAttributes(Entity entity);
 

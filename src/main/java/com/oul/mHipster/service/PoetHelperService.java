@@ -42,8 +42,8 @@ public class PoetHelperService {
                 .build();
     }
 
-
-    public MethodSpec buildConstructor(Entity entity) {
+    //parametarizovano za serviceImpl i api layer-e
+    public MethodSpec buildConstructor(Entity entity, String layerName) {
 
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         List<ParameterSpec> parameterSpecsList = new ArrayList<>();
@@ -51,8 +51,7 @@ public class PoetHelperService {
         List<Attribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
         relationAttributes.forEach(attribute -> {
 
-            // javapoet za kreiranje constructora ce da koristi i api layer tako da ne moze uvek "servuceImplClass"
-            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "serviceImplClass");
+            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), layerName);
 
             fieldSpecList.add(FieldSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())

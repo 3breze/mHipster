@@ -1,5 +1,6 @@
 package com.oul.mHipster.service.impl;
 
+import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.*;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
@@ -9,6 +10,7 @@ import com.squareup.javapoet.ClassName;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
@@ -27,7 +29,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     @Override
     public void createEntityManager(SourceDomainLayer sourceDomainLayer) {
         this.sourceDomainLayer = sourceDomainLayer;
-        createTypeNames();
+        createDependenciesTypeNames();
+        createRelationTypeNames();
     }
 
     @Override
@@ -37,7 +40,20 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
     @Override
     public FieldTypeNameWrapper getProperty(String entityName, String layerName) {
-        return checkIfDomain(entityName) ? metamodel.get(entityName).get(layerName) : new FieldTypeNameWrapper(ClassName.bestGuess(layerName), "nazivPoljaVrvUvekIdSamo");
+        return Optional.ofNullable(metamodel.get(entityName).get(layerName))
+                .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
+    }
+
+    @Override
+    public FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName) {
+        return new FieldTypeNameWrapper(ClassName.bestGuess(layerName), fieldName);
+    }
+
+    //na top nivou provera da li je generic, split pa za oba provera -> da li je u modelu (key-evi: classNames i
+    // dependencies) ili je obican field (tad nam treba fieldName)
+
+    private Boolean checkIfGeneric(String fieldName) {
+        return fieldName.contains("&lt;");
     }
 
     @Override
@@ -55,22 +71,45 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
                 .collect(Collectors.toList());
     }
 
+    public void createDependenciesTypeNames() {
+        Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
+
+        typeNameMap.put("pageable", new FieldTypeNameWrapper(
+                ClassName.get("org.springframework.data.domain", "Pageable"), "pageable"));
+        typeNameMap.put("page", new FieldTypeNameWrapper(
+                ClassName.get("org.springframework.data.domain", "Page"), "page"));
+        typeNameMap.put("pageImpl", new FieldTypeNameWrapper(
+                ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
+        typeNameMap.put("predicate", new FieldTypeNameWrapper(
+                ClassName.get("import com.querydsl.core.types", "Predicate"), "predicate"));
+
+        metamodel.put("dependencies", typeNameMap);
+    }
+
     @Override
-    public void createTypeNames() {
+    public void createRelationTypeNames() {
         this.sourceDomainLayer.getEntities().forEach(entity -> {
             Map<String, ClassNamingInfo> layerMap = entity.getLayers();
             Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
-            typeNameMap.put("domainClass", new FieldTypeNameWrapper(ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
-            typeNameMap.put("requestClazz", new FieldTypeNameWrapper(ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-                    layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
-            typeNameMap.put("responseClazz", new FieldTypeNameWrapper(ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
-                    layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
-            typeNameMap.put("daoClass", new FieldTypeNameWrapper(ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
-                    layerMap.get(LayerName.DAO.toString()).getClassName()), entity.getInstanceName()));
-            typeNameMap.put("apiClass", new FieldTypeNameWrapper(ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
-                    layerMap.get(LayerName.API.toString()).getClassName()), entity.getInstanceName()));
-            typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
-                    layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()), entity.getInstanceName()));
+
+            typeNameMap.put("domainClass", new FieldTypeNameWrapper(
+                    ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
+            typeNameMap.put("requestClazz", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
+                            layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
+            typeNameMap.put("responseClazz", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
+                            layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
+            typeNameMap.put("daoClass", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
+                            layerMap.get(LayerName.DAO.toString()).getClassName()), entity.getInstanceName()));
+            typeNameMap.put("apiClass", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
+                            layerMap.get(LayerName.API.toString()).getClassName()), entity.getInstanceName()));
+            typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
+                            layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()), entity.getInstanceName()));
+
             metamodel.put(entity.getClassName(), typeNameMap);
         });
     }

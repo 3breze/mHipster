@@ -45,7 +45,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
-        MethodSpec constructor = poetHelperService.buildConstructor(entity);
+        MethodSpec constructor = poetHelperService.buildConstructor(entity, "serviceImplClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("SERVICE_IMPL")).findFirst();
         if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
