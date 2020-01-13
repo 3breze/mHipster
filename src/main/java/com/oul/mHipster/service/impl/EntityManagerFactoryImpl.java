@@ -6,6 +6,8 @@ import com.oul.mHipster.model.*;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,27 +40,64 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
         return metamodel;
     }
 
+    /*
+     * ?
+     * FieldName i layerName kao parametri za kljuceve nestovanih mapa u metamodelu se mesaju ali se misli na isto
+     * Iz perspektive typeName-a za dao smislenije da se parametar zove layerName, ali iz perspektive return type-a
+     * on trazi kljuc pod parametrom fieldName.
+     * GetPropety i checkIfInModel jako slicni, ali u prvom ne mogu da u else-u uradim BestGuess jer mi treba parametar
+     * name da vratim u tom slucaju (prakticno getProperty uvek mora da nadje FieldType domenske klase, exception je
+     * cisto reda radi tu). CheckIfInModelu moze da ide dalje pretragu putem BestGuess-a jer ga trazi samo za potrebe
+     * popunjavanja typeArgument-a u generic tipu te mu ne treba parametar za ime.
+     */
+
+    /**
+     * Method overriding za pronalazenje method parametara (nikad nece biti generic polja).
+     */
     @Override
     public FieldTypeNameWrapper getProperty(String entityName, String layerName) {
         return Optional.ofNullable(metamodel.get(entityName).get(layerName))
                 .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
     }
 
+    /**
+     * Ako se radi o polju koja nisu domenske klase (eg. "Long id, String name")
+     */
     @Override
     public FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName) {
         return new FieldTypeNameWrapper(ClassName.bestGuess(layerName), fieldName);
     }
 
-    //na top nivou provera da li je generic, split pa za oba provera -> da li je u modelu (key-evi: classNames i
-    // dependencies) ili je obican field (tad nam treba fieldName)
-
-    private Boolean checkIfGeneric(String fieldName) {
-        return fieldName.contains("&lt;");
+    /**
+     * Na top nivou ide provera da li je generic polje, ako jeste radim split, pa za genericType i typeArgument ide
+     * dalja provera -> da li je u modelu (key-evi: classNames ili dependencies) ili je obican field (ne treba nam
+     * fieldName kao u slucaju parametara methoda)
+     */
+    @Override
+    public TypeName getReturnTypeName(String entityName, String fieldName) {
+        return fieldName.contains("&lt;") ? parameterizedTypeTokenSplit(fieldName, entityName) : checkIfInModel(entityName, fieldName).getTypeName();
     }
 
-    @Override
-    public Boolean checkIfDomain(String entityName) {
-        return metamodel.containsKey(entityName);
+    /**
+     * Eg. splitujemo "Page&lt;responseClazz&gt;"
+     * ParameterizedTypeName vraca typeName
+     */
+    private TypeName parameterizedTypeTokenSplit(String genericField, String entityName) {
+        FieldTypeNameWrapper genericType = checkIfInModel(genericField.substring(0, genericField.indexOf("&lt;")), entityName);
+        FieldTypeNameWrapper typeArgument = checkIfInModel(genericField.substring(genericField.indexOf("&lt;") + 1,
+                genericField.indexOf("&gt;")), entityName);
+        return ParameterizedTypeName.get((ClassName) genericType.getTypeName(),
+                typeArgument.getTypeName());
+    }
+
+    /**
+     * Nazivi polja su kljucevi nestovane mape. Nad mapa za kljuceve ima "dependencies" (gde spadaju QueryDSL i Sping Data
+     * paketi) i nazive clasa entita u projektu ("TechnicalData", "Company"...).
+     * Provera fieldName-a je nad kljucevima nestovanih klasa pod dva kljuca: naziva klase datog entiteta i dependencies.
+     */
+    private FieldTypeNameWrapper checkIfInModel(String entityName, String fieldName) {
+        return Optional.ofNullable(metamodel.get(entityName).get(fieldName))
+                .orElse(new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName));
     }
 
     @Override

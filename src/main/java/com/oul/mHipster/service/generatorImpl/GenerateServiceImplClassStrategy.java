@@ -11,10 +11,7 @@ import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.PoetHelperService;
 import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
 import com.oul.mHipster.util.Util;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.springframework.stereotype.Service;
 
 import javax.lang.model.element.Modifier;
@@ -61,13 +58,14 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                                 .build());
             });
 
-            FieldTypeNameWrapper returnTypeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), method.getMethodSignature().getReturns());
+            TypeName returnTypeName = entityManagerFactory.getReturnTypeName(entity.getClassName(),
+                    method.getMethodSignature().getReturns());
 
             methods.add(MethodSpec.methodBuilder(method.getType())
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(parameters)
-                    .returns(returnTypeNameWrapper.getTypeName())
+                    .returns(returnTypeName)
                     .build());
         });
 

@@ -149,6 +149,10 @@ public class TestPoetApi {
                 .indent("    ")
                 .build();
 
+        String ttt = "Page<Lolo>";
+        System.out.println(ttt.substring(0, ttt.indexOf("<")));
+        System.out.println(ttt.substring(ttt.indexOf("<") + 1, ttt.indexOf(">")));
+
         try {
             javaFile.writeTo(System.out);
         } catch (IOException e) {
