@@ -26,11 +26,14 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\gene
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\wrapper\LayerInfoWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\generatorImpl\GenerateDaoClassStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\LombokSettings.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\LayerClass.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\FieldTypeNameWrapper.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\ClassNamingInfo.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\MethodSignature.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\generatorImpl\UnknownLayerStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\JavaFileMakerServiceImpl.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\EntityManagerFactoryImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\JavaFileMakerService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\Entity.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\EntityManagerFactory.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\Layer.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\ConfigUtil.java

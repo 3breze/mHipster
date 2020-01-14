@@ -75,7 +75,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      */
     @Override
     public TypeName getReturnTypeName(String entityName, String fieldName) {
-        return fieldName.contains("&lt;") ? parameterizedTypeTokenSplit(fieldName, entityName) : checkIfInModel(entityName, fieldName).getTypeName();
+        return fieldName.contains("<") ? parameterizedTypeTokenSplit(fieldName, entityName) : checkIfInModel(entityName, fieldName).getTypeName();
     }
 
     /**
@@ -83,9 +83,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      * ParameterizedTypeName vraca typeName
      */
     private TypeName parameterizedTypeTokenSplit(String genericField, String entityName) {
-        FieldTypeNameWrapper genericType = checkIfInModel(genericField.substring(0, genericField.indexOf("&lt;")), entityName);
-        FieldTypeNameWrapper typeArgument = checkIfInModel(genericField.substring(genericField.indexOf("&lt;") + 1,
-                genericField.indexOf("&gt;")), entityName);
+        System.out.println("parameterized: " + genericField);
+        FieldTypeNameWrapper genericType = checkIfInModel(entityName, genericField.substring(0, genericField.indexOf("<")));
+        FieldTypeNameWrapper typeArgument = checkIfInModel(entityName, genericField.substring(genericField.indexOf("<") + 1,
+                genericField.indexOf(">")));
+
         return ParameterizedTypeName.get((ClassName) genericType.getTypeName(),
                 typeArgument.getTypeName());
     }
@@ -96,8 +98,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      * Provera fieldName-a je nad kljucevima nestovanih klasa pod dva kljuca: naziva klase datog entiteta i dependencies.
      */
     private FieldTypeNameWrapper checkIfInModel(String entityName, String fieldName) {
-        return Optional.ofNullable(metamodel.get(entityName).get(fieldName))
-                .orElse(new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName));
+        System.out.println("checkIfInModel: " + fieldName);
+        System.out.println(metamodel.get(entityName).get(fieldName));
+        FieldTypeNameWrapper field = metamodel.get(entityName).get(fieldName);
+        if (field != null) {
+            return field;
+        } else {
+            return new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName);
+        }
     }
 
     @Override
@@ -133,18 +141,21 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
             typeNameMap.put("domainClass", new FieldTypeNameWrapper(
                     ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
-            typeNameMap.put("requestClazz", new FieldTypeNameWrapper(
+            typeNameMap.put("requestClass", new FieldTypeNameWrapper(
                     ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
                             layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
-            typeNameMap.put("responseClazz", new FieldTypeNameWrapper(
+            typeNameMap.put("responseClass", new FieldTypeNameWrapper(
                     ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
-                            layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
+                            layerMap.get(LayerName.RESPONSE_DTO.toString()).getClassName()), entity.getInstanceName()));
             typeNameMap.put("daoClass", new FieldTypeNameWrapper(
                     ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
                             layerMap.get(LayerName.DAO.toString()).getClassName()), entity.getInstanceName()));
             typeNameMap.put("apiClass", new FieldTypeNameWrapper(
                     ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
                             layerMap.get(LayerName.API.toString()).getClassName()), entity.getInstanceName()));
+            typeNameMap.put("serviceClass", new FieldTypeNameWrapper(
+                    ClassName.get(layerMap.get(LayerName.SERVICE.toString()).getPackageName(),
+                            layerMap.get(LayerName.SERVICE.toString()).getClassName()), entity.getInstanceName()));
             typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(
                     ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
                             layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()), entity.getInstanceName()));

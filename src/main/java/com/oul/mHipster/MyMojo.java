@@ -56,8 +56,6 @@ public class MyMojo extends AbstractMojo {
 //                System.out.println("--  --  --  --");
 //            });
             SourceDomainLayer sourceDomainLayer = new SourceDomainLayer(mavenInfoWrapper.getName(), entityModelList);
-            EntityManagerFactory entityManagerFactory = EntityManagerFactoryImpl.getInstance();
-            entityManagerFactory.createEntityManager(sourceDomainLayer);
             entityModelBuilder.buildLayers(sourceDomainLayer);
 
         } catch (JAXBException e) {

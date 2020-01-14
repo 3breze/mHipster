@@ -19,33 +19,33 @@
             <type>concrete</type>
             <methods>
                 <method type="findAll">
-                    <methodSignature returns="Page&lt;responseClazz&gt;">
+                    <methodSignature returns="Page&lt;responseClass&gt;">
                         <parameters>
                             <parameter type="Predicate">predicate</parameter>
                             <parameter type="Pageable">pageable</parameter>
                         </parameters>
                     </methodSignature>
                     <methodBody>
-                        Page&lt;${domainClazz}&gt; page = ${dao}.findAll(predicate, pageable);
+                        Page&lt;${domainClass}&gt; page = ${dao}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
-                        page.stream().map(${responseClazz}::new).collect(Collectors.toList()), pageable,
+                        page.stream().map(${responseClass}::new).collect(Collectors.toList()), pageable,
                         page.getTotalElements())
                     </methodBody>
                 </method>
                 <method type="findById">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
                             <parameter type="Long">Id</parameter>
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}
-                        return new ${responseClazz}(${domain})
+                        return new ${responseClass}(${domain})
                     </methodBody>
                 </method>
                 <method type="save">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClazz">requestInst
+                            <parameter type="requestClass">requestInst
                             </parameter>
                         </parameters>
                     </methodSignature>
@@ -56,17 +56,17 @@
                     </methodBody>
                 </method>
                 <method type="update">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClazz">requestInst
+                            <parameter type="requestClass">requestInst
                             </parameter>
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}
-                        ${domainClazz} ${domainInst} = ${optionalInst}.get();
+                        ${domainClass} ${domainInst} = ${optionalInst}.get();
                         ${builderInject}
                         ${daoInst}.save(${domainInst})
-                        return new ${responseClazz}(${domainInst})
+                        return new ${responseClass}(${domainInst})
                     </methodBody>
                 </method>
                 <method type="delete">
@@ -87,7 +87,7 @@
             <type>interface</type>
             <methods>
                 <method type="findAll">
-                    <methodSignature returns="Page&lt;responseClazz&gt;">
+                    <methodSignature returns="Page&lt;responseClass&gt;">
                         <parameters>
                             <parameter type="Predicate">predicate</parameter>
                             <parameter type="Pageable">pageable</parameter>
@@ -95,24 +95,24 @@
                     </methodSignature>
                 </method>
                 <method type="findById">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
                             <parameter type="Long">Id</parameter>
                         </parameters>
                     </methodSignature>
                 </method>
                 <method type="save">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClazz">requestInst
+                            <parameter type="requestClass">requestInst
                             </parameter>
                         </parameters>
                     </methodSignature>
                 </method>
                 <method type="update">
-                    <methodSignature returns="responseClazz">
+                    <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClazz">requestInst
+                            <parameter type="requestClass">requestInst
                             </parameter>
                         </parameters>
                     </methodSignature>

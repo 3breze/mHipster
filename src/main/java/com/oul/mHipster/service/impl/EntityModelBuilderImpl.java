@@ -4,6 +4,7 @@ import com.oul.mHipster.layersConfig.Layer;
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.*;
+import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityModelBuilder;
 import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.JavaFileMakerService;
@@ -94,6 +95,9 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
             Map<String, ClassNamingInfo> layersMap = buildLayerClass(entity, sourceDomainLayer);
             entity.setLayers(layersMap);
         });
+
+        EntityManagerFactory entityManagerFactory = EntityManagerFactoryImpl.getInstance();
+        entityManagerFactory.createEntityManager(sourceDomainLayer);
 
         sourceDomainLayer.getEntities().forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
             GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
