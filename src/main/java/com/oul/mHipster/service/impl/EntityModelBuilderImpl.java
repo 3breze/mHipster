@@ -102,8 +102,8 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
         sourceDomainLayer.getEntities().forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
             GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
             TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
-            entityModel.setTypeSpec(typeSpec);
-            if(layer.getName().equals(LayerName.SERVICE_IMPL.toString())) System.out.println(typeSpec);
+            if(layer.getName().equals(LayerName.SERVICE_IMPL.toString()))
+                entityModel.setTypeSpec(typeSpec);
         }));
 
         javaFileMakerService.makeJavaFiles(sourceDomainLayer);
