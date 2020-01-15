@@ -58,6 +58,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                                 .build());
             });
 
+            System.out.println("entity: " + entity.getClassName() + ", method: " + method.getType());
             TypeName returnTypeName = entityManagerFactory.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
 

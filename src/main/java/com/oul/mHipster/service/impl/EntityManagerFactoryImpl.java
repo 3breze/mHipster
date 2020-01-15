@@ -9,11 +9,10 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
@@ -98,14 +97,15 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      * Provera fieldName-a je nad kljucevima nestovanih klasa pod dva kljuca: naziva klase datog entiteta i dependencies.
      */
     private FieldTypeNameWrapper checkIfInModel(String entityName, String fieldName) {
-        System.out.println("checkIfInModel: " + fieldName);
-        System.out.println(metamodel.get(entityName).get(fieldName));
-        FieldTypeNameWrapper field = metamodel.get(entityName).get(fieldName);
-        if (field != null) {
-            return field;
-        } else {
-            return new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName);
+        System.out.println("checkIfInModel>> " + fieldName);
+        FieldTypeNameWrapper entityBasedClass = metamodel.get(entityName).get(fieldName);
+        if (entityBasedClass == null) {
+            FieldTypeNameWrapper dependencyBasedClass = metamodel.get("dependencies").get(fieldName);
+            if (dependencyBasedClass == null)
+                return new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName);
+            return dependencyBasedClass;
         }
+        return entityBasedClass;
     }
 
     @Override
@@ -121,13 +121,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     public void createDependenciesTypeNames() {
         Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
 
-        typeNameMap.put("pageable", new FieldTypeNameWrapper(
+        typeNameMap.put("Pageable", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.domain", "Pageable"), "pageable"));
-        typeNameMap.put("page", new FieldTypeNameWrapper(
+        typeNameMap.put("Page", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.domain", "Page"), "page"));
-        typeNameMap.put("pageImpl", new FieldTypeNameWrapper(
+        typeNameMap.put("PageImpl", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
-        typeNameMap.put("predicate", new FieldTypeNameWrapper(
+        typeNameMap.put("Predicate", new FieldTypeNameWrapper(
                 ClassName.get("import com.querydsl.core.types", "Predicate"), "predicate"));
 
         metamodel.put("dependencies", typeNameMap);
