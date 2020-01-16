@@ -9,10 +9,11 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
@@ -39,17 +40,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
         return metamodel;
     }
 
-    /*
-     * ?
-     * FieldName i layerName kao parametri za kljuceve nestovanih mapa u metamodelu se mesaju ali se misli na isto
-     * Iz perspektive typeName-a za dao smislenije da se parametar zove layerName, ali iz perspektive return type-a
-     * on trazi kljuc pod parametrom fieldName.
-     * GetPropety i checkIfInModel jako slicni, ali u prvom ne mogu da u else-u uradim BestGuess jer mi treba parametar
-     * name da vratim u tom slucaju (prakticno getProperty uvek mora da nadje FieldType domenske klase, exception je
-     * cisto reda radi tu). CheckIfInModelu moze da ide dalje pretragu putem BestGuess-a jer ga trazi samo za potrebe
-     * popunjavanja typeArgument-a u generic tipu te mu ne treba parametar za ime.
-     */
-
     /**
      * Method overriding za pronalazenje method parametara (nikad nece biti generic polja).
      */
@@ -60,21 +50,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     }
 
     /**
-     * Ako se radi o polju koja nisu domenske klase (eg. "Long id, String name")
-     */
-    @Override
-    public FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName) {
-        return new FieldTypeNameWrapper(ClassName.bestGuess(layerName), fieldName);
-    }
-
-    /**
      * Na top nivou ide provera da li je generic polje, ako jeste radim split, pa za genericType i typeArgument ide
      * dalja provera -> da li je u modelu (key-evi: classNames ili dependencies) ili je obican field (ne treba nam
      * fieldName kao u slucaju parametara methoda)
      */
     @Override
     public TypeName getReturnTypeName(String entityName, String fieldName) {
-        return fieldName.contains("<") ? parameterizedTypeTokenSplit(fieldName, entityName) : checkIfInModel(entityName, fieldName).getTypeName();
+        return fieldName.contains("<") ? parameterizedTypeTokenSplit(fieldName, entityName) :
+                getProperty(entityName, fieldName, null).getTypeName();
     }
 
     /**
@@ -82,10 +65,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      * ParameterizedTypeName vraca typeName
      */
     private TypeName parameterizedTypeTokenSplit(String genericField, String entityName) {
-        System.out.println("parameterized: " + genericField);
-        FieldTypeNameWrapper genericType = checkIfInModel(entityName, genericField.substring(0, genericField.indexOf("<")));
-        FieldTypeNameWrapper typeArgument = checkIfInModel(entityName, genericField.substring(genericField.indexOf("<") + 1,
-                genericField.indexOf(">")));
+        FieldTypeNameWrapper genericType = getProperty(entityName, genericField.substring(0, genericField.indexOf("<")),
+                null);
+        FieldTypeNameWrapper typeArgument = getProperty(entityName, genericField.substring(genericField.indexOf("<") + 1,
+                genericField.indexOf(">")), null);
 
         return ParameterizedTypeName.get((ClassName) genericType.getTypeName(),
                 typeArgument.getTypeName());
@@ -96,13 +79,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
      * paketi) i nazive clasa entita u projektu ("TechnicalData", "Company"...).
      * Provera fieldName-a je nad kljucevima nestovanih klasa pod dva kljuca: naziva klase datog entiteta i dependencies.
      */
-    private FieldTypeNameWrapper checkIfInModel(String entityName, String fieldName) {
-        System.out.println("checkIfInModel>> " + fieldName);
-        FieldTypeNameWrapper entityBasedClass = metamodel.get(entityName).get(fieldName);
+    @Override
+    public FieldTypeNameWrapper getProperty(String entityName, String typeArgument, String instanceName) {
+        FieldTypeNameWrapper entityBasedClass = metamodel.get(entityName).get(typeArgument);
         if (entityBasedClass == null) {
-            FieldTypeNameWrapper dependencyBasedClass = metamodel.get("dependencies").get(fieldName);
+            FieldTypeNameWrapper dependencyBasedClass = metamodel.get("dependencies").get(typeArgument);
             if (dependencyBasedClass == null)
-                return new FieldTypeNameWrapper(ClassName.bestGuess(fieldName), fieldName);
+                return new FieldTypeNameWrapper(ClassName.bestGuess(typeArgument), instanceName);
             return dependencyBasedClass;
         }
         return entityBasedClass;

@@ -51,7 +51,9 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         serviceImplLayerOptional.get().getMethods().forEach(method -> {
             List<ParameterSpec> parameters = new ArrayList<>();
             method.getMethodSignature().getParameters().forEach(parameter -> {
-                FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "daoClass");
+                FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(),
+                        parameter.getType(), parameter.getName());
+
                 parameters.add(
                         ParameterSpec
                                 .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())

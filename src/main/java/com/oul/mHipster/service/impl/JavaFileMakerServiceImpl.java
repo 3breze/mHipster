@@ -12,7 +12,7 @@ public class JavaFileMakerServiceImpl implements JavaFileMakerService {
 
     @Override
     public void makeJavaFiles(SourceDomainLayer sourceDomainLayer) {
-
+        //Packagename se razliku na nivou typespeca a ne samo na nivou entiteta
         List<JavaFile> javaFileList = sourceDomainLayer.getEntities().stream()
                 .filter(entity -> entity.getTypeSpec() != null)
                 .map(entityModel -> JavaFile
