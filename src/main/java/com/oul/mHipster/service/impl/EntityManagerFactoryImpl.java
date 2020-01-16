@@ -42,6 +42,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
     /**
      * Method overriding za pronalazenje method parametara (nikad nece biti generic polja).
+     * TypeName-ovi klasa iz modela (ne ukljucuje dependencies i javine klase)
      */
     @Override
     public FieldTypeNameWrapper getProperty(String entityName, String layerName) {
@@ -92,12 +93,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     }
 
     @Override
-    public List<Attribute> findRelationAttributes(Entity entity) {
+    public List<RelationAttribute> findRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
                         ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
                                 ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
+                .map(attribute -> (RelationAttribute) attribute)
                 .collect(Collectors.toList());
     }
 
@@ -124,24 +126,30 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
             typeNameMap.put("domainClass", new FieldTypeNameWrapper(
                     ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
+
+            ClassNamingInfo requestInfo = layerMap.get(LayerName.REQUEST_DTO.toString());
             typeNameMap.put("requestClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.REQUEST_DTO.toString()).getPackageName(),
-                            layerMap.get(LayerName.REQUEST_DTO.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(requestInfo.getPackageName(), requestInfo.getClassName()), requestInfo.getInstanceName()));
+
+            ClassNamingInfo responseInfo = layerMap.get(LayerName.RESPONSE_DTO.toString());
             typeNameMap.put("responseClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.RESPONSE_DTO.toString()).getPackageName(),
-                            layerMap.get(LayerName.RESPONSE_DTO.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(responseInfo.getPackageName(), responseInfo.getClassName()), responseInfo.getInstanceName()));
+
+            ClassNamingInfo daoInfo = layerMap.get(LayerName.DAO.toString());
             typeNameMap.put("daoClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.DAO.toString()).getPackageName(),
-                            layerMap.get(LayerName.DAO.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(daoInfo.getPackageName(), daoInfo.getClassName()), daoInfo.getInstanceName()));
+
+            ClassNamingInfo apiInfo = layerMap.get(LayerName.API.toString());
             typeNameMap.put("apiClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.API.toString()).getPackageName(),
-                            layerMap.get(LayerName.API.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(apiInfo.getPackageName(), apiInfo.getClassName()), apiInfo.getInstanceName()));
+
+            ClassNamingInfo serviceInfo = layerMap.get(LayerName.SERVICE.toString());
             typeNameMap.put("serviceClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.SERVICE.toString()).getPackageName(),
-                            layerMap.get(LayerName.SERVICE.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(serviceInfo.getPackageName(), serviceInfo.getClassName()), serviceInfo.getInstanceName()));
+
+            ClassNamingInfo serviceImplInfo = layerMap.get(LayerName.SERVICE.toString());
             typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(
-                    ClassName.get(layerMap.get(LayerName.SERVICE_IMPL.toString()).getPackageName(),
-                            layerMap.get(LayerName.SERVICE_IMPL.toString()).getClassName()), entity.getInstanceName()));
+                    ClassName.get(serviceImplInfo.getPackageName(), serviceImplInfo.getClassName()), serviceImplInfo.getInstanceName()));
 
             metamodel.put(entity.getClassName(), typeNameMap);
         });

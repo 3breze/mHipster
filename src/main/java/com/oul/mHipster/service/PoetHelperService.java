@@ -3,6 +3,7 @@ package com.oul.mHipster.service;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
 import com.squareup.javapoet.*;
@@ -21,7 +22,7 @@ public class PoetHelperService {
     }
 
     public MethodSpec buildGetter(Attribute attribute) {
-        String fieldName = attribute.getValue();
+        String fieldName = attribute.getFieldName();
         String getterName = buildGetterName(fieldName);
         return MethodSpec.methodBuilder(getterName).returns(ClassName.bestGuess(attribute.getType().toString())).addModifiers(Modifier.PUBLIC).build();
     }
@@ -48,10 +49,20 @@ public class PoetHelperService {
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         List<ParameterSpec> parameterSpecsList = new ArrayList<>();
 
-        List<Attribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
+        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "daoClass");
+        fieldSpecList.add(FieldSpec
+                .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
+                .addModifiers(Modifier.PRIVATE)
+                .build());
+        parameterSpecsList.add(ParameterSpec
+                .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
+                .build());
+
+        List<RelationAttribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
+
         relationAttributes.forEach(attribute -> {
 
-            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), layerName);
+            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(attribute.getClassSimpleName(), "serviceClass");
 
             fieldSpecList.add(FieldSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
@@ -63,7 +74,7 @@ public class PoetHelperService {
         });
 
         CodeBlock.Builder builder = CodeBlock.builder();
-        fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb, cb));
+        fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb.name, cb.name));
 
         return MethodSpec.constructorBuilder()
                 .addAnnotation(Autowired.class)

@@ -78,16 +78,25 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
             if (method.getName().equals("mappedBy") && !value.equals("")) {
                 ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                 Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
-                return new RelationAttribute(field.getType(), field.getName(), relationDomainClass.getSimpleName(),
-                        RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
+                return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),
+                        relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             } else if (method.getName().equals("mappedBy") && value.equals("")) {
-                return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(),
-                        RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
+                Class<?> typeArgument = resolveTypeArgument(field);
+                return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
+                        clazz.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }
         }
-        return new RelationAttribute(field.getType(), field.getName(), clazz.getSimpleName(), RelationType.MANYTOONE);
+        return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),
+                clazz.getSimpleName(), RelationType.MANYTOONE);
     }
 
+    private Class<?> resolveTypeArgument(Field field) {
+        if (field.getType().toString().equals("interface java.util.List")) {
+            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+            return (Class<?>) genericType.getActualTypeArguments()[0];
+        }
+        return field.getType();
+    }
 
     @Override
     public void buildLayers(SourceDomainLayer sourceDomainLayer) {
@@ -104,7 +113,7 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
             TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
             // Potrebne izmene jer ce jedan entity imati niz TypeSpecova
             // Izmene trebaju i u javaFileMakerService gde se setuje packageName
-            if(layer.getName().equals(LayerName.SERVICE_IMPL.toString()))
+            if (layer.getName().equals(LayerName.SERVICE_IMPL.toString()))
                 entityModel.setTypeSpec(typeSpec);
         }));
 

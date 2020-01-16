@@ -2,11 +2,11 @@ package com.oul.mHipster.model;
 
 public class Attribute {
     private Class<?> type;
-    private String value;
+    private String fieldName;
 
-    public Attribute(Class<?> type, String value) {
+    public Attribute(Class<?> type, String fieldName) {
         this.type = type;
-        this.value = value;
+        this.fieldName = fieldName;
     }
 
     public Class<?> getType() {
@@ -17,19 +17,19 @@ public class Attribute {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
     @Override
     public String toString() {
         return "Attribute{" +
                 "type=" + type +
-                ", value='" + value + '\'' +
+                ", value='" + fieldName + '\'' +
                 '}';
     }
 }

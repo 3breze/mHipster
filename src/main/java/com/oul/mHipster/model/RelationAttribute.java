@@ -1,13 +1,23 @@
 package com.oul.mHipster.model;
 
 public class RelationAttribute extends Attribute {
+    private String classSimpleName;
     private String owner;
     private RelationType relationType;
 
-    public RelationAttribute(Class<?> type, String value, String owner, RelationType relationType) {
-        super(type, value);
+    public RelationAttribute(Class<?> type, String fieldName, String classSimpleName, String owner, RelationType relationType) {
+        super(type, fieldName);
+        this.classSimpleName = classSimpleName;
         this.owner = owner;
         this.relationType = relationType;
+    }
+
+    public String getClassSimpleName() {
+        return classSimpleName;
+    }
+
+    public void setClassSimpleName(String classSimpleName) {
+        this.classSimpleName = classSimpleName;
     }
 
     public String getOwner() {
@@ -30,7 +40,8 @@ public class RelationAttribute extends Attribute {
     public String toString() {
         return "RelationAttribute{" +
                 "type='" + super.getType() + '\'' +
-                ",value='" + super.getValue() + '\'' +
+                ",fieldName='" + super.getFieldName() + '\'' +
+                ",classSimpleName='" + classSimpleName + '\'' +
                 ",owner='" + owner + '\'' +
                 ", relationType='" + relationType + '\'' +
                 '}';

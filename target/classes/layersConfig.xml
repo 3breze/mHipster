@@ -35,7 +35,7 @@
                 <method type="findById">
                     <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="Long">Id</parameter>
+                            <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}

@@ -2,6 +2,7 @@ package com.oul.mHipster.service;
 
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.SourceDomainLayer;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.squareup.javapoet.TypeName;
@@ -25,5 +26,5 @@ public interface EntityManagerFactory {
 
     void createDependenciesTypeNames();
 
-    List<Attribute> findRelationAttributes(Entity entity);
+    List<RelationAttribute> findRelationAttributes(Entity entity);
 }

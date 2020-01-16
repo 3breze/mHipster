@@ -33,7 +33,6 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     @Override
     public TypeSpec generate(Entity entity) {
-//        Map<String, ClassNamingInfo> layerMap = entity.getLayers();
 //        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "daoClass");
@@ -60,7 +59,6 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                                 .build());
             });
 
-            System.out.println("entity: " + entity.getClassName() + ", method: " + method.getType());
             TypeName returnTypeName = entityManagerFactory.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
 
