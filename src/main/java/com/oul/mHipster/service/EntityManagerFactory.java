@@ -1,6 +1,5 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.SourceDomainLayer;

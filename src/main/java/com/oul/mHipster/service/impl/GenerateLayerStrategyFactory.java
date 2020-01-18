@@ -4,6 +4,14 @@ import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.generatorImpl.*;
 
+/**
+ * Ovde mi se bas svidja pristup i upotreba strategije, jedino bih pokusao da implementiram AbstractFactory pattern
+ * i pokusao da izbegnem TypeSpec tj zakucavanje za JavaPoet lib da bih sebi lako ostavio mogucnost da zamenim lib
+ *
+ * Znaci:
+ * factory: AbstractLayerStrategyFactory -> JPoetLayerStrategyFactory
+ * strategy: GenericApiClassBuilderStrategy -> JPoetApiClassBuilderStrategy
+ */
 public class GenerateLayerStrategyFactory {
 
     private final GenerateRequestDtoClassStrategy generateRequestDtoClassStrategy = new GenerateRequestDtoClassStrategy();

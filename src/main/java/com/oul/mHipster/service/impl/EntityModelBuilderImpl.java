@@ -84,7 +84,8 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
 
         //ti si owner:
         //kad ti je mappedBy prazan i nisi manytoone
-        return Stream.of(annM2M, annO2M, annO2O, annM2O).filter(Objects::nonNull)
+        return Stream.of(annM2M, annO2M, annO2O, annM2O)
+                .filter(Objects::nonNull)
                 .map(annotation -> resolveRelation(annotation, field, clazz))
                 .findFirst()
                 .orElse(new Attribute(field.getType(), field.getName()));

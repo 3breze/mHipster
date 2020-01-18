@@ -31,6 +31,15 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         this.layersConfig = Util.getValue();
     }
 
+    /**
+     * EntityManagerFactory je singleton da bi mogao da mu pristupas gde god je potrebno a cini mi se da bi to mofao da izbegnes.
+     * Negde sam procitao da cim imas vise od jednog singletona u aplikaciji nesto si lose dizajnirao.
+     * Cini mi se da bi trebala da postoji klasa EntityManager koja bi sadrzala entity i dodatne operacije nad njim koje
+     * ovde radis u factory, i da bi samo prosledjivanje EntityManagera bilo dovoljno da se izgradi TypeSpec.
+     *
+     * EntityManagerFactory bi, kako mu ime kaze trebao jedino da sadrzi meta informacije, tj sve EntityManagere po konkretnim Class vrednostima.
+     * Znaci nakon skeniranja da pokupi sve enititete i da im bude pristupna tacka gde ti trebaju
+     */
     @Override
     public TypeSpec generate(Entity entity) {
 //        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
