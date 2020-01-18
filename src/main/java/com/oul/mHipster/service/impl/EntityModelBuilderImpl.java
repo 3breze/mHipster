@@ -21,11 +21,36 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Previse nadleznosti za jedan servis!
+ * Trebalo bi ga razdvojiti na najmanje 2 servisa gde bi se jedan bavio skeniranjem modela a drugi izgradnjom layera
+ * jer su procesi nezavisni jedan od drugog.
+ *
+ * Ja bih cak razdvojio na 3 servisa gde bi prvi skenirao model, drugi logicki gradio layere tj modele layera na osnovu
+ * kojih se mogu izgraditi java fajlovi a treci samo na osnovu modela layera gradio konkretne java fajlove.
+ * Na taj nacin bi postigao da segmenti plugina mogu nezavisno da se grade i odrzavaju, imali bi jedino integraciju
+ * preko interfejsa i ona bi bila bas pogodna za mockovanje pri testiranju (mogao bi da zakucas izgled layera i da testiras build
+ * java klasa, ili da zakucas izgled domaina i da testiras kako ce izgraditi model layera). Najvaznije, zavisnost izmedju
+ * komponenti sistema ce biti mala i imaces mogucnost da prepises komponentu bez da izmenis pola projekta.
+ *
+ * Dodatno, zbog preglednosti i lakseg reuse-ovanja pomocnog koda servis bi trebao samo da implementira metode iz
+ * interfejsa. Dodatne pomocne metode (sve privatne metode) treba podeliti u dve grupe:
+ *
+ * 1. grupa koja se odnosi na isti poslovni proces (npr. findRelation, resolveRelation...) njih bi trebalo izmestiti iz klase
+ * ali ostaviti usko povezane sa servisom. Najbolje resenje za to je apstraktna nadklasa, koja bi se dalje mogla reuse-ovati
+ * kroz projekat ako uocis potrebu za slicnim servisom koji ipak ne bi mergeovao sa ovim.
+ *
+ * 2. grupa koja se odnosi na na druge alate (npr. resolveTypeArgument), takve bi stvari trebalo izdvajati u util klase,
+ * u ovom slucaju mogli bi imati ReflectionUtil servis koji bi imao dve metode:
+ *      boolean isParameterizedType(Field field);
+ *      Class<T> getParameterizedType(Field field);
+ */
 public class EntityModelBuilderImpl implements EntityModelBuilder {
 
     private LayersConfig layersConfig;
@@ -90,6 +115,12 @@ public class EntityModelBuilderImpl implements EntityModelBuilder {
                 clazz.getSimpleName(), RelationType.MANYTOONE);
     }
 
+    /**
+     * Ne proveravaj tip na ovaj nacin jer imas previse opcija parametrizovanih kolekcija.
+     *
+     * U ovom slucaju lepsa provera bi bila:
+     * field.getType().isAssignableFrom(Collection.class);
+     */
     private Class<?> resolveTypeArgument(Field field) {
         if (field.getType().toString().equals("interface java.util.List")) {
             ParameterizedType genericType = (ParameterizedType) field.getGenericType();
