@@ -1,4 +1,3 @@
-/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/SourceDomainLayer.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/RelationType.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/Entity.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/Attribute.java
@@ -26,7 +25,10 @@
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/generatorImpl/UnknownLayerStrategy.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/RelationAttribute.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/exception/JavaPoetErrorException.java
+/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/SourceClassService.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/layersConfig/enums/LayerName.java
+/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/impl/SourceClassServiceImpl.java
+/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/RootEntityModel.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/EntityManagerFactory.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/wrapper/MavenInfoWrapper.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/util/Util.java

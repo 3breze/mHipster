@@ -1,7 +1,7 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.model.SourceDomainLayer;
+import com.oul.mHipster.model.RootEntityModel;
 
 public interface JavaFileMakerService {
-    void makeJavaFiles(SourceDomainLayer sourceDomainLayer);
+    void makeJavaFiles(RootEntityModel rootEntityModel);
 }

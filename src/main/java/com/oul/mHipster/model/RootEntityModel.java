@@ -2,12 +2,12 @@ package com.oul.mHipster.model;
 
 import java.util.List;
 
-public class SourceDomainLayer {
+public class RootEntityModel {
 
     private String rootPackageName;
     private List<Entity> entities;
 
-    public SourceDomainLayer(String rootPackageName, List<Entity> entities) {
+    public RootEntityModel(String rootPackageName, List<Entity> entities) {
         this.rootPackageName = rootPackageName;
         this.entities = entities;
     }

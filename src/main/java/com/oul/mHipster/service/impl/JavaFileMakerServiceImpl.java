@@ -1,6 +1,6 @@
 package com.oul.mHipster.service.impl;
 
-import com.oul.mHipster.model.SourceDomainLayer;
+import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.service.JavaFileMakerService;
 import com.squareup.javapoet.JavaFile;
 
@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 public class JavaFileMakerServiceImpl implements JavaFileMakerService {
 
     @Override
-    public void makeJavaFiles(SourceDomainLayer sourceDomainLayer) {
+    public void makeJavaFiles(RootEntityModel rootEntityModel) {
         //Packagename se razliku na nivou typespeca a ne samo na nivou entiteta
-        List<JavaFile> javaFileList = sourceDomainLayer.getEntities().stream()
+        List<JavaFile> javaFileList = rootEntityModel.getEntities().stream()
                 .filter(entity -> entity.getTypeSpec() != null)
                 .map(entityModel -> JavaFile
                         .builder(entityModel.getPackageName(), entityModel.getTypeSpec())

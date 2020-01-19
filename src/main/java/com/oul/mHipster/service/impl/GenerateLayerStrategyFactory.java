@@ -3,7 +3,7 @@ package com.oul.mHipster.service.impl;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.generatorImpl.*;
-
+//final
 public class GenerateLayerStrategyFactory {
 
     private final GenerateRequestDtoClassStrategy generateRequestDtoClassStrategy = new GenerateRequestDtoClassStrategy();

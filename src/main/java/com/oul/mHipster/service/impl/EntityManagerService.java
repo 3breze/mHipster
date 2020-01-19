@@ -1,7 +1,6 @@
 package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.*;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
@@ -15,13 +14,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EntityManagerFactoryImpl implements EntityManagerFactory {
+public class EntityManagerService implements EntityManagerFactory {
 
-    private static final EntityManagerFactory instance = new EntityManagerFactoryImpl();
-    private SourceDomainLayer sourceDomainLayer;
+    private static final EntityManagerFactory instance = new EntityManagerService();
+
     private Map<String, Map<String, FieldTypeNameWrapper>> metamodel = new HashMap<>();
 
-    private EntityManagerFactoryImpl() {
+    private EntityManagerService() {
     }
 
     public static EntityManagerFactory getInstance() {
@@ -29,16 +28,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     }
 
     @Override
-    public void createEntityManager(SourceDomainLayer sourceDomainLayer) {
-        this.sourceDomainLayer = sourceDomainLayer;
-        createDependenciesTypeNames();
-        createRelationTypeNames();
+    public void createEntityManager(RootEntityModel rootEntityModel) {
+
     }
 
-    @Override
-    public Map<String, Map<String, FieldTypeNameWrapper>> getMetamodel() {
-        return metamodel;
-    }
 
     /**
      * Method overriding za pronalazenje method parametara (nikad nece biti generic polja).
@@ -92,6 +85,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
         return entityBasedClass;
     }
 
+    // leti odavde
     @Override
     public List<RelationAttribute> findRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
@@ -103,55 +97,5 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
                 .collect(Collectors.toList());
     }
 
-    public void createDependenciesTypeNames() {
-        Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
 
-        typeNameMap.put("Pageable", new FieldTypeNameWrapper(
-                ClassName.get("org.springframework.data.domain", "Pageable"), "pageable"));
-        typeNameMap.put("Page", new FieldTypeNameWrapper(
-                ClassName.get("org.springframework.data.domain", "Page"), "page"));
-        typeNameMap.put("PageImpl", new FieldTypeNameWrapper(
-                ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
-        typeNameMap.put("Predicate", new FieldTypeNameWrapper(
-                ClassName.get("import com.querydsl.core.types", "Predicate"), "predicate"));
-
-        metamodel.put("dependencies", typeNameMap);
-    }
-
-    @Override
-    public void createRelationTypeNames() {
-        this.sourceDomainLayer.getEntities().forEach(entity -> {
-            Map<String, ClassNamingInfo> layerMap = entity.getLayers();
-            Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
-
-            typeNameMap.put("domainClass", new FieldTypeNameWrapper(
-                    ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
-
-            ClassNamingInfo requestInfo = layerMap.get(LayerName.REQUEST_DTO.toString());
-            typeNameMap.put("requestClass", new FieldTypeNameWrapper(
-                    ClassName.get(requestInfo.getPackageName(), requestInfo.getClassName()), requestInfo.getInstanceName()));
-
-            ClassNamingInfo responseInfo = layerMap.get(LayerName.RESPONSE_DTO.toString());
-            typeNameMap.put("responseClass", new FieldTypeNameWrapper(
-                    ClassName.get(responseInfo.getPackageName(), responseInfo.getClassName()), responseInfo.getInstanceName()));
-
-            ClassNamingInfo daoInfo = layerMap.get(LayerName.DAO.toString());
-            typeNameMap.put("daoClass", new FieldTypeNameWrapper(
-                    ClassName.get(daoInfo.getPackageName(), daoInfo.getClassName()), daoInfo.getInstanceName()));
-
-            ClassNamingInfo apiInfo = layerMap.get(LayerName.API.toString());
-            typeNameMap.put("apiClass", new FieldTypeNameWrapper(
-                    ClassName.get(apiInfo.getPackageName(), apiInfo.getClassName()), apiInfo.getInstanceName()));
-
-            ClassNamingInfo serviceInfo = layerMap.get(LayerName.SERVICE.toString());
-            typeNameMap.put("serviceClass", new FieldTypeNameWrapper(
-                    ClassName.get(serviceInfo.getPackageName(), serviceInfo.getClassName()), serviceInfo.getInstanceName()));
-
-            ClassNamingInfo serviceImplInfo = layerMap.get(LayerName.SERVICE.toString());
-            typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(
-                    ClassName.get(serviceImplInfo.getPackageName(), serviceImplInfo.getClassName()), serviceImplInfo.getInstanceName()));
-
-            metamodel.put(entity.getClassName(), typeNameMap);
-        });
-    }
 }

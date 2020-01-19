@@ -6,6 +6,7 @@ public class MavenInfoWrapper {
     private String groupId;
     private String artifactId;
     private String name;
+    private MavenProject mavenProject;
 
     public MavenInfoWrapper() {
     }
@@ -14,6 +15,7 @@ public class MavenInfoWrapper {
         this.groupId = mavenProject.getGroupId();
         this.artifactId = mavenProject.getArtifactId();
         this.name = String.join(".", groupId, artifactId);
+        this.mavenProject = mavenProject;
     }
 
     public String getGroupId() {
@@ -38,5 +40,13 @@ public class MavenInfoWrapper {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public MavenProject getMavenProject() {
+        return mavenProject;
+    }
+
+    public void setMavenProject(MavenProject mavenProject) {
+        this.mavenProject = mavenProject;
     }
 }

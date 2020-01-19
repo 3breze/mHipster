@@ -9,7 +9,7 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.PoetHelperService;
-import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
+import com.oul.mHipster.service.impl.EntityManagerService;
 import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.*;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     public GenerateServiceImplClassStrategy() {
         this.poetHelperService = new PoetHelperService();
-        this.entityManagerFactory = EntityManagerFactoryImpl.getInstance();
+        this.entityManagerFactory = EntityManagerService.getInstance();
         this.layersConfig = Util.getValue();
     }
 

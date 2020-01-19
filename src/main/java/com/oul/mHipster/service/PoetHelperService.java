@@ -5,7 +5,7 @@ import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
-import com.oul.mHipster.service.impl.EntityManagerFactoryImpl;
+import com.oul.mHipster.service.impl.EntityManagerService;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +18,7 @@ public class PoetHelperService {
     private EntityManagerFactory entityManagerFactory;
 
     public PoetHelperService() {
-        this.entityManagerFactory = EntityManagerFactoryImpl.getInstance();
+        this.entityManagerFactory = EntityManagerService.getInstance();
     }
 
     public MethodSpec buildGetter(Attribute attribute) {
@@ -58,6 +58,7 @@ public class PoetHelperService {
                 .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
                 .build());
 
+        // izvuci iz abstraktne superklase?
         List<RelationAttribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
 
         relationAttributes.forEach(attribute -> {
