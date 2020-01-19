@@ -7,9 +7,11 @@ import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
+import com.oul.mHipster.service.EntityManagerService;
 import com.oul.mHipster.service.GenerateLayerStrategy;
-import com.oul.mHipster.service.PoetHelperService;
-import com.oul.mHipster.service.impl.EntityManagerService;
+import com.oul.mHipster.service.JPoetHelperService;
+import com.oul.mHipster.service.impl.AttributeService;
+import com.oul.mHipster.service.impl.JPoetHelperServiceImpl;
 import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.*;
 import org.springframework.stereotype.Service;
@@ -21,27 +23,29 @@ import java.util.Optional;
 
 public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
-    private PoetHelperService poetHelperService;
+    private JPoetHelperService JPoetHelperService;
     private LayersConfig layersConfig;
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManagerService entityManagerService;
+    private AttributeService attributeService;
 
     public GenerateServiceImplClassStrategy() {
-        this.poetHelperService = new PoetHelperService();
-        this.entityManagerFactory = EntityManagerService.getInstance();
+        this.entityManagerService = EntityManagerFactory.getInstance();
         this.layersConfig = Util.getValue();
+        this.JPoetHelperService = new JPoetHelperServiceImpl();
+        this.attributeService = new AttributeService();
     }
 
     @Override
     public TypeSpec generate(Entity entity) {
 //        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
 
-        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "daoClass");
+        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         FieldSpec daoField = FieldSpec
                 .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
-        MethodSpec constructor = poetHelperService.buildConstructor(entity, "serviceImplClass");
+        MethodSpec constructor = JPoetHelperService.buildConstructor(entity, "serviceImplClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("SERVICE_IMPL")).findFirst();
         if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
@@ -50,7 +54,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         serviceImplLayerOptional.get().getMethods().forEach(method -> {
             List<ParameterSpec> parameters = new ArrayList<>();
             method.getMethodSignature().getParameters().forEach(parameter -> {
-                FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(),
+                FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                         parameter.getType(), parameter.getName());
 
                 parameters.add(
@@ -59,7 +63,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                                 .build());
             });
 
-            TypeName returnTypeName = entityManagerFactory.getReturnTypeName(entity.getClassName(),
+            TypeName returnTypeName = attributeService.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
 
             methods.add(MethodSpec.methodBuilder(method.getType())
@@ -70,10 +74,13 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                     .build());
         });
 
+        FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
+
         return TypeSpec
                 .classBuilder(entity.getLayers().get(LayerName.SERVICE_IMPL.toString()).getClassName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Service.class)
+                .addSuperinterface(serviceTypeNameWrapper.getTypeName())
                 .addField(daoField)
                 .addMethod(constructor)
                 .addMethods(methods)

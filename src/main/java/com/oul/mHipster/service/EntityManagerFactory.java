@@ -1,23 +1,26 @@
 package com.oul.mHipster.service;
 
-import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.RelationAttribute;
-import com.oul.mHipster.model.RootEntityModel;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
-import com.squareup.javapoet.TypeName;
+import com.oul.mHipster.model.wrapper.LayerModelWrapper;
+import com.oul.mHipster.service.impl.EntityManagerServiceImpl;
 
-import java.util.List;
-import java.util.Map;
+public final class EntityManagerFactory {
 
-public interface EntityManagerFactory {
+    private static EntityManagerService instance;
+    private static LayerModelWrapper layerModelWrapper;
 
-    void createEntityManager(RootEntityModel rootEntityModel);
+    private EntityManagerFactory() {
+    }
 
-    TypeName getReturnTypeName(String entityName, String fieldName);
+    public static void createEntityManager(LayerModelWrapper layerModelWrapper) {
+        EntityManagerFactory.layerModelWrapper = layerModelWrapper;
+    }
 
-    FieldTypeNameWrapper getProperty(String entityName, String layerName);
-
-    FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName);
-
-    List<RelationAttribute> findRelationAttributes(Entity entity);
+    public static EntityManagerService getInstance() {
+        // instance creation logic, same as singleton creation logic
+        if (instance == null) {
+            instance = new EntityManagerServiceImpl();
+            instance.setLayerModel(layerModelWrapper);
+        }
+        return instance;
+    }
 }

@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-abstract class RelationService {
+abstract class RelationAttributeService {
 
     Attribute findRelation(Field field, Class clazz) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
@@ -29,7 +29,8 @@ abstract class RelationService {
         Annotation annO2O = field.getAnnotation(OneToOne.class);
         Annotation annM2O = field.getAnnotation(ManyToOne.class);
 
-        return Stream.of(annM2M, annO2M, annO2O, annM2O).filter(Objects::nonNull)
+        return Stream.of(annM2M, annO2M, annO2O, annM2O)
+                .filter(Objects::nonNull)
                 .map(annotation -> resolveRelation(annotation, field, clazz))
                 .findFirst()
                 .orElse(new Attribute(field.getType(), field.getName()));
@@ -63,8 +64,7 @@ abstract class RelationService {
                 clazz.getSimpleName(), RelationType.MANYTOONE);
     }
 
-    // maybe?
-    public List<RelationAttribute> findRelationAttributes(Entity entity) {
+    List<RelationAttribute> findRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||

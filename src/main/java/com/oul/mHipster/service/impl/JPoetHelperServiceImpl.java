@@ -1,11 +1,12 @@
-package com.oul.mHipster.service;
+package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
-import com.oul.mHipster.service.impl.EntityManagerService;
+import com.oul.mHipster.service.EntityManagerFactory;
+import com.oul.mHipster.service.EntityManagerService;
+import com.oul.mHipster.service.JPoetHelperService;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,24 +14,17 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PoetHelperService {
+public class JPoetHelperServiceImpl implements JPoetHelperService {
 
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManagerService entityManagerService;
+    private AttributeService attributeService;
 
-    public PoetHelperService() {
-        this.entityManagerFactory = EntityManagerService.getInstance();
+    public JPoetHelperServiceImpl() {
+        this.entityManagerService = EntityManagerFactory.getInstance();
+        this.attributeService = new AttributeService();
     }
 
-    public MethodSpec buildGetter(Attribute attribute) {
-        String fieldName = attribute.getFieldName();
-        String getterName = buildGetterName(fieldName);
-        return MethodSpec.methodBuilder(getterName).returns(ClassName.bestGuess(attribute.getType().toString())).addModifiers(Modifier.PUBLIC).build();
-    }
-
-    private String buildGetterName(String field) {
-        return "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
-    }
-
+    @Override
     public CodeBlock buildFindByIdCodeBlock(Entity entity) {
         TypeName resourceNotFoundClass = ClassName.get("com.whatever.exception", "ResourceNotFoundException");
         return CodeBlock.builder()
@@ -44,12 +38,13 @@ public class PoetHelperService {
     }
 
     //parametarizovano za serviceImpl i api layer-e
+    @Override
     public MethodSpec buildConstructor(Entity entity, String layerName) {
 
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         List<ParameterSpec> parameterSpecsList = new ArrayList<>();
 
-        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerFactory.getProperty(entity.getClassName(), "daoClass");
+        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         fieldSpecList.add(FieldSpec
                 .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
                 .addModifiers(Modifier.PRIVATE)
@@ -58,12 +53,11 @@ public class PoetHelperService {
                 .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
                 .build());
 
-        // izvuci iz abstraktne superklase?
-        List<RelationAttribute> relationAttributes = entityManagerFactory.findRelationAttributes(entity);
+        List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
 
         relationAttributes.forEach(attribute -> {
 
-            FieldTypeNameWrapper typeNameWrapper = entityManagerFactory.getProperty(attribute.getClassSimpleName(), "serviceClass");
+            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(), "serviceClass");
 
             fieldSpecList.add(FieldSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())

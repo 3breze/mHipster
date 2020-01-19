@@ -28,13 +28,20 @@ public class LayerModelServiceImpl implements LayerModelService {
     }
 
     public LayerModelWrapper initLayerModel() {
-        createDependenciesTypeNames();
-        createRelationTypeNames();
+        generateLayerClassNaming();
+        registerDependenciesTypeNames();
+        registerRelationTypeNames();
         return new LayerModelWrapper(layerModel);
     }
 
-    @Override
-    public Map<String, ClassNamingInfo> generateLayerClassNaming(Entity entity, RootEntityModel rootEntityModel) {
+    public void generateLayerClassNaming() {
+        rootEntityModel.getEntities().forEach(entity -> {
+            Map<String, ClassNamingInfo> layersMap = createLayerClassNaming(entity, rootEntityModel);
+            entity.setLayers(layersMap);
+        });
+    }
+
+    private Map<String, ClassNamingInfo> createLayerClassNaming(Entity entity, RootEntityModel rootEntityModel) {
         return layersConfig.getLayers().stream().collect(Collectors.toMap(Layer::getName, layer -> {
             String className = entity.getClassName() + layer.getNamingSuffix();
             String instanceName = ClassUtils.instanceNameBuilder(className);
@@ -43,7 +50,7 @@ public class LayerModelServiceImpl implements LayerModelService {
         }));
     }
 
-    private void createDependenciesTypeNames() {
+    private void registerDependenciesTypeNames() {
         Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
 
         typeNameMap.put("Pageable", new FieldTypeNameWrapper(
@@ -59,7 +66,7 @@ public class LayerModelServiceImpl implements LayerModelService {
     }
 
 
-    private void createRelationTypeNames() {
+    private void registerRelationTypeNames() {
         this.rootEntityModel.getEntities().forEach(entity -> {
             Map<String, ClassNamingInfo> layerMap = entity.getLayers();
             Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();

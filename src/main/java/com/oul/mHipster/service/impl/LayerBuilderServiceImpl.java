@@ -2,19 +2,16 @@ package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.service.*;
 import com.squareup.javapoet.TypeSpec;
 
-import java.util.Map;
-
 public class LayerBuilderServiceImpl implements LayerBuilderService {
 
     private LayersConfig layersConfig;
     private JavaFileMakerService javaFileMakerService;
-    private final GenerateLayerStrategyFactory generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
+    private GenerateLayerStrategyFactory generateLayerStrategyFactory;
 
     public LayerBuilderServiceImpl(LayersConfig layersConfig) {
         this.layersConfig = layersConfig;
@@ -26,15 +23,9 @@ public class LayerBuilderServiceImpl implements LayerBuilderService {
 
         LayerModelService layerModelService = new LayerModelServiceImpl(layersConfig, rootEntityModel);
         LayerModelWrapper layerModelWrapper = layerModelService.initLayerModel();
+        EntityManagerFactory.createEntityManager(layerModelWrapper);
 
-        rootEntityModel.getEntities().forEach(entity -> {
-            Map<String, ClassNamingInfo> layersMap = layerModelService.generateLayerClassNaming(entity, rootEntityModel);
-            entity.setLayers(layersMap);
-        });
-
-        EntityManagerFactory entityManagerFactory = EntityManagerService.getInstance();
-        entityManagerFactory.createEntityManager(rootEntityModel);
-
+        generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
         rootEntityModel.getEntities().forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
             GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
             TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
