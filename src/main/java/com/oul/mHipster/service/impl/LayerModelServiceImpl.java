@@ -30,7 +30,7 @@ public class LayerModelServiceImpl implements LayerModelService {
     public LayerModelWrapper initLayerModel() {
         generateLayerClassNaming();
         registerDependenciesTypeNames();
-        registerRelationTypeNames();
+        registerDomainLayerTypeNames();
         return new LayerModelWrapper(layerModel);
     }
 
@@ -60,13 +60,16 @@ public class LayerModelServiceImpl implements LayerModelService {
         typeNameMap.put("PageImpl", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
         typeNameMap.put("Predicate", new FieldTypeNameWrapper(
-                ClassName.get("import com.querydsl.core.types", "Predicate"), "predicate"));
+                ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
+        typeNameMap.put("ResourceNotFoundException", new FieldTypeNameWrapper(
+                ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ResourceNotFoundException"),
+                "resourceNotFoundException"));
 
         layerModel.put("dependencies", typeNameMap);
     }
 
 
-    private void registerRelationTypeNames() {
+    private void registerDomainLayerTypeNames() {
         this.rootEntityModel.getEntities().forEach(entity -> {
             Map<String, ClassNamingInfo> layerMap = entity.getLayers();
             Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();

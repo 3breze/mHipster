@@ -37,7 +37,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     @Override
     public TypeSpec generate(Entity entity) {
-//        CodeBlock throwExceptionCodeBlock = poetHelperService.buildFindByIdCodeBlock(entity);
+        CodeBlock throwExceptionCodeBlock = JPoetHelperService.buildFindByIdCodeBlock(entity);
 
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         FieldSpec daoField = FieldSpec
@@ -45,13 +45,17 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                 .addModifiers(Modifier.PRIVATE)
                 .build();
 
-        MethodSpec constructor = JPoetHelperService.buildConstructor(entity, "serviceImplClass");
+        // dependencyClass -> needs DAO dependency
+        MethodSpec constructor = JPoetHelperService.buildConstructor(entity, "daoClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream().filter(layer -> layer.getName().equals("SERVICE_IMPL")).findFirst();
         if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
 
         List<MethodSpec> methods = new ArrayList<>();
         serviceImplLayerOptional.get().getMethods().forEach(method -> {
+
+            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
+
             List<ParameterSpec> parameters = new ArrayList<>();
             method.getMethodSignature().getParameters().forEach(parameter -> {
                 FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
@@ -66,7 +70,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
             TypeName returnTypeName = attributeService.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
 
-            methods.add(MethodSpec.methodBuilder(method.getType())
+            methods.add(methodBuilder
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(parameters)

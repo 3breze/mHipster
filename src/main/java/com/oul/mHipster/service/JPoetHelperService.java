@@ -8,6 +8,6 @@ public interface JPoetHelperService {
 
     CodeBlock buildFindByIdCodeBlock(Entity entity);
 
-    MethodSpec buildConstructor(Entity entity, String layerName);
+    MethodSpec buildConstructor(Entity entity, String dependencyClass);
 
 }
