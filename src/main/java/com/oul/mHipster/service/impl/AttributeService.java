@@ -10,6 +10,8 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.Modifier;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AttributeService extends RelationAttributeService {
 
@@ -43,14 +45,16 @@ public class AttributeService extends RelationAttributeService {
                 typeArgument.getTypeName());
     }
 
-    public MethodSpec buildGetter(Attribute attribute) {
-        String fieldName = attribute.getFieldName();
-        String getterName = buildGetterName(fieldName);
-        return MethodSpec.methodBuilder(getterName).returns(ClassName.bestGuess(attribute.getType().toString())).addModifiers(Modifier.PUBLIC).build();
-    }
-
-    private String buildGetterName(String field) {
-        return "get" + field.substring(0, 1).toUpperCase() + field.substring(1);
+    List<MethodSpec> buildGetters(List<Attribute> attributes) {
+        return attributes.stream().map(attribute -> {
+            String fieldName = attribute.getFieldName();
+            String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            return MethodSpec.methodBuilder(getterName)
+                    .returns(ClassName.bestGuess(attribute.getType().toString()))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("return $L", fieldName)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
 }

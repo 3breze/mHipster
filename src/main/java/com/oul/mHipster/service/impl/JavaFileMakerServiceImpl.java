@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class JavaFileMakerServiceImpl implements JavaFileMakerService {
 
     @Override
-    public void makeJavaFiles(RootEntityModel rootEntityModel) {
+    public void makeJavaFiles(RootEntityModel rootEntityModel){
         //Packagename se razliku na nivou typespeca a ne samo na nivou entiteta
         List<JavaFile> javaFileList = rootEntityModel.getEntities().stream()
                 .filter(entity -> entity.getTypeSpec() != null)
@@ -30,5 +30,13 @@ public class JavaFileMakerServiceImpl implements JavaFileMakerService {
                 e.printStackTrace();
             }
         });
+
+        try {
+            JavaFile.builder("paketi.paketi", new JPoetHelperServiceImpl().buildResourceNotFoundException())
+                    .indent("    ")
+                    .build().writeTo(System.out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

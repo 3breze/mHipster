@@ -1,5 +1,6 @@
 package com.oul.mHipster.service.impl;
 
+import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
 
@@ -25,22 +29,35 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         this.attributeService = new AttributeService();
     }
 
-    public TypeSpec buildResourceNotFoundException() {
+    TypeSpec buildResourceNotFoundException() {
+        // typeName ide u model za packagename posle
         FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
 
         MethodSpec constructor = buildConstructor(null, "exception");
 
+        List<Attribute> attributes = Arrays.asList(new Attribute(String.class, "resourceName"),
+                new Attribute(String.class, "fieldName"),
+                new Attribute(Object.class, "fieldValue"));
+
+        List<FieldSpec> fieldSpecList = attributes.stream().map(attribute -> FieldSpec
+                .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getFieldName())
+                .addModifiers(Modifier.PRIVATE)
+                .build()).collect(Collectors.toList());
+
+        AttributeService attributeService = new AttributeService();
+        List<MethodSpec> getterMethods = attributeService.buildGetters(attributes);
         return TypeSpec
                 .classBuilder("ResourceNotFoundException")
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(AnnotationSpec.builder(ResponseStatus.class)
+                .addAnnotation(AnnotationSpec
+                        .builder(ResponseStatus.class)
                         .addMember("value", "$L", HttpStatus.NOT_FOUND)
                         .build())
                 .superclass(RuntimeException.class)
-//                .addField(daoField)
+                .addFields(fieldSpecList)
                 .addMethod(constructor)
-//                .addMethods(methods)
+                .addMethods(getterMethods)
                 .build();
     }
 
@@ -60,8 +77,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addStatement("$T $L = $L.get()", daoTypeNameWrapper.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
                 .build();
     }
-
-    //parametarizovano za serviceImpl i api layer-e
+    
     @Override
     public MethodSpec buildConstructor(Entity entity, String dependencyClass) {
         MethodSpec.Builder methodBuilder = MethodSpec.constructorBuilder();
@@ -94,7 +110,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     .builder(ClassName.bestGuess("Object"), "fieldValue")
                     .addModifiers(Modifier.PRIVATE)
                     .build());
-            methodBuilder.addStatement("super(String.format(\"%s not found with %s : '%s'\", resourceName, fieldName, fieldValue));");
+            methodBuilder.addStatement("super(String.format(\"%s not found with %s : '%s'\", resourceName, fieldName, fieldValue))");
         }
 
         if (dependencyClass.equals("daoClass")) {

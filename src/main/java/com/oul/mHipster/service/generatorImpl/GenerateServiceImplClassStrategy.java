@@ -33,7 +33,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         this.layersConfig = Util.getValue();
         this.JPoetHelperService = new JPoetHelperServiceImpl();
         this.attributeService = new AttributeService();
-    }
+}
 
     @Override
     public TypeSpec generate(Entity entity) {
