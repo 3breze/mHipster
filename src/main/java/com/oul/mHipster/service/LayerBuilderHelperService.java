@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface LayerBuilderHelperService {
 
-    CodeBlock processMethodBody(String methodBody);
+    CodeBlock processMethodBody(Entity entity, String methodBody);
 
     List<ParameterSpec> resolveParameters(Entity entity, Method method);
 

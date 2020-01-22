@@ -82,9 +82,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         // For api class its serviceClass dependency, for serviceImpl class its dao dependency, if exception then skip
         if (dependencyClass.matches("daoClass|serviceClass")) {
             methodBuilder.addAnnotation(Autowired.class);
-        }
-
-        if (dependencyClass.equals("exception")) {
+        } else if (dependencyClass.equals("exception")) {
             methodBuilder.addStatement("super(String.format(\"%s not found with %s : '%s'\", " +
                     "resourceName, fieldName, fieldValue))");
         }
@@ -96,7 +94,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .collect(Collectors.toList());
 
         CodeBlock.Builder builder = CodeBlock.builder();
-        fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb.name, cb.name));
+        fieldSpecList.forEach(field -> builder.addStatement("this.$N = $N", field.name, field.name));
 
         return methodBuilder
                 .addModifiers(Modifier.PUBLIC)

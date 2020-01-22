@@ -24,7 +24,6 @@ public class EntityManagerServiceImpl implements EntityManagerService {
      */
     @Override
     public FieldTypeNameWrapper getProperty(String entityName, String layerName) {
-        System.out.println("entityName = " + entityName + ", layerName = " + layerName);
         return Optional.ofNullable(layerModel.get(entityName).get(layerName))
                 .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
     }

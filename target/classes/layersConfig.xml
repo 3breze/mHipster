@@ -26,7 +26,7 @@
                         </parameters>
                     </methodSignature>
                     <methodBody>
-                        Page&lt;${domainClass}&gt; page = ${dao}.findAll(predicate, pageable);
+                        Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);
                         return new PageImpl&lt;&gt;(
                         page.stream().map(${responseClass}::new).collect(Collectors.toList()), pageable,
                         page.getTotalElements())
@@ -39,7 +39,7 @@
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}
-                        return new ${responseClass}(${domain})
+                        return new ${responseClass}(${domainInst})
                     </methodBody>
                 </method>
                 <method type="save">
@@ -76,7 +76,7 @@
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}
-                        ${dao}.delete(${domainInst})
+                        ${daoInst}.delete(${domainInst})
                     </methodBody>
                 </method>
             </methods>

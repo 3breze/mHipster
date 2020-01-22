@@ -10,6 +10,8 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterSpec;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService {
@@ -21,8 +23,30 @@ public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService 
     }
 
     @Override
-    public CodeBlock processMethodBody(String methodBody) {
-        return null;
+    public CodeBlock processMethodBody(Entity entity, String methodBody) {
+
+        String regex = "\\$\\{(.*?)}";
+        String suffix = "Inst";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(methodBody);
+        StringBuffer sb = new StringBuffer();
+        boolean flag = false;
+        while (matcher.find()) {
+            String str = matcher.group(1);
+            if (str.endsWith(suffix)) {
+                flag = true;
+                str = str.substring(0, str.indexOf(suffix));
+            }
+            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), str);
+            matcher.appendReplacement(sb, flag ? typeNameWrapper.getInstanceName() : typeNameWrapper.getTypeName().toString());
+        }
+        matcher.appendTail(sb);
+        String codeBlock = sb.toString();
+
+        String codeBlock1 = codeBlock.replaceAll("&lt;", "<");
+        String codeBlock2 = codeBlock1.replaceAll("&gt;", ">");
+
+        return CodeBlock.builder().addStatement(codeBlock2).build();
     }
 
     @Override
