@@ -2,18 +2,17 @@ package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
 import com.oul.mHipster.service.JPoetHelperService;
+import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +53,29 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addFields(fieldSpecList)
                 .addMethod(constructor)
                 .addMethods(getterMethods)
+                .build();
+    }
+
+    @Override
+    public CodeBlock buildLombokBuilder(Entity entity) {
+        FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
+                "domainClass");
+        FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
+                "requestClass");
+
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> {
+            return FieldSpec
+                    .builder(attribute.getType(), attribute.getFieldName())
+                    .addModifiers(Modifier.PRIVATE)
+                    .build();
+        }).collect(Collectors.toList());
+
+        StringBuffer builderStingBuffer = new StringBuffer();
+        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(").append(requestTypeNameWrapper.getInstanceName()).append(".get")
+                .append(ClassUtils.fieldGetter(field.name)).append(")"));
+        return CodeBlock.builder()
+                .addStatement("$T $L = $T.builder()$L.build()", domainTypeNameWrapper.getTypeName(),
+                        domainTypeNameWrapper.getInstanceName(), domainTypeNameWrapper.getTypeName(), builderStingBuffer.toString())
                 .build();
     }
 

@@ -138,6 +138,7 @@ public class TestPoetApi {
                         .addAnnotation(Override.class)
                         .addParameter(param)
                         .addStatement(codeBlock2)
+                        .addStatement(lombokBuilder.toString())
                         .returns(ParameterizedTypeName.get(ClassName.bestGuess("Pageeelone"),
                                 responseDtoClass))
 //                        .returns(responseDtoClass)

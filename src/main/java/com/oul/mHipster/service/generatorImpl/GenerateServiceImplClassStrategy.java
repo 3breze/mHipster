@@ -67,8 +67,10 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
         List<MethodSpec> methods = serviceImplLayerOptional.get().getMethods().stream().map(method -> {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
+
             CodeBlock methodBody = layerBuilderHelperService.processMethodBody(entity, method.getMethodBody());
-            System.out.println("methodBody = " + methodBody);
+//            System.out.println("\"" + entity.getClassName() + "\" method[ " + method.getType() + "] =>" + methodBody);
+
             List<ParameterSpec> parameters = layerBuilderHelperService.resolveParameters(entity, method);
             TypeName returnTypeName = attributeService.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
@@ -77,7 +79,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(parameters)
-//                    .addCode()
+                    .addCode(methodBody)
                     .returns(returnTypeName)
                     .build();
         }).collect(Collectors.toList());

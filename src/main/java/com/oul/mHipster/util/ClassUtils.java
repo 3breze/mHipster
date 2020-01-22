@@ -63,4 +63,8 @@ public class ClassUtils {
     public static String optionalNameBuilder(String className) {
         return "optional" + className;
     }
+
+    public static String fieldGetter(String field) {
+        return field.substring(0, 1).toUpperCase() + field.substring(1) + "()";
+    }
 }

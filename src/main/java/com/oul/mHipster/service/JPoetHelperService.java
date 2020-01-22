@@ -11,6 +11,8 @@ public interface JPoetHelperService {
 
     CodeBlock buildFindByIdCodeBlock(Entity entity);
 
+    CodeBlock buildLombokBuilder(Entity entity);
+
     MethodSpec buildConstructor(Entity entity, List<FieldSpec> fieldSpecList, String dependencyClass);
 
 }

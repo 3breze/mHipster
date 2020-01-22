@@ -52,7 +52,7 @@
                     <methodBody>${findByIdRelation}
                         ${builderInject}
                         ${daoInst}.save(${domainInst})
-                        return new ${responseClazz}(${domainInst})
+                        return new ${responseClass}(${domainInst})
                     </methodBody>
                 </method>
                 <method type="update">
