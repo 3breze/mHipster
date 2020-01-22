@@ -4,9 +4,9 @@ import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
-import com.oul.mHipster.service.LayerBuilderService;
+import com.oul.mHipster.service.LayerGeneratorService;
 import com.oul.mHipster.service.SourceClassService;
-import com.oul.mHipster.service.impl.LayerBuilderServiceImpl;
+import com.oul.mHipster.service.impl.LayerGeneratorServiceImpl;
 import com.oul.mHipster.service.impl.SourceClassAttributeServiceImpl;
 import com.oul.mHipster.util.ConfigUtil;
 import com.oul.mHipster.util.Util;
@@ -38,8 +38,8 @@ public class MyMojo extends AbstractMojo {
             RootEntityModel rootEntityModel = sourceClassService.buildRootEntityModel();
 
             // Generate CRUD classes / layers
-            LayerBuilderService layerBuilderService = new LayerBuilderServiceImpl(layersConfig);
-            layerBuilderService.buildLayers(rootEntityModel);
+            LayerGeneratorService layerGeneratorService = new LayerGeneratorServiceImpl(layersConfig);
+            layerGeneratorService.generateLayers(rootEntityModel);
 
         } catch (JAXBException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");

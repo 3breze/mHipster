@@ -64,7 +64,7 @@ abstract class RelationAttributeService {
                 clazz.getSimpleName(), RelationType.MANYTOONE);
     }
 
-    List<RelationAttribute> findRelationAttributes(Entity entity) {
+    public List<RelationAttribute> findRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||

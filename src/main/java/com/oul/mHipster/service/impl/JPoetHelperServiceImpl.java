@@ -15,26 +15,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     private EntityManagerService entityManagerService;
-    private AttributeService attributeService;
 
     public JPoetHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
-        this.attributeService = new AttributeService();
     }
 
     TypeSpec buildResourceNotFoundException() {
         // typeName ide u model za packagename posle
         FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
-
-        MethodSpec constructor = buildConstructor(null, "exception");
 
         List<Attribute> attributes = Arrays.asList(new Attribute(String.class, "resourceName"),
                 new Attribute(String.class, "fieldName"),
@@ -44,6 +39,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getFieldName())
                 .addModifiers(Modifier.PRIVATE)
                 .build()).collect(Collectors.toList());
+        MethodSpec constructor = buildConstructor(null, fieldSpecList, "exception");
 
         AttributeService attributeService = new AttributeService();
         List<MethodSpec> getterMethods = attributeService.buildGetters(attributes);
@@ -63,6 +59,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     @Override
     public CodeBlock buildFindByIdCodeBlock(Entity entity) {
+
         FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
         FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
@@ -77,62 +74,29 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addStatement("$T $L = $L.get()", daoTypeNameWrapper.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
                 .build();
     }
-    
+
     @Override
-    public MethodSpec buildConstructor(Entity entity, String dependencyClass) {
+    public MethodSpec buildConstructor(Entity entity, List<FieldSpec> fieldSpecList, String dependencyClass) {
         MethodSpec.Builder methodBuilder = MethodSpec.constructorBuilder();
-        List<FieldSpec> fieldSpecList = new ArrayList<>();
-        List<ParameterSpec> parameterSpecsList = new ArrayList<>();
 
         // For api class its serviceClass dependency, for serviceImpl class its dao dependency, if exception then skip
         if (dependencyClass.matches("daoClass|serviceClass")) {
-            FieldTypeNameWrapper dependencyTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), dependencyClass);
-            fieldSpecList.add(FieldSpec
-                    .builder(dependencyTypeNameWrapper.getTypeName(), dependencyTypeNameWrapper.getInstanceName())
-                    .addModifiers(Modifier.PRIVATE)
-                    .build());
-            parameterSpecsList.add(ParameterSpec
-                    .builder(dependencyTypeNameWrapper.getTypeName(), dependencyTypeNameWrapper.getInstanceName())
-                    .build());
             methodBuilder.addAnnotation(Autowired.class);
         }
 
         if (dependencyClass.equals("exception")) {
-            fieldSpecList.add(FieldSpec
-                    .builder(ClassName.bestGuess("String"), "resourceName")
-                    .addModifiers(Modifier.PRIVATE)
-                    .build());
-            fieldSpecList.add(FieldSpec
-                    .builder(ClassName.bestGuess("String"), "fieldName")
-                    .addModifiers(Modifier.PRIVATE)
-                    .build());
-            fieldSpecList.add(FieldSpec
-                    .builder(ClassName.bestGuess("Object"), "fieldValue")
-                    .addModifiers(Modifier.PRIVATE)
-                    .build());
-            methodBuilder.addStatement("super(String.format(\"%s not found with %s : '%s'\", resourceName, fieldName, fieldValue))");
+            methodBuilder.addStatement("super(String.format(\"%s not found with %s : '%s'\", " +
+                    "resourceName, fieldName, fieldValue))");
         }
 
-        if (dependencyClass.equals("daoClass")) {
-            List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
-
-            relationAttributes.forEach(attribute -> {
-
-                FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(), "serviceClass");
-
-                fieldSpecList.add(FieldSpec
-                        .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
-                        .addModifiers(Modifier.PRIVATE)
-                        .build());
-                parameterSpecsList.add(ParameterSpec
-                        .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
-                        .build());
-            });
-        }
+        List<ParameterSpec> parameterSpecsList = fieldSpecList.stream()
+                .map(fieldSpec -> ParameterSpec
+                        .builder(fieldSpec.type, fieldSpec.name)
+                        .build())
+                .collect(Collectors.toList());
 
         CodeBlock.Builder builder = CodeBlock.builder();
         fieldSpecList.forEach(cb -> builder.addStatement("this.$N = $N", cb.name, cb.name));
-
 
         return methodBuilder
                 .addModifiers(Modifier.PUBLIC)
@@ -140,6 +104,4 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addCode(builder.build())
                 .build();
     }
-
-
 }

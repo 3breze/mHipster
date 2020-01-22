@@ -7,19 +7,19 @@ import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.service.*;
 import com.squareup.javapoet.TypeSpec;
 
-public class LayerBuilderServiceImpl implements LayerBuilderService {
+public class LayerGeneratorServiceImpl implements LayerGeneratorService {
 
     private LayersConfig layersConfig;
     private JavaFileMakerService javaFileMakerService;
     private GenerateLayerStrategyFactory generateLayerStrategyFactory;
 
-    public LayerBuilderServiceImpl(LayersConfig layersConfig) {
+    public LayerGeneratorServiceImpl(LayersConfig layersConfig) {
         this.layersConfig = layersConfig;
         this.javaFileMakerService = new JavaFileMakerServiceImpl();
     }
 
     @Override
-    public void buildLayers(RootEntityModel rootEntityModel) {
+    public void generateLayers(RootEntityModel rootEntityModel) {
 
         LayerModelService layerModelService = new LayerModelServiceImpl(layersConfig, rootEntityModel);
         LayerModelWrapper layerModelWrapper = layerModelService.initLayerModel();
