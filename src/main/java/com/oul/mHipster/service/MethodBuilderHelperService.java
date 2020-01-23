@@ -7,7 +7,7 @@ import com.squareup.javapoet.ParameterSpec;
 
 import java.util.List;
 
-public interface LayerBuilderHelperService {
+public interface MethodBuilderHelperService {
 
     CodeBlock processMethodBody(Entity entity, String methodBody);
 

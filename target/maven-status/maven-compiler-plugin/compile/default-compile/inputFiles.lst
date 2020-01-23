@@ -6,10 +6,10 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\Util.ja
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\RelationType.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\RelationAttribute.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\SourceClassAttributeServiceImpl.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\MethodBuilderHelperService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\Parameter.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\generatorImpl\GenerateRequestDtoClassStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\RelationAttributeService.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\LayerBuilderHelperService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\LombokSettings.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\FieldTypeNameWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\ClassNamingInfo.java
@@ -34,9 +34,9 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\gene
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\generatorImpl\GenerateServiceImplClassStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\JPoetHelperServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\ClassUtils.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\MethodBuilderHelperServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layersConfig\LayersConfig.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\MavenInfoWrapper.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\LayerBuilderHelperServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\impl\GenerateLayerStrategyFactory.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\LayerModelWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\TestPoetApi.java

@@ -2,6 +2,7 @@ package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
@@ -64,12 +65,10 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
 
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> {
-            return FieldSpec
-                    .builder(attribute.getType(), attribute.getFieldName())
-                    .addModifiers(Modifier.PRIVATE)
-                    .build();
-        }).collect(Collectors.toList());
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
+                .builder(attribute.getType(), attribute.getFieldName())
+                .addModifiers(Modifier.PRIVATE)
+                .build()).collect(Collectors.toList());
 
         StringBuffer builderStingBuffer = new StringBuffer();
         fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(").append(requestTypeNameWrapper.getInstanceName()).append(".get")
@@ -78,6 +77,36 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addStatement("$T $L = $T.builder()$L.build()", domainTypeNameWrapper.getTypeName(),
                         domainTypeNameWrapper.getInstanceName(), domainTypeNameWrapper.getTypeName(), builderStingBuffer.toString())
                 .build();
+    }
+
+    @Override
+    public CodeBlock buildRelationFindByIdCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
+//        List<Director> directors = directorDao.findByIdIn(contentRequestDto.getDirectors());
+        FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
+                "domainClass");
+        FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
+                "requestClass");
+
+        CodeBlock.Builder cbBuilder = CodeBlock.builder();
+        relationAttributes.forEach(relationAttribute -> {
+            FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
+                    "daoClass");
+            cbBuilder.addStatement("List<$T> $L = $L.findByIdIn($L.$L)", domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
+                    daoTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(), "getSOMEFIELD()");
+        });
+        return cbBuilder.build();
+    }
+
+    @Override
+    public List<FieldSpec> buildFieldSpecs(List<RelationAttribute> relationAttributes) {
+        return relationAttributes.stream().map(attribute -> {
+            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(),
+                    "serviceClass");
+            return FieldSpec
+                    .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
+                    .addModifiers(Modifier.PRIVATE)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     @Override

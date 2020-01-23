@@ -2,12 +2,14 @@ package com.oul.mHipster.service.impl;
 
 import com.oul.mHipster.layersConfig.Method;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
 import com.oul.mHipster.service.JPoetHelperService;
-import com.oul.mHipster.service.LayerBuilderHelperService;
+import com.oul.mHipster.service.MethodBuilderHelperService;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterSpec;
 
 import java.util.List;
@@ -15,10 +17,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService {
+public class MethodBuilderHelperServiceImpl implements MethodBuilderHelperService {
 
     private static final String REGEX = "\\$\\{(.*?)}";
-//    private static final String REGEX = "\\$\\{(.*?)}";
     private static final String INSTANCE_SUFFIX = "Inst";
     private static final String INJECT_RELATION_FIND_BY_ID = "findByIdRelation";
     private static final String INJECT_FIND_BY_ID = "findByIdInject";
@@ -28,10 +29,12 @@ public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService 
 
     private EntityManagerService entityManagerService;
     private JPoetHelperService jPoetHelperService;
+    private AttributeService attributeService;
 
-    public LayerBuilderHelperServiceImpl() {
+    public MethodBuilderHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
         this.jPoetHelperService = new JPoetHelperServiceImpl();
+        this.attributeService = new AttributeService();
     }
 
     @Override
@@ -47,7 +50,11 @@ public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService 
             String injectKeyword = matcher.group(1);
 
             if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
-                cbBuilder.addStatement("[...code to be added in...]");
+                List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
+                if (!relationAttributes.isEmpty()) {
+                    CodeBlock relationFindByIdCodeBlock = jPoetHelperService.buildRelationFindByIdCodeBlock(entity, relationAttributes);
+                    cbBuilder.add(relationFindByIdCodeBlock);
+                }
                 matcher.appendReplacement(templateCode, "");
                 continue;
             }

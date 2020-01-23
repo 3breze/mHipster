@@ -10,7 +10,7 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.*;
 import com.oul.mHipster.service.impl.AttributeService;
 import com.oul.mHipster.service.impl.JPoetHelperServiceImpl;
-import com.oul.mHipster.service.impl.LayerBuilderHelperServiceImpl;
+import com.oul.mHipster.service.impl.MethodBuilderHelperServiceImpl;
 import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.*;
 import org.springframework.stereotype.Service;
@@ -26,14 +26,14 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
     private EntityManagerService entityManagerService;
     private JPoetHelperService jPoetHelperService;
     private AttributeService attributeService;
-    private LayerBuilderHelperService layerBuilderHelperService;
+    private MethodBuilderHelperService methodBuilderHelperService;
 
     public GenerateServiceImplClassStrategy() {
         this.layersConfig = Util.getValue();
         this.entityManagerService = EntityManagerFactory.getInstance();
         this.jPoetHelperService = new JPoetHelperServiceImpl();
         this.attributeService = new AttributeService();
-        this.layerBuilderHelperService = new LayerBuilderHelperServiceImpl();
+        this.methodBuilderHelperService = new MethodBuilderHelperServiceImpl();
     }
 
     @Override
@@ -42,14 +42,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
         // Ovo ce biti izmesteno npr. findFieldsForEntity
         List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
-        List<FieldSpec> fieldSpecList = relationAttributes.stream().map(attribute -> {
-            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(),
-                    "serviceClass");
-            return FieldSpec
-                    .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())
-                    .addModifiers(Modifier.PRIVATE)
-                    .build();
-        }).collect(Collectors.toList());
+        List<FieldSpec> fieldSpecList = jPoetHelperService.buildFieldSpecs(relationAttributes);
 
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         fieldSpecList.add(FieldSpec
@@ -68,9 +61,9 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         List<MethodSpec> methods = serviceImplLayerOptional.get().getMethods().stream().map(method -> {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
 
-            CodeBlock methodBody = layerBuilderHelperService.processMethodBody(entity, method.getMethodBody());
+            CodeBlock methodBody = methodBuilderHelperService.processMethodBody(entity, method.getMethodBody());
 
-            List<ParameterSpec> parameters = layerBuilderHelperService.resolveParameters(entity, method);
+            List<ParameterSpec> parameters = methodBuilderHelperService.resolveParameters(entity, method);
             TypeName returnTypeName = attributeService.getReturnTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns());
 
