@@ -47,7 +47,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec
                         .builder(ResponseStatus.class)
-                        .addMember("value", "$L", HttpStatus.NOT_FOUND)
+                        .addMember("value", "$T.$L", HttpStatus.class,
+                                HttpStatus.NOT_FOUND.name())
                         .build())
                 .superclass(RuntimeException.class)
                 .addFields(fieldSpecList)
@@ -72,7 +73,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         StringBuffer builderStingBuffer = new StringBuffer();
         fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(").append(requestTypeNameWrapper.getInstanceName()).append(".get")
-                .append(ClassUtils.fieldGetter(field.name)).append(")"));
+                .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
         return CodeBlock.builder()
                 .addStatement("$T $L = $T.builder()$L.build()", domainTypeNameWrapper.getTypeName(),
                         domainTypeNameWrapper.getInstanceName(), domainTypeNameWrapper.getTypeName(), builderStingBuffer.toString())
@@ -93,7 +94,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .beginControlFlow("if ($L.isEmpty())", entity.getOptionalName())
                 .addStatement("throw new $T(\"$T $L\")", responseTypeNameWrapper.getTypeName(), responseTypeNameWrapper.getTypeName(), "not found!")
                 .endControlFlow()
-                .addStatement("$T $L = $L.get()", daoTypeNameWrapper.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
+                .addStatement("$T $L = $L.get()", domainTypeNameWrapper.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
                 .build();
     }
 

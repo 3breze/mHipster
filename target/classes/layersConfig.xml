@@ -25,12 +25,7 @@
                             <parameter type="Pageable">pageable</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>
-                        Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);
-                        return new PageImpl&lt;&gt;(
-                        page.stream().map(${responseClass}::new).collect(Collectors.toList()), pageable,
-                        page.getTotalElements())
-                    </methodBody>
+                    <methodBody>Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);&#xA;return new PageImpl&lt;&gt;(page.stream().map(${responseClass}::new).collect(Collectors.toList()), pageable,page.getTotalElements())</methodBody>
                 </method>
                 <method type="findById">
                     <methodSignature returns="responseClass">
@@ -38,9 +33,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdInject}
-                        return new ${responseClass}(${domainInst})
-                    </methodBody>
+                    <methodBody>${findByIdInject}return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="save">
                     <methodSignature returns="responseClass">
@@ -49,11 +42,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdRelation}
-                        ${builderInject}
-                        ${daoInst}.save(${domainInst})
-                        return new ${responseClass}(${domainInst})
-                    </methodBody>
+                    <methodBody>${findByIdRelation}${builderInject}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="update">
                     <methodSignature returns="responseClass">
@@ -62,12 +51,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdInject}
-                        ${domainClass} ${domainInst} = ${optionalInst}.get();
-                        ${builderInject}
-                        ${daoInst}.save(${domainInst})
-                        return new ${responseClass}(${domainInst})
-                    </methodBody>
+                    <methodBody>${findByIdInject}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="delete">
                     <methodSignature returns="Boolean">
@@ -75,9 +59,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdInject}
-                        ${daoInst}.delete(${domainInst})
-                    </methodBody>
+                    <methodBody>${findByIdInject}${daoInst}.delete(${domainInst})</methodBody>
                 </method>
             </methods>
         </layer>

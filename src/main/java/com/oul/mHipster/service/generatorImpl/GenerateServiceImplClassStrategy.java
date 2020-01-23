@@ -69,7 +69,6 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
 
             CodeBlock methodBody = layerBuilderHelperService.processMethodBody(entity, method.getMethodBody());
-//            System.out.println("\"" + entity.getClassName() + "\" method[ " + method.getType() + "] =>" + methodBody);
 
             List<ParameterSpec> parameters = layerBuilderHelperService.resolveParameters(entity, method);
             TypeName returnTypeName = attributeService.getReturnTypeName(entity.getClassName(),

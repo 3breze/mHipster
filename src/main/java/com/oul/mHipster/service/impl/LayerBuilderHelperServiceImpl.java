@@ -17,6 +17,15 @@ import java.util.stream.Collectors;
 
 public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService {
 
+    private static final String REGEX = "\\$\\{(.*?)}";
+//    private static final String REGEX = "\\$\\{(.*?)}";
+    private static final String INSTANCE_SUFFIX = "Inst";
+    private static final String INJECT_RELATION_FIND_BY_ID = "findByIdRelation";
+    private static final String INJECT_FIND_BY_ID = "findByIdInject";
+    private static final String INJECT_BUILDER = "builderInject";
+    private static final String INJECT_OPTIONAL = "optionalInst";
+    private static final String CLASS_SUFFIX = "Class";
+
     private EntityManagerService entityManagerService;
     private JPoetHelperService jPoetHelperService;
 
@@ -28,45 +37,50 @@ public class LayerBuilderHelperServiceImpl implements LayerBuilderHelperService 
     @Override
     public CodeBlock processMethodBody(Entity entity, String methodBody) {
 
-        String regex = "\\$\\{(.*?)}";
-        String suffix = "Inst";
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(REGEX);
         Matcher matcher = pattern.matcher(methodBody);
-        StringBuffer sb = new StringBuffer();
+        StringBuffer templateCode = new StringBuffer();
+        CodeBlock.Builder cbBuilder = CodeBlock.builder();
         boolean flag = false;
+
         while (matcher.find()) {
-            String str = matcher.group(1);
-            if (str.equals("findByIdRelation")) {
-                matcher.appendReplacement(sb, "[...code to be added in...]");
+            String injectKeyword = matcher.group(1);
+
+            if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
+                cbBuilder.addStatement("[...code to be added in...]");
+                matcher.appendReplacement(templateCode, "");
                 continue;
             }
-            if (str.equals("findByIdInject")) {
+            if (injectKeyword.equals(INJECT_FIND_BY_ID)) {
                 CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity);
-                matcher.appendReplacement(sb, findByIdCodeBlock.toString());
+                cbBuilder.add(findByIdCodeBlock);
+                matcher.appendReplacement(templateCode, "");
                 continue;
             }
-            if (str.equals("builderInject")) {
+            if (injectKeyword.equals(INJECT_BUILDER)) {
                 CodeBlock lombokBuilderCodeBlock = jPoetHelperService.buildLombokBuilder(entity);
-                matcher.appendReplacement(sb, lombokBuilderCodeBlock.toString());
+                cbBuilder.add(lombokBuilderCodeBlock);
+                matcher.appendReplacement(templateCode, "");
                 continue;
             }
-            if (str.equals("optionalInst")) {
-                matcher.appendReplacement(sb, entity.getOptionalName());
+            if (injectKeyword.equals(INJECT_OPTIONAL)) {
+                matcher.appendReplacement(templateCode, entity.getOptionalName());
                 continue;
             }
-            if (str.endsWith(suffix)) {
+            if (injectKeyword.endsWith(INSTANCE_SUFFIX)) {
                 flag = true;
-                str = str.substring(0, str.indexOf(suffix));
-                str += "Class";
+                injectKeyword = injectKeyword.substring(0, injectKeyword.indexOf(INSTANCE_SUFFIX));
+                injectKeyword += CLASS_SUFFIX;
             }
-            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), str);
-            matcher.appendReplacement(sb, flag ? typeNameWrapper.getInstanceName() : entity.getClassName());
+
+            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), injectKeyword);
+            matcher.appendReplacement(templateCode, flag ? typeNameWrapper.getInstanceName() : entity.getClassName());
             flag = false;
         }
-        matcher.appendTail(sb);
 
-        System.out.println("----");
-        return CodeBlock.builder().addStatement(sb.toString()).build();
+        matcher.appendTail(templateCode);
+        cbBuilder.addStatement(templateCode.toString());
+        return cbBuilder.build();
     }
 
     @Override
