@@ -150,6 +150,8 @@ public class TestPoetApi {
                 .indent("    ")
                 .build();
 
+//        ClassName.bestGuess("void");
+
         String ttt = "Page<responseClazz>";
         System.out.println(ttt.substring(0, ttt.indexOf("<")));
         System.out.println(ttt.substring(ttt.indexOf("<") + 1, ttt.indexOf(">")));

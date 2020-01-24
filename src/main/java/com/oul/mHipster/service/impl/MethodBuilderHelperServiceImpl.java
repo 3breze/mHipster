@@ -24,6 +24,7 @@ public class MethodBuilderHelperServiceImpl implements MethodBuilderHelperServic
     private static final String INJECT_RELATION_FIND_BY_ID = "findByIdRelation";
     private static final String INJECT_FIND_BY_ID = "findByIdInject";
     private static final String INJECT_BUILDER = "builderInject";
+    private static final String INJECT_SETTER_CALLS = "setterCalls";
     private static final String INJECT_OPTIONAL = "optionalInst";
     private static final String CLASS_SUFFIX = "Class";
 
@@ -64,6 +65,12 @@ public class MethodBuilderHelperServiceImpl implements MethodBuilderHelperServic
                 matcher.appendReplacement(templateCode, "");
                 continue;
             }
+            if (injectKeyword.equals(INJECT_SETTER_CALLS)) {
+                CodeBlock setterCallsCodeBlock = jPoetHelperService.buildSetterCallsCodeBlock(entity);
+                cbBuilder.add(setterCallsCodeBlock);
+                matcher.appendReplacement(templateCode, "");
+                continue;
+            }
             if (injectKeyword.equals(INJECT_BUILDER)) {
                 CodeBlock lombokBuilderCodeBlock = jPoetHelperService.buildLombokBuilder(entity);
                 cbBuilder.add(lombokBuilderCodeBlock);
@@ -91,7 +98,7 @@ public class MethodBuilderHelperServiceImpl implements MethodBuilderHelperServic
     }
 
     @Override
-    public List<ParameterSpec> resolveParameters(Entity entity, Method method) {
+    public List<ParameterSpec> resolveMethodParameters(Entity entity, Method method) {
         return method.getMethodSignature().getParameters().stream().map(parameter -> {
             FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                     parameter.getType(), parameter.getName());

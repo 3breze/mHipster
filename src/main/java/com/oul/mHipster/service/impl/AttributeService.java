@@ -4,10 +4,7 @@ import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.util.List;
@@ -53,6 +50,21 @@ public class AttributeService extends RelationAttributeService {
                     .returns(ClassName.bestGuess(attribute.getType().toString()))
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $L", fieldName)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    List<MethodSpec> buildSetters(List<Attribute> attributes) {
+        return attributes.stream().map(attribute -> {
+            String fieldName = attribute.getFieldName();
+            String getterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            return MethodSpec.methodBuilder(getterName)
+                    .addParameter(ParameterSpec
+                            .builder(ClassName.bestGuess(attribute.getType().toString()), fieldName)
+                            .build())
+                    .returns(TypeName.VOID)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("this.$L = $L", fieldName, fieldName)
                     .build();
         }).collect(Collectors.toList());
     }

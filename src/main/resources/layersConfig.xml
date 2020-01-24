@@ -51,7 +51,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdInject}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${findByIdRelation}${findByIdInject}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="delete">
                     <methodSignature returns="Void">

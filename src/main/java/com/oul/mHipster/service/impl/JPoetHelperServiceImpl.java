@@ -43,6 +43,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         AttributeService attributeService = new AttributeService();
         List<MethodSpec> getterMethods = attributeService.buildGetters(attributes);
+        List<MethodSpec> setterMethods = attributeService.buildSetters(attributes);
+
         return TypeSpec
                 .classBuilder("ResourceNotFoundException")
                 .addModifiers(Modifier.PUBLIC)
@@ -55,6 +57,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addFields(fieldSpecList)
                 .addMethod(constructor)
                 .addMethods(getterMethods)
+                .addMethods(setterMethods)
                 .build();
     }
 
@@ -82,17 +85,17 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     @Override
     public CodeBlock buildRelationFindByIdCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 //        List<Director> directors = directorDao.findByIdIn(contentRequestDto.getDirectors());
-        FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
-                "domainClass");
         FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         relationAttributes.forEach(relationAttribute -> {
-            FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
-                    "daoClass");
-            cbBuilder.addStatement("List<$T> $L = $L.findByIdIn($L.$L)", domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
-                    daoTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(), "getSOMEFIELD()");
+            FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
+                    "serviceClass");
+            FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
+                    "domainClass");
+            cbBuilder.addStatement("List<$T> $L = $L.findByIdIn($L.get$LList())", domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
+                    serviceTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(), ClassUtils.capitalize(domainTypeNameWrapper.getInstanceName()));
         });
         return cbBuilder.build();
     }
@@ -153,5 +156,17 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addParameters(parameterSpecsList)
                 .addCode(builder.build())
                 .build();
+    }
+
+    @Override
+    public CodeBlock buildSetterCallsCodeBlock(Entity entity) {
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
+                .builder(attribute.getType(), attribute.getFieldName())
+                .addModifiers(Modifier.PRIVATE)
+                .build()).collect(Collectors.toList());
+
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
+        fieldSpecList.forEach(field -> codeBlockBuilder.addStatement("$L.set$N($N)", entity.getInstanceName(), ClassUtils.capitalize(field.name), field.name));
+        return codeBlockBuilder.build();
     }
 }

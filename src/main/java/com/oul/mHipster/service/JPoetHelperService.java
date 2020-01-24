@@ -20,4 +20,5 @@ public interface JPoetHelperService {
 
     MethodSpec buildConstructor(Entity entity, List<FieldSpec> fieldSpecList, String dependencyClass);
 
+    CodeBlock buildSetterCallsCodeBlock(Entity entity);
 }

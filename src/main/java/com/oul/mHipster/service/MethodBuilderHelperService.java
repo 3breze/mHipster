@@ -11,6 +11,6 @@ public interface MethodBuilderHelperService {
 
     CodeBlock processMethodBody(Entity entity, String methodBody);
 
-    List<ParameterSpec> resolveParameters(Entity entity, Method method);
+    List<ParameterSpec> resolveMethodParameters(Entity entity, Method method);
 
 }

@@ -67,4 +67,8 @@ public class ClassUtils {
     public static String fieldGetter(String field) {
         return field.substring(0, 1).toUpperCase() + field.substring(1) + "()";
     }
+
+    public static String capitalize(String field) {
+        return field.substring(0, 1).toUpperCase() + field.substring(1);
+    }
 }
