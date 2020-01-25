@@ -2,7 +2,10 @@ package com.oul.mHipster;
 
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;

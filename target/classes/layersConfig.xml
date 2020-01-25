@@ -7,6 +7,51 @@
             <packageName>api</packageName>
             <namingSuffix>Api</namingSuffix>
             <type>concrete</type>
+            <methods>
+                <method type="findAll">
+                    <methodSignature returns="Page&lt;responseClass&gt;">
+                        <parameters>
+                            <parameter type="Predicate">predicate</parameter>
+                            <parameter type="Pageable">pageable</parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>return ${serviceInst}.findAll(predicate, pageable)</methodBody>
+                </method>
+                <method type="findById">
+                    <methodSignature returns="responseClass">
+                        <parameters>
+                            <parameter type="Long">id</parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>return new ${serviceInst}.findById(id)</methodBody>
+                </method>
+                <method type="save">
+                    <methodSignature returns="responseClass">
+                        <parameters>
+                            <parameter type="requestClass">requestInst
+                            </parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>return ${serviceInst}.save(${requestInst})</methodBody>
+                </method>
+                <method type="update">
+                    <methodSignature returns="responseClass">
+                        <parameters>
+                            <parameter type="requestClass">requestInst
+                            </parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>return ${serviceInst}.update(${requestInst})</methodBody>
+                </method>
+                <method type="delete">
+                    <methodSignature returns="Void">
+                        <parameters>
+                            <parameter type="Long">id</parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>${serviceInst}.delete(id)</methodBody>
+                </method>
+            </methods>
         </layer>
         <layer name="DAO">
             <packageName>dao</packageName>
