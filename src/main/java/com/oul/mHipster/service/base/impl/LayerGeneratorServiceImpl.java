@@ -6,7 +6,7 @@ import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
-import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.ModelService;
 import com.oul.mHipster.service.base.JavaFileMakerService;
 import com.oul.mHipster.service.base.LayerGeneratorService;

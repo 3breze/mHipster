@@ -1,7 +1,6 @@
 package com.oul.mHipster.service.strategy;
 
 import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.strategy.impl.*;
 
 //final

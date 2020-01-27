@@ -11,5 +11,5 @@ public interface EntityManagerService {
 
     FieldTypeNameWrapper getProperty(String entityName, String layerName);
 
-    FieldTypeNameWrapper getProperty(String entityName, String layerName, String fieldName);
+    FieldTypeNameWrapper getProperty(String entityName, String typeArgument, String instanceName);
 }

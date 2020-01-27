@@ -11,7 +11,7 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
-import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.JPoetHelperService;
 import com.oul.mHipster.service.helper.MethodBuilderService;
 import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
@@ -68,15 +68,15 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE_IMPL.name());
 
-            TypeName returnTypeName = attributeBuilderService.getReturnTypeName(entity.getClassName(),
-                    method.getMethodSignature().getReturns());
+            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getReturnTypeName(entity.getClassName(),
+                    method.getMethodSignature().getReturns(), null);
 
             return methodBuilder
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(parameters)
                     .addCode(methodBody)
-                    .returns(returnTypeName)
+                    .returns(returnTypeName.getTypeName())
                     .build();
         }).collect(Collectors.toList());
 

@@ -106,7 +106,7 @@ public class MethodBuilderServiceImpl implements MethodBuilderService {
     @Override
     public List<ParameterSpec> getMethodParameters(Entity entity, Method method, String layer) {
         return method.getMethodSignature().getParameters().stream().map(parameter -> {
-            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
+            FieldTypeNameWrapper typeNameWrapper = attributeBuilderService.getReturnTypeName(entity.getClassName(),
                     parameter.getType(), parameter.getName());
             ParameterSpec.Builder parameterBuilder = ParameterSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName());

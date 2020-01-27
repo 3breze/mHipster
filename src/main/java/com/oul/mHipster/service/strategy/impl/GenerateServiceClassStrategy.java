@@ -6,15 +6,15 @@ import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.MethodBuilderService;
 import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
 import com.oul.mHipster.service.helper.impl.MethodBuilderServiceImpl;
 import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
@@ -48,13 +48,13 @@ public class GenerateServiceClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE.name());
 
-            TypeName returnTypeName = attributeBuilderService.getReturnTypeName(entity.getClassName(),
-                    method.getMethodSignature().getReturns());
+            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getReturnTypeName(entity.getClassName(),
+                    method.getMethodSignature().getReturns(), null);
 
             return methodBuilder
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameters(parameters)
-                    .returns(returnTypeName)
+                    .returns(returnTypeName.getTypeName())
                     .build();
         }).collect(Collectors.toList());
 

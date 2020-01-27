@@ -5,32 +5,34 @@ import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.JPoetHelperService;
+import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
 import com.oul.mHipster.service.helper.impl.JPoetHelperServiceImpl;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
 
     private JPoetHelperService jPoetHelperService;
+    private AttributeBuilderService attributeBuilderService;
 
     public GenerateResponseDtoClassStrategy() {
         this.jPoetHelperService = new JPoetHelperServiceImpl();
+        this.attributeBuilderService = new AttributeBuilderService();
     }
 
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-//        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
-//                .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getFieldName())
-//                .addModifiers(Modifier.PRIVATE)
-//                .build()).collect(Collectors.toList());
-//        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, null);
-//
+        List<FieldSpec> fieldSpecList = attributeBuilderService.getFieldSpecList(entity, LayerName.RESPONSE_DTO.name());
+        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "");
+
 //        List<MethodSpec> getterMethods = jPoetHelperService.buildGetters(entity.getAttributes());
 //        List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(entity.getAttributes());
 
@@ -43,8 +45,8 @@ public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
                         .addMember("value", "$L",
                                 JsonInclude.Include.NON_NULL.name())
                         .build())
-//                .addFields(fieldSpecList)
-//                .addMethod(constructor)
+                .addFields(fieldSpecList)
+                .addMethod(constructor)
 //                .addMethods(getterMethods)
 //                .addMethods(setterMethods)
                 .build();

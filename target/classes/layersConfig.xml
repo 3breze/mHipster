@@ -57,6 +57,15 @@
             <packageName>dao</packageName>
             <namingSuffix>Dao</namingSuffix>
             <type>interface</type>
+            <methods>
+            <method type="findByIdIn">
+                <methodSignature returns="List&lt;domainClass&gt;">
+                    <parameters>
+                        <parameter type="List&lt;Long&gt;">ids</parameter>
+                    </parameters>
+                </methodSignature>
+                <methodBody></methodBody>
+            </method></methods>
         </layer>
         <layer name="SERVICE_IMPL">
             <packageName>service.impl</packageName>
@@ -79,6 +88,22 @@
                         </parameters>
                     </methodSignature>
                     <methodBody>${findByIdInject}return new ${responseClass}(${domainInst})</methodBody>
+                </method>
+                <method type="findOne">
+                    <methodSignature returns="domainClass">
+                        <parameters>
+                            <parameter type="Long">id</parameter>
+                        </parameters>
+                    </methodSignature>
+                    <methodBody>${findByIdInject}return ${domainInst}</methodBody>
+                </method>
+                <method type="findByIds">
+                    <methodSignature returns="List&lt;domainClass&gt;">
+                        <parameters>
+                            <parameter type="List&lt;Long&gt;">ids</parameter>
+                        </parameters>
+                    </methodSignature>return contents.stream().collect(Collectors.toMap(Content::getId, this::prepareResponse));
+                    <methodBody>List&lt;${domainClass}&gt; ${domainInst}List = ${daoInst}.findByIdIn(ids)&#xA;return ${domainInst}List</methodBody>
                 </method>
                 <method type="save">
                     <methodSignature returns="responseClass">
