@@ -4,9 +4,13 @@ import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layersConfig.Layer;
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
-import com.oul.mHipster.service.*;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+import com.oul.mHipster.service.EntityManagerFactory;
+import com.oul.mHipster.service.EntityManagerService;
+import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.JPoetHelperService;
 import com.oul.mHipster.service.helper.MethodBuilderService;
 import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
@@ -43,7 +47,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
     }
 
     @Override
-    public TypeSpec generate(Entity entity) {
+    public TypeSpecWrapper generate(Entity entity) {
 
         FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
         List<FieldSpec> fieldSpecList = new ArrayList<>();
@@ -52,7 +56,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
                 .addModifiers(Modifier.PRIVATE)
                 .build());
 
-        MethodSpec constructor = jPoetHelperService.buildConstructor(entity, fieldSpecList, "serviceClass");
+        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "serviceClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream()
                 .filter(layer -> layer.getName().equals("API"))
@@ -86,8 +90,10 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
                     .build();
         }).collect(Collectors.toList());
 
-        return TypeSpec
-                .classBuilder(entity.getLayers().get(LayerName.SERVICE_IMPL.toString()).getClassName())
+        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.SERVICE_IMPL.toString());
+
+        TypeSpec typeSpec = TypeSpec
+                .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(RestController.class)
                 .addAnnotation(AnnotationSpec
@@ -98,5 +104,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
                 .addMethod(constructor)
                 .addMethods(methods)
                 .build();
+
+        return new TypeSpecWrapper(typeSpec, classNamingInfo.getPackageName());
     }
 }

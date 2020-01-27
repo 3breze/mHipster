@@ -4,10 +4,14 @@ import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layersConfig.Layer;
 import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
-import com.oul.mHipster.service.*;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+import com.oul.mHipster.service.EntityManagerFactory;
+import com.oul.mHipster.service.EntityManagerService;
+import com.oul.mHipster.service.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.JPoetHelperService;
 import com.oul.mHipster.service.helper.MethodBuilderService;
 import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
@@ -39,10 +43,8 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
     }
 
     @Override
-    public TypeSpec generate(Entity entity) {
-        CodeBlock throwExceptionCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity);
+    public TypeSpecWrapper generate(Entity entity) {
 
-        // Ovo ce biti izmesteno npr. findFieldsForEntity
         List<RelationAttribute> relationAttributes = attributeBuilderService.findRelationAttributes(entity);
         List<FieldSpec> fieldSpecList = jPoetHelperService.buildFieldSpecs(relationAttributes);
 
@@ -52,8 +54,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                 .addModifiers(Modifier.PRIVATE)
                 .build());
 
-        // dependencyClass -> needs DAO dependency
-        MethodSpec constructor = jPoetHelperService.buildConstructor(entity, fieldSpecList, "daoClass");
+        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "daoClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream()
                 .filter(layer -> layer.getName().equals("SERVICE_IMPL"))
@@ -81,8 +82,10 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
         FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
 
-        return TypeSpec
-                .classBuilder(entity.getLayers().get(LayerName.SERVICE_IMPL.toString()).getClassName())
+        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.SERVICE_IMPL.toString());
+
+        TypeSpec typeSpec = TypeSpec
+                .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Service.class)
                 .addSuperinterface(serviceTypeNameWrapper.getTypeName())
@@ -90,5 +93,6 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                 .addMethod(constructor)
                 .addMethods(methods)
                 .build();
+        return new TypeSpecWrapper(typeSpec, classNamingInfo.getPackageName());
     }
 }

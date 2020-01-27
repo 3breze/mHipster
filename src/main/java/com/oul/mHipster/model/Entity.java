@@ -1,8 +1,9 @@
 package com.oul.mHipster.model;
 
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.util.ClassUtils;
-import com.squareup.javapoet.TypeSpec;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class Entity {
     private String optionalName;
     private Map<String, ClassNamingInfo> layers;
     private List<Attribute> attributes;
-    private TypeSpec typeSpec;
+    private List<TypeSpecWrapper> typeSpecWrapperList;
 
     public String getClassName() {
         return className;
@@ -63,12 +64,12 @@ public class Entity {
         this.attributes = attributes;
     }
 
-    public TypeSpec getTypeSpec() {
-        return typeSpec;
+    public List<TypeSpecWrapper> getTypeSpecWrapperList() {
+        return typeSpecWrapperList;
     }
 
-    public void setTypeSpec(TypeSpec typeSpec) {
-        this.typeSpec = typeSpec;
+    public void setTypeSpecWrapperList(List<TypeSpecWrapper> typeSpecWrapperList) {
+        this.typeSpecWrapperList = typeSpecWrapperList;
     }
 
     public static Builder builder() {
@@ -82,7 +83,7 @@ public class Entity {
         private String optionalName;
         private Map<String, ClassNamingInfo> layers;
         private List<Attribute> attributes;
-        private TypeSpec typeSpec;
+        private List<TypeSpecWrapper> typeSpecWrapperList = new ArrayList<>();
 
         public Builder infoFields(Class<?> clazz) {
             String className = ClassUtils.getClassName(clazz);
@@ -98,8 +99,8 @@ public class Entity {
             return this;
         }
 
-        public Builder typeSpec(TypeSpec typeSpec) {
-            this.typeSpec = typeSpec;
+        public Builder typeSpecWrapperList(List<TypeSpecWrapper> typeSpecWrapperList) {
+            this.typeSpecWrapperList = typeSpecWrapperList;
             return this;
         }
 
@@ -111,7 +112,7 @@ public class Entity {
             entity.setOptionalName(optionalName);
             entity.setLayers(layers);
             entity.setAttributes(attributes);
-            entity.setTypeSpec(typeSpec);
+            entity.setTypeSpecWrapperList(typeSpecWrapperList);
             return entity;
         }
     }

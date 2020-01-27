@@ -94,7 +94,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
-    public MethodSpec buildConstructor(Entity entity, List<FieldSpec> fieldSpecList, String dependencyClass) {
+    public MethodSpec buildConstructor(List<FieldSpec> fieldSpecList, String dependencyClass) {
         MethodSpec.Builder methodBuilder = MethodSpec.constructorBuilder();
 
         // For api class its serviceClass dependency, for serviceImpl class its dao dependency, if exception then skip

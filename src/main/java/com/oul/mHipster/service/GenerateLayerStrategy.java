@@ -1,8 +1,8 @@
 package com.oul.mHipster.service;
 
 import com.oul.mHipster.model.Entity;
-import com.squareup.javapoet.TypeSpec;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 
 public interface GenerateLayerStrategy {
-    public TypeSpec generate(Entity entity);
+    TypeSpecWrapper generate(Entity entity);
 }

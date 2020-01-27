@@ -44,6 +44,7 @@ com/oul/mHipster/service/strategy/impl/UnknownLayerStrategy.class
 com/oul/mHipster/service/strategy/impl/GenerateRequestDtoClassStrategy.class
 com/oul/mHipster/service/base/impl/LayerGeneratorServiceImpl.class
 com/oul/mHipster/service/strategy/impl/GenerateServiceImplClassStrategy.class
+com/oul/mHipster/model/wrapper/TypeSpecWrapper.class
 com/oul/mHipster/service/helper/impl/JPoetClassBuilderServiceImpl.class
 com/oul/mHipster/service/base/JavaFileMakerService.class
 com/oul/mHipster/TestPoetApi.class

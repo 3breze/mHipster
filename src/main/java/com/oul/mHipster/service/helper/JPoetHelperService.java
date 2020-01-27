@@ -19,7 +19,7 @@ public interface JPoetHelperService {
 
     CodeBlock buildLombokBuilder(Entity entity);
 
-    MethodSpec buildConstructor(Entity entity, List<FieldSpec> fieldSpecList, String dependencyClass);
+    MethodSpec buildConstructor(List<FieldSpec> fieldSpecList, String dependencyClass);
 
     CodeBlock buildSetterCallsCodeBlock(Entity entity);
 

@@ -99,7 +99,7 @@
                     <methodBody>${findByIdRelation}${findByIdInject}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="delete">
-                    <methodSignature returns="Void">
+                    <methodSignature returns="void">
                         <parameters>
                             <parameter type="Long">id</parameter>
                         </parameters>
@@ -131,21 +131,19 @@
                 <method type="save">
                     <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClass">requestInst
-                            </parameter>
+                            <parameter type="requestClass">requestInst</parameter>
                         </parameters>
                     </methodSignature>
                 </method>
                 <method type="update">
                     <methodSignature returns="responseClass">
                         <parameters>
-                            <parameter type="requestClass">requestInst
-                            </parameter>
+                            <parameter type="requestClass">requestInst</parameter>
                         </parameters>
                     </methodSignature>
                 </method>
                 <method type="delete">
-                    <methodSignature returns="Boolean">
+                    <methodSignature returns="void">
                         <parameters>
                             <parameter type="Long">id</parameter>
                         </parameters>

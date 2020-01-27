@@ -1,12 +1,12 @@
 package com.oul.mHipster.service.strategy.impl;
 
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.GenerateLayerStrategy;
-import com.squareup.javapoet.TypeSpec;
 
 public class UnknownLayerStrategy implements GenerateLayerStrategy {
     @Override
-    public TypeSpec generate(Entity entity) {
+    public TypeSpecWrapper generate(Entity entity) {
         return null;
     }
 }

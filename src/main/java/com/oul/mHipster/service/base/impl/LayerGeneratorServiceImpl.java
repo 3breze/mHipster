@@ -4,12 +4,14 @@ import com.oul.mHipster.layersConfig.LayersConfig;
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
-import com.oul.mHipster.service.*;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+import com.oul.mHipster.service.EntityManagerFactory;
+import com.oul.mHipster.service.GenerateLayerStrategy;
+import com.oul.mHipster.service.ModelService;
 import com.oul.mHipster.service.base.JavaFileMakerService;
 import com.oul.mHipster.service.base.LayerGeneratorService;
-import com.oul.mHipster.service.strategy.GenerateLayerStrategyFactory;
 import com.oul.mHipster.service.impl.ModelServiceImpl;
-import com.squareup.javapoet.TypeSpec;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategyFactory;
 
 public class LayerGeneratorServiceImpl implements LayerGeneratorService {
 
@@ -32,11 +34,8 @@ public class LayerGeneratorServiceImpl implements LayerGeneratorService {
         generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
         rootEntityModel.getEntities().forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
             GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));
-            TypeSpec typeSpec = generateLayerStrategy.generate(entityModel);
-            // Potrebne izmene jer ce jedan entity imati niz TypeSpecova
-            // Izmene trebaju i u javaFileMakerService gde se setuje packageName
-            if (layer.getName().equals(LayerName.API.toString()))
-                entityModel.setTypeSpec(typeSpec);
+            TypeSpecWrapper typeSpecWrapper = generateLayerStrategy.generate(entityModel);
+            entityModel.getTypeSpecWrapperList().add(typeSpecWrapper);
         }));
 
         javaFileMakerService.makeJavaFiles(rootEntityModel);

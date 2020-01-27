@@ -5,6 +5,7 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.service.EntityManagerService;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 
 import java.util.Map;
 import java.util.Optional;
@@ -38,8 +39,10 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         FieldTypeNameWrapper entityBasedClass = layerModel.get(entityName).get(typeArgument);
         if (entityBasedClass == null) {
             FieldTypeNameWrapper dependencyBasedClass = layerModel.get("dependencies").get(typeArgument);
-            if (dependencyBasedClass == null)
-                return new FieldTypeNameWrapper(ClassName.bestGuess(typeArgument), instanceName);
+            if (dependencyBasedClass == null) {
+                if (typeArgument.equals("void")) return new FieldTypeNameWrapper(TypeName.VOID, instanceName);
+                return new FieldTypeNameWrapper(ClassName.get("java.lang", typeArgument), instanceName);
+            }
             return dependencyBasedClass;
         }
         return entityBasedClass;

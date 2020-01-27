@@ -6,17 +6,19 @@ import com.squareup.javapoet.JavaFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class JavaFileMakerServiceImpl implements JavaFileMakerService {
 
     @Override
-    public void makeJavaFiles(RootEntityModel rootEntityModel){
-        //Packagename se razliku na nivou typespeca a ne samo na nivou entiteta
+    public void makeJavaFiles(RootEntityModel rootEntityModel) {
+
         List<JavaFile> javaFileList = rootEntityModel.getEntities().stream()
-                .filter(entity -> entity.getTypeSpec() != null)
-                .map(entityModel -> JavaFile
-                        .builder(entityModel.getPackageName(), entityModel.getTypeSpec())
+                .flatMap(entity -> entity.getTypeSpecWrapperList().stream())
+                .filter(typeSpecWrapper -> Objects.nonNull(typeSpecWrapper.getTypeSpec()))
+                .map(typeSpecWrapper -> JavaFile
+                        .builder(typeSpecWrapper.getPackageName(), typeSpecWrapper.getTypeSpec())
                         .indent("    ")
                         .build()).collect(Collectors.toList());
 

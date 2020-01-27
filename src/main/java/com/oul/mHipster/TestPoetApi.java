@@ -142,7 +142,7 @@ public class TestPoetApi {
                         .addParameter(param)
                         .addStatement(codeBlock2)
                         .addStatement(lombokBuilder.toString())
-                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("Pageeelone"),
+                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("JpaRepository"),
                                 responseDtoClass))
 //                        .returns(responseDtoClass)
                         .build())

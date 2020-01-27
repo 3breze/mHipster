@@ -63,7 +63,16 @@ public class ModelServiceImpl implements ModelService {
                 ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
         typeNameMap.put("ResourceNotFoundException", new FieldTypeNameWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ResourceNotFoundException"),
-                "resourceNotFoundException"));
+                "ResourceNotFoundException"));
+        typeNameMap.put("ValidationGroup", new FieldTypeNameWrapper(
+                ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ValidationGroup"),
+                "ValidationGroup"));
+        typeNameMap.put("JpaRepository", new FieldTypeNameWrapper(
+                ClassName.get("org.springframework.data.jpa.repository", "JpaRepository"),
+                "JpaRepository"));
+        typeNameMap.put("QuerydslPredicateExecutor", new FieldTypeNameWrapper(
+                ClassName.get("org.springframework.data.querydsl", "QuerydslPredicateExecutor"),
+                "QuerydslPredicateExecutor"));
 
         layerModel.put("dependencies", typeNameMap);
     }

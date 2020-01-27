@@ -28,7 +28,7 @@ public class JPoetClassBuilderServiceImpl extends JPoetHelperServiceImpl impleme
 
         // typeName ide u model za packagename posle
         FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
-                "ResourceNotFoundException", "exception");
+                "ResourceNotFoundException", null);
 
         List<Attribute> attributes = Arrays.asList(new Attribute(String.class, "resourceName"),
                 new Attribute(String.class, "fieldName"),
@@ -38,7 +38,7 @@ public class JPoetClassBuilderServiceImpl extends JPoetHelperServiceImpl impleme
                 .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getFieldName())
                 .addModifiers(Modifier.PRIVATE)
                 .build()).collect(Collectors.toList());
-        MethodSpec constructor = buildConstructor(null, fieldSpecList, "exception");
+        MethodSpec constructor = buildConstructor(fieldSpecList, "exception");
 
         List<MethodSpec> getterMethods = buildGetters(attributes);
         List<MethodSpec> setterMethods = buildSetters(attributes);
@@ -61,6 +61,10 @@ public class JPoetClassBuilderServiceImpl extends JPoetHelperServiceImpl impleme
 
     @Override
     public TypeSpec buildValidationGroup() {
+
+        FieldTypeNameWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "ValidationGroup", "exception");
+
         return TypeSpec
                 .classBuilder("ValidationGroup")
                 .addModifiers(Modifier.PUBLIC)
