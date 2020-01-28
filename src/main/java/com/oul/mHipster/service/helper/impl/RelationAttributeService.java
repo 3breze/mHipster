@@ -13,15 +13,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class RelationAttributeService {
+
+    private static final String MAPPED_BY_ANN_NAME = "mappedBy";
+    private static final String MAPPED_BY_ANN_VALUE = "";
 
     protected Attribute findRelation(Field field, Class clazz) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
@@ -40,22 +41,18 @@ public abstract class RelationAttributeService {
         Class<? extends Annotation> type = annotation.annotationType();
 
         for (Method method : type.getDeclaredMethods()) {
-            Object value = null;
 
-            try {
-                value = method.invoke(annotation, (Object[]) null);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            if (method.getName().equals("mappedBy") && !value.equals("")) {
+            Object value = ReflectionUtil.methodInvoker(method, annotation);
 
-                ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-                Class<?> relationDomainClass = (Class<?>) genericType.getActualTypeArguments()[0];
+            if (method.getName().equals(MAPPED_BY_ANN_NAME) && !value.equals(MAPPED_BY_ANN_VALUE)) {
+                Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
+
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),
                         relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
-            } else if (method.getName().equals("mappedBy") && value.equals("")) {
 
+            } else if (method.getName().equals(MAPPED_BY_ANN_NAME) && value.equals(MAPPED_BY_ANN_VALUE)) {
                 Class<?> typeArgument = ReflectionUtil.resolveTypeArgument(field);
+
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
                         clazz.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }

@@ -4,7 +4,10 @@ import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.net.URLClassLoader;
 import java.util.Collection;
@@ -18,11 +21,27 @@ public class ReflectionUtil {
         return reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
     }
 
+    public static Class<?> resolveParameterizedType(Field field) {
+        ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        return (Class<?>) genericType.getActualTypeArguments()[0];
+    }
+
     public static Class<?> resolveTypeArgument(Field field) {
         if (Collection.class.isAssignableFrom(field.getType())) {
             ParameterizedType genericType = (ParameterizedType) field.getGenericType();
             return (Class<?>) genericType.getActualTypeArguments()[0];
         }
         return field.getType();
+    }
+
+    public static Object methodInvoker(Method method, Annotation annotation) {
+        Object value = null;
+
+        try {
+            value = method.invoke(annotation, (Object[]) null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return value;
     }
 }
