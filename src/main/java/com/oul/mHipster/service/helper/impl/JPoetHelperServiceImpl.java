@@ -66,7 +66,6 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     @Override
     public List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes) {
         return relationAttributes.stream().map(attribute -> {
-            System.out.println("Build relation field: "+attribute.getClassSimpleName());
             FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(),
                     "serviceClass");
             return FieldSpec

@@ -62,7 +62,7 @@ public class AttributeBuilderService extends RelationAttributeService {
 
                     FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
                             attribute.getType().getSimpleName(), attribute.getFieldName());
-                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(attribute.getType().getSimpleName()),
+                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess("java.lang.List"),
                             fieldSpec.getTypeName());
 
                     FieldSpec.Builder fieldBuilder = FieldSpec
