@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public abstract class RelationAttributeService {
 
     private static final String MAPPED_BY_ANN_NAME = "mappedBy";
-    private static final String MAPPED_BY_ANN_VALUE = "";
+    private static final String EMPTY_MAPPED_BY_ANN_VALUE = "";
 
     protected Attribute findRelation(Field field, Class clazz) {
         Annotation annM2M = field.getAnnotation(ManyToMany.class);
@@ -41,20 +41,18 @@ public abstract class RelationAttributeService {
         Class<? extends Annotation> type = annotation.annotationType();
 
         for (Method method : type.getDeclaredMethods()) {
-
             Object value = ReflectionUtil.methodInvoker(method, annotation);
 
-            if (method.getName().equals(MAPPED_BY_ANN_NAME) && !value.equals(MAPPED_BY_ANN_VALUE)) {
+            if (method.getName().equals(MAPPED_BY_ANN_NAME) && !value.equals(EMPTY_MAPPED_BY_ANN_VALUE)) {
                 Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
-
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),
                         relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
 
-            } else if (method.getName().equals(MAPPED_BY_ANN_NAME) && value.equals(MAPPED_BY_ANN_VALUE)) {
+            } else if (method.getName().equals(MAPPED_BY_ANN_NAME) && value.equals(EMPTY_MAPPED_BY_ANN_VALUE)) {
                 Class<?> typeArgument = ReflectionUtil.resolveTypeArgument(field);
-
+                Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
-                        clazz.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
+                        relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }
         }
         return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),

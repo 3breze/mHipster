@@ -64,8 +64,9 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
-    public List<FieldSpec> buildFieldSpecs(List<RelationAttribute> relationAttributes) {
+    public List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes) {
         return relationAttributes.stream().map(attribute -> {
+            System.out.println("Build relation field: "+attribute.getClassSimpleName());
             FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(),
                     "serviceClass");
             return FieldSpec
@@ -84,7 +85,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
         return CodeBlock.builder()
-                .addStatement("Optional<$T> $L = $L.findById(id)", domainTypeNameWrapper.getTypeName(),
+                .addStatement("Optional<$T> $L = $L.findOne(id)", domainTypeNameWrapper.getTypeName(),
                         entity.getOptionalName(), daoTypeNameWrapper.getInstanceName())
                 .beginControlFlow("if ($L.isEmpty())", entity.getOptionalName())
                 .addStatement("throw new $T(\"$T $L\")", responseTypeNameWrapper.getTypeName(), responseTypeNameWrapper.getTypeName(), "not found!")

@@ -19,10 +19,7 @@ import com.oul.mHipster.service.helper.impl.MethodBuilderServiceImpl;
 import com.oul.mHipster.util.Util;
 import com.squareup.javapoet.*;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -82,7 +79,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
                             .addMember("method", "$T.$L", RequestMethod.class, requestMethod)
                             .addMember("produces", "$T.$L", MediaType.class, "APPLICATION_JSON_VALUE")
                             .build())
-                    .addAnnotation(RequestBody.class)
+                    .addAnnotation(ResponseBody.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(parameters)
                     .addCode(methodBody)
@@ -90,7 +87,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
                     .build();
         }).collect(Collectors.toList());
 
-        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.SERVICE_IMPL.toString());
+        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.API.toString());
 
         TypeSpec typeSpec = TypeSpec
                 .classBuilder(classNamingInfo.getClassName())

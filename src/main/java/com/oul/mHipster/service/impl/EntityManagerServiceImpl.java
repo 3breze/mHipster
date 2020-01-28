@@ -40,11 +40,48 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         if (entityBasedClass == null) {
             FieldTypeNameWrapper dependencyBasedClass = layerModel.get("dependencies").get(typeArgument);
             if (dependencyBasedClass == null) {
-                if (typeArgument.equals("void")) return new FieldTypeNameWrapper(TypeName.VOID, instanceName);
+                if (Character.isLowerCase(typeArgument.charAt(0))) {
+                    TypeName typeName = getPrimitiveTypeName(typeArgument);
+                    return new FieldTypeNameWrapper(typeName, instanceName);
+                }
                 return new FieldTypeNameWrapper(ClassName.get("java.lang", typeArgument), instanceName);
             }
             return dependencyBasedClass;
         }
         return entityBasedClass;
+    }
+
+    private TypeName getPrimitiveTypeName(String typeArgument) {
+        TypeName result = null;
+        switch (typeArgument) {
+            case "void":
+                result = TypeName.VOID;
+                break;
+            case "boolean":
+                result = TypeName.BOOLEAN;
+                break;
+            case "byte":
+                result = TypeName.BYTE;
+                break;
+            case "short":
+                result = TypeName.SHORT;
+                break;
+            case "int":
+                result = TypeName.INT;
+                break;
+            case "long":
+                result = TypeName.LONG;
+                break;
+            case "char":
+                result = TypeName.CHAR;
+                break;
+            case "float":
+                result = TypeName.FLOAT;
+                break;
+            case "double":
+                result = TypeName.DOUBLE;
+                break;
+        }
+        return result;
     }
 }

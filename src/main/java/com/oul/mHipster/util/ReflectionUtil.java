@@ -26,6 +26,10 @@ public class ReflectionUtil {
         return (Class<?>) genericType.getActualTypeArguments()[0];
     }
 
+    public static boolean isParameterizedType(Field field) {
+        return Collection.class.isAssignableFrom(field.getType());
+    }
+
     public static Class<?> resolveTypeArgument(Field field) {
         if (Collection.class.isAssignableFrom(field.getType())) {
             ParameterizedType genericType = (ParameterizedType) field.getGenericType();

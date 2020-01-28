@@ -46,7 +46,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
     public TypeSpecWrapper generate(Entity entity) {
 
         List<RelationAttribute> relationAttributes = attributeBuilderService.findRelationAttributes(entity);
-        List<FieldSpec> fieldSpecList = jPoetHelperService.buildFieldSpecs(relationAttributes);
+        List<FieldSpec> fieldSpecList = jPoetHelperService.buildRelationFieldSpecList(relationAttributes);
 
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         fieldSpecList.add(FieldSpec

@@ -12,7 +12,10 @@ import java.util.List;
 
 public class ClassUtils {
 
-    public static URLClassLoader createCustomClassloader(MavenProject project) {
+    private static final String TYPE_ARG_START = "<";
+    private static final String TYPE_ARG_END = ">";
+
+    static URLClassLoader createCustomClassloader(MavenProject project) {
 
         try {
             List<String> classpathElements = project.getRuntimeClasspathElements();
@@ -58,6 +61,14 @@ public class ClassUtils {
 
     public static String instanceNameBuilder(String className) {
         return className.substring(0, 1).toLowerCase() + className.substring(1);
+    }
+
+    public static String getGenericTypeName(String genericField){
+        return genericField.substring(0, genericField.indexOf(TYPE_ARG_START));
+    }
+    public static String getTypeArgumentName(String genericField){
+        return genericField.substring(genericField.indexOf(TYPE_ARG_START) + 1,
+                genericField.indexOf(TYPE_ARG_END));
     }
 
     public static String optionalNameBuilder(String className) {

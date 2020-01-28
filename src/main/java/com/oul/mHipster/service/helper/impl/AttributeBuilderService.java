@@ -2,9 +2,11 @@ package com.oul.mHipster.service.helper.impl;
 
 import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.Entity;
+import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.EntityManagerFactory;
 import com.oul.mHipster.service.EntityManagerService;
+import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 public class AttributeBuilderService extends RelationAttributeService {
 
     private EntityManagerService entityManagerService;
+    private static final String TYPE_ARG_START = "<";
+
 
     public AttributeBuilderService() {
         this.entityManagerService = EntityManagerFactory.getInstance();
@@ -26,7 +30,7 @@ public class AttributeBuilderService extends RelationAttributeService {
      * typeArgument kao u slucaju parametara methoda)
      */
     public FieldTypeNameWrapper getReturnTypeName(String entityName, String typeArgument, String instanceName) {
-        return typeArgument.contains("<") ? parameterizedTypeTokenSplit(typeArgument, entityName, instanceName) :
+        return typeArgument.contains(TYPE_ARG_START) ? parameterizedTypeTokenSplit(typeArgument, entityName, instanceName) :
                 entityManagerService.getProperty(entityName, typeArgument, instanceName);
     }
 
@@ -35,10 +39,11 @@ public class AttributeBuilderService extends RelationAttributeService {
      * ParameterizedTypeName vraca typeName
      */
     private FieldTypeNameWrapper parameterizedTypeTokenSplit(String genericField, String entityName, String instanceName) {
-        FieldTypeNameWrapper genericType = entityManagerService.getProperty(entityName, genericField.substring(0, genericField.indexOf("<")),
-                null);
-        FieldTypeNameWrapper typeArgument = entityManagerService.getProperty(entityName, genericField.substring(genericField.indexOf("<") + 1,
-                genericField.indexOf(">")), null);
+        String genericTypeName = ClassUtils.getGenericTypeName(genericField);
+        String typeArgumentName = ClassUtils.getTypeArgumentName(genericField);
+
+        FieldTypeNameWrapper genericType = entityManagerService.getProperty(entityName, genericTypeName, null);
+        FieldTypeNameWrapper typeArgument = entityManagerService.getProperty(entityName, typeArgumentName, null);
 
         TypeName typeName = ParameterizedTypeName.get((ClassName) genericType.getTypeName(),
                 typeArgument.getTypeName());
@@ -50,17 +55,27 @@ public class AttributeBuilderService extends RelationAttributeService {
         TypeName updateValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",
                 "Update");
 
-        return entity.getAttributes().stream().map(attribute -> {
-            FieldSpec.Builder fieldBuilder = FieldSpec
-                    .builder(attribute.getType(), attribute.getFieldName()).addModifiers(Modifier.PRIVATE);
-            if (layer.equals(LayerName.REQUEST_DTO.name()) && attribute.getFieldName().equals("id")) {
-                fieldBuilder.addAnnotation(AnnotationSpec
-                        .builder(NotNull.class)
-                        .addMember("groups", "{ $T.$L }", updateValidationGroupTypeName, "class")
-                        .addMember("message", "$S", attribute.getFieldName() + " cannot be null.")
-                        .build());
-            }
-            return fieldBuilder.build();
-        }).collect(Collectors.toList());
+        return entity.getAttributes().stream()
+                .filter(RelationAttribute.class::isInstance)
+                .filter(attribute -> !attribute.getType().getSimpleName().equals("List"))
+                .map(attribute -> {
+
+                    FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
+                            attribute.getType().getSimpleName(), attribute.getFieldName());
+                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(attribute.getType().getSimpleName()),
+                            fieldSpec.getTypeName());
+
+                    FieldSpec.Builder fieldBuilder = FieldSpec
+                            .builder(parameterized, fieldSpec.getInstanceName()).addModifiers(Modifier.PRIVATE);
+
+                    if (attribute.getFieldName().equals("id") && layer.equals(LayerName.REQUEST_DTO.name())) {
+                        fieldBuilder.addAnnotation(AnnotationSpec
+                                .builder(NotNull.class)
+                                .addMember("groups", "{ $T.$L }", updateValidationGroupTypeName, "class")
+                                .addMember("message", "$S", attribute.getFieldName() + " cannot be null.")
+                                .build());
+                    }
+                    return fieldBuilder.build();
+                }).collect(Collectors.toList());
     }
 }

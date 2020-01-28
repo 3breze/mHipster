@@ -44,7 +44,7 @@
                     <methodBody>return ${serviceInst}.update(${requestInst})</methodBody>
                 </method>
                 <method type="delete">
-                    <methodSignature returns="Void">
+                    <methodSignature returns="void">
                         <parameters>
                             <parameter type="Long">id</parameter>
                         </parameters>
