@@ -52,17 +52,16 @@ public class AttributeBuilderService extends RelationAttributeService {
 
     public List<FieldSpec> getFieldSpecList(Entity entity, String layer) {
 
-        TypeName updateValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",
-                "Update");
+        FieldTypeNameWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "ValidationGroupUpdate", "update");
 
         return entity.getAttributes().stream()
                 .filter(RelationAttribute.class::isInstance)
-                .filter(attribute -> !attribute.getType().getSimpleName().equals("List"))
                 .map(attribute -> {
-
+                    System.out.println(attribute);
                     FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
-                            attribute.getType().getSimpleName(), attribute.getFieldName());
-                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess("java.lang.List"),
+                            ((RelationAttribute) attribute).getClassSimpleName(), attribute.getFieldName());
+                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(attribute.getType().toString()),
                             fieldSpec.getTypeName());
 
                     FieldSpec.Builder fieldBuilder = FieldSpec
@@ -71,7 +70,7 @@ public class AttributeBuilderService extends RelationAttributeService {
                     if (attribute.getFieldName().equals("id") && layer.equals(LayerName.REQUEST_DTO.name())) {
                         fieldBuilder.addAnnotation(AnnotationSpec
                                 .builder(NotNull.class)
-                                .addMember("groups", "{ $T.$L }", updateValidationGroupTypeName, "class")
+                                .addMember("groups", "{ $T.$L }", validationGroupTypeNameWrapper.getTypeName(), "class")
                                 .addMember("message", "$S", attribute.getFieldName() + " cannot be null.")
                                 .build());
                     }

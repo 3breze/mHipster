@@ -52,7 +52,7 @@ public abstract class RelationAttributeService {
                 Class<?> typeArgument = ReflectionUtil.resolveTypeArgument(field);
                 Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
-                        relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
+                        clazz.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }
         }
         return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),

@@ -134,7 +134,6 @@ public class MethodBuilderServiceImpl implements MethodBuilderService {
     @Override
     public ParameterSpec.Builder processMethodSignature(Entity entity, Method method, Parameter parameter,
                                                         ParameterSpec.Builder parameterBuilder) {
-
         TypeName saveValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",
                 "Save");
         TypeName updateValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",

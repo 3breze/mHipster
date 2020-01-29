@@ -65,8 +65,14 @@ public class ModelServiceImpl implements ModelService {
                 ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ResourceNotFoundException"),
                 "ResourceNotFoundException"));
         typeNameMap.put("ValidationGroup", new FieldTypeNameWrapper(
-                ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ValidationGroup"),
+                ClassName.get(rootEntityModel.getRootPackageName() + ".property", "ValidationGroup"),
                 "ValidationGroup"));
+        typeNameMap.put("ValidationGroupUpdate", new FieldTypeNameWrapper(
+                ClassName.get(rootEntityModel.getRootPackageName() + ".ValidationGroup.property", "Update"),
+                "Update"));
+        typeNameMap.put("ValidationGroupSave", new FieldTypeNameWrapper(
+                ClassName.get(rootEntityModel.getRootPackageName() + ".ValidationGroup.property", "Save"),
+                "Save"));
         typeNameMap.put("JpaRepository", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.jpa.repository", "JpaRepository"),
                 "JpaRepository"));
