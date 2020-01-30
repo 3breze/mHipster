@@ -23,7 +23,7 @@ public interface JPoetHelperService {
 
     CodeBlock buildSetterCallsCodeBlock(Entity entity);
 
-    List<MethodSpec> buildGetters(List<Attribute> attributes);
+    List<MethodSpec> buildGetters(List<FieldSpec> fieldSpecList);
 
-    List<MethodSpec> buildSetters(List<Attribute> attributes);
+    List<MethodSpec> buildSetters(List<FieldSpec> fieldSpecList);
 }

@@ -40,8 +40,8 @@ public class JPoetClassBuilderServiceImpl extends JPoetHelperServiceImpl impleme
                 .build()).collect(Collectors.toList());
         MethodSpec constructor = buildConstructor(fieldSpecList, "exception");
 
-        List<MethodSpec> getterMethods = buildGetters(attributes);
-        List<MethodSpec> setterMethods = buildSetters(attributes);
+        List<MethodSpec> getterMethods = buildGetters(fieldSpecList);
+        List<MethodSpec> setterMethods = buildSetters(fieldSpecList);
 
         return TypeSpec
                 .classBuilder("ResourceNotFoundException")

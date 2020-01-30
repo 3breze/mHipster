@@ -9,10 +9,13 @@ import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
 import com.oul.mHipster.service.helper.impl.JPoetHelperServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GenerateRequestDtoClassStrategy implements GenerateLayerStrategy {
 
@@ -27,20 +30,22 @@ public class GenerateRequestDtoClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<FieldSpec> attributeSpecList = attributeBuilderService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
+        List<FieldSpec> attributeList = attributeBuilderService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
         List<FieldSpec> relationAttributeList = attributeBuilderService.getRelationAttributeFieldSpecList(entity);
+        List<FieldSpec> allAttributesList = Stream.concat(attributeList.stream(), relationAttributeList.stream())
+                .collect(Collectors.toList());
 
-//        List<MethodSpec> getterMethods = jPoetHelperService.buildGetters(entity.getAttributes());
-//        List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(entity.getAttributes());
+        List<MethodSpec> getterMethods = jPoetHelperService.buildGetters(allAttributesList);
+        List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(allAttributesList);
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.REQUEST_DTO.toString());
         TypeSpec typeSpec = TypeSpec
                 .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)
-                .addFields(attributeSpecList)
+                .addFields(attributeList)
                 .addFields(relationAttributeList)
-//                .addMethods(getterMethods)
-//                .addMethods(setterMethods)
+                .addMethods(getterMethods)
+                .addMethods(setterMethods)
                 .build();
 
         return new TypeSpecWrapper(typeSpec, classNamingInfo.getPackageName());

@@ -1,6 +1,5 @@
 package com.oul.mHipster.service.helper.impl;
 
-import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
@@ -134,12 +133,12 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
-    public List<MethodSpec> buildGetters(List<Attribute> attributes) {
-        return attributes.stream().map(attribute -> {
-            String fieldName = attribute.getFieldName();
+    public List<MethodSpec> buildGetters(List<FieldSpec> fieldSpecList) {
+        return fieldSpecList.stream().map(fieldSpec -> {
+            String fieldName = fieldSpec.name;
             String getterName = "get" + ClassUtils.capitalize(fieldName);
             return MethodSpec.methodBuilder(getterName)
-                    .returns(ClassName.bestGuess(attribute.getType().toString()))
+                    .returns(fieldSpec.type)
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $L", fieldName)
                     .build();
@@ -147,13 +146,13 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
-    public List<MethodSpec> buildSetters(List<Attribute> attributes) {
-        return attributes.stream().map(attribute -> {
-            String fieldName = attribute.getFieldName();
-            String getterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-            return MethodSpec.methodBuilder(getterName)
+    public List<MethodSpec> buildSetters(List<FieldSpec> fieldSpecList) {
+        return fieldSpecList.stream().map(fieldSpec -> {
+            String fieldName = fieldSpec.name;
+            String setterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            return MethodSpec.methodBuilder(setterName)
                     .addParameter(ParameterSpec
-                            .builder(ClassName.bestGuess(attribute.getType().toString()), fieldName)
+                            .builder(fieldSpec.type, fieldName)
                             .build())
                     .returns(TypeName.VOID)
                     .addModifiers(Modifier.PUBLIC)
