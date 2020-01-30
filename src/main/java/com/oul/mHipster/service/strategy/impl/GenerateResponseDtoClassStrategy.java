@@ -30,8 +30,8 @@ public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<FieldSpec> fieldSpecList = attributeBuilderService.getFieldSpecList(entity, LayerName.RESPONSE_DTO.name());
-        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "");
+//        List<FieldSpec> fieldSpecList = attributeBuilderService.getFieldSpecList(entity, LayerName.RESPONSE_DTO.name());
+//        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "");
 
 //        List<MethodSpec> getterMethods = jPoetHelperService.buildGetters(entity.getAttributes());
 //        List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(entity.getAttributes());
@@ -45,8 +45,8 @@ public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
                         .addMember("value", "$L",
                                 JsonInclude.Include.NON_NULL.name())
                         .build())
-                .addFields(fieldSpecList)
-                .addMethod(constructor)
+//                .addFields(fieldSpecList)
+//                .addMethod(constructor)
 //                .addMethods(getterMethods)
 //                .addMethods(setterMethods)
                 .build();

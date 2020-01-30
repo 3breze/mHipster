@@ -4,12 +4,11 @@ import com.oul.mHipster.layersConfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.helper.JPoetHelperService;
 import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
 import com.oul.mHipster.service.helper.impl.JPoetHelperServiceImpl;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
@@ -28,18 +27,18 @@ public class GenerateRequestDtoClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<FieldSpec> fieldSpecList = attributeBuilderService.getFieldSpecList(entity, LayerName.REQUEST_DTO.name());
-        MethodSpec constructor = jPoetHelperService.buildConstructor(fieldSpecList, "");
+        List<FieldSpec> attributeSpecList = attributeBuilderService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
+        List<FieldSpec> relationAttributeList = attributeBuilderService.getRelationAttributeFieldSpecList(entity);
 
 //        List<MethodSpec> getterMethods = jPoetHelperService.buildGetters(entity.getAttributes());
 //        List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(entity.getAttributes());
 
-        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.RESPONSE_DTO.toString());
+        ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.REQUEST_DTO.toString());
         TypeSpec typeSpec = TypeSpec
                 .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)
-                .addFields(fieldSpecList)
-                .addMethod(constructor)
+                .addFields(attributeSpecList)
+                .addFields(relationAttributeList)
 //                .addMethods(getterMethods)
 //                .addMethods(setterMethods)
                 .build();

@@ -53,9 +53,9 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         relationAttributes.forEach(relationAttribute -> {
-            FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
+            FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "serviceClass");
-            FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getClassSimpleName(),
+            FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "domainClass");
             cbBuilder.addStatement("List<$T> $L = $L.findByIdIn($L.get$LList())", domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
                     serviceTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(), ClassUtils.capitalize(domainTypeNameWrapper.getInstanceName()));
@@ -66,7 +66,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     @Override
     public List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes) {
         return relationAttributes.stream().map(attribute -> {
-            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getClassSimpleName(),
+            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(attribute.getTypeArgument(),
                     "serviceClass");
             return FieldSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName())

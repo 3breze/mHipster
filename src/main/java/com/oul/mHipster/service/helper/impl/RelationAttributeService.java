@@ -44,13 +44,14 @@ public abstract class RelationAttributeService {
             Object value = ReflectionUtil.methodInvoker(method, annotation);
 
             if (method.getName().equals(MAPPED_BY_ANN_NAME) && !value.equals(EMPTY_MAPPED_BY_ANN_VALUE)) {
+                Class<?> typeArgument = ReflectionUtil.resolveTypeArgument(field);
                 Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
-                return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(field.getType()),
+                return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
                         relationDomainClass.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
 
             } else if (method.getName().equals(MAPPED_BY_ANN_NAME) && value.equals(EMPTY_MAPPED_BY_ANN_VALUE)) {
                 Class<?> typeArgument = ReflectionUtil.resolveTypeArgument(field);
-                Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
+//                Class<?> relationDomainClass = ReflectionUtil.resolveParameterizedType(field);
                 return new RelationAttribute(field.getType(), field.getName(), ClassUtils.getClassName(typeArgument),
                         clazz.getSimpleName(), RelationType.valueOf(ClassUtils.getClassName(type).toUpperCase()));
             }
