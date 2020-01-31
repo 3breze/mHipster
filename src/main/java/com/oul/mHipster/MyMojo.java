@@ -1,13 +1,13 @@
 package com.oul.mHipster;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layerconfig.LayersConfig;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
-import com.oul.mHipster.service.base.LayerGeneratorService;
-import com.oul.mHipster.service.base.SourceClassService;
-import com.oul.mHipster.service.base.impl.LayerGeneratorServiceImpl;
-import com.oul.mHipster.service.base.impl.SourceClassAttributeServiceImpl;
+import com.oul.mHipster.service.main.LayerGeneratorService;
+import com.oul.mHipster.service.main.SourceClassService;
+import com.oul.mHipster.service.main.impl.LayerGeneratorServiceImpl;
+import com.oul.mHipster.service.main.impl.SourceAttributeServiceImpl;
 import com.oul.mHipster.util.ConfigUtil;
 import com.oul.mHipster.util.Util;
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,7 +34,7 @@ public class MyMojo extends AbstractMojo {
             Util.applyLayersConfig(layersConfig, mavenInfoWrapper);
 
             // Partially build entity model based on source project domain classes
-            SourceClassService sourceClassService = new SourceClassAttributeServiceImpl(mavenInfoWrapper);
+            SourceClassService sourceClassService = new SourceAttributeServiceImpl(mavenInfoWrapper);
             RootEntityModel rootEntityModel = sourceClassService.buildRootEntityModel();
 
             // Generate CRUD classes / layers

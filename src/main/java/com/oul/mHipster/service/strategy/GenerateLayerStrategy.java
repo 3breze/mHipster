@@ -1,10 +1,10 @@
 package com.oul.mHipster.service.strategy;
 
-import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layerconfig.LayersConfig;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.EntityManagerFactory;
-import com.oul.mHipster.service.EntityManagerService;
+import com.oul.mHipster.service.model.EntityManagerFactory;
+import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.util.Util;
 
 public interface GenerateLayerStrategy {

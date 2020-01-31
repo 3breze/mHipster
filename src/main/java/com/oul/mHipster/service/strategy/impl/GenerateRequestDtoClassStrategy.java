@@ -1,12 +1,12 @@
 package com.oul.mHipster.service.strategy.impl;
 
-import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.helper.JPoetHelperService;
-import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
-import com.oul.mHipster.service.helper.impl.JPoetHelperServiceImpl;
+import com.oul.mHipster.service.poetic.JPoetHelperService;
+import com.oul.mHipster.service.poetic.impl.AttributeBuilderService;
+import com.oul.mHipster.service.poetic.impl.JPoetHelperServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;

@@ -1,6 +1,6 @@
 package com.oul.mHipster.util;
 
-import com.oul.mHipster.layersConfig.LayersConfig;
+import com.oul.mHipster.layerconfig.LayersConfig;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

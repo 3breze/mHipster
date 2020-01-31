@@ -63,12 +63,17 @@ public class ClassUtils {
         return className.substring(0, 1).toLowerCase() + className.substring(1);
     }
 
-    public static String getGenericTypeName(String genericField){
+    public static String getGenericTypeName(String genericField) {
         return genericField.substring(0, genericField.indexOf(TYPE_ARG_START));
     }
-    public static String getTypeArgumentName(String genericField){
+
+    public static String getTypeArgumentName(String genericField) {
         return genericField.substring(genericField.indexOf(TYPE_ARG_START) + 1,
                 genericField.indexOf(TYPE_ARG_END));
+    }
+
+    public static boolean isParameterizedField(String typeArgument) {
+        return typeArgument.contains(TYPE_ARG_START);
     }
 
     public static String optionalNameBuilder(String className) {
@@ -79,7 +84,7 @@ public class ClassUtils {
         return field.substring(0, 1).toUpperCase() + field.substring(1) + "()";
     }
 
-    public static String capitalize(String field) {
+    public static String capitalizeField(String field) {
         return field.substring(0, 1).toUpperCase() + field.substring(1);
     }
 }

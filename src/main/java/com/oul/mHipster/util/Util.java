@@ -1,8 +1,8 @@
 package com.oul.mHipster.util;
 
-import com.oul.mHipster.layersConfig.LayersConfig;
-import com.oul.mHipster.layersConfig.enums.LayerName;
-import com.oul.mHipster.layersConfig.wrapper.LayerInfoWrapper;
+import com.oul.mHipster.layerconfig.LayersConfig;
+import com.oul.mHipster.layerconfig.enums.LayerName;
+import com.oul.mHipster.layerconfig.wrapper.LayerInfoWrapper;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
 
 import java.util.HashMap;

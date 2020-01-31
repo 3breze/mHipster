@@ -1,15 +1,15 @@
 package com.oul.mHipster.service.strategy.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.layersConfig.Layer;
-import com.oul.mHipster.layersConfig.enums.LayerName;
+import com.oul.mHipster.layerconfig.Layer;
+import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.helper.MethodBuilderService;
-import com.oul.mHipster.service.helper.impl.AttributeBuilderService;
-import com.oul.mHipster.service.helper.impl.MethodBuilderServiceImpl;
+import com.oul.mHipster.service.poetic.MethodBuilderService;
+import com.oul.mHipster.service.poetic.impl.AttributeBuilderService;
+import com.oul.mHipster.service.poetic.impl.MethodBuilderServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.*;
 
@@ -43,7 +43,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getReturnTypeName(entity.getClassName(),
+            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder
