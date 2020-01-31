@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MethodBuilderServiceImpl implements MethodBuilderService {
+public class MethodServiceImpl implements MethodBuilderService {
 
     private static final String REGEX = "\\$\\{(.*?)}";
     private static final String INSTANCE_SUFFIX = "Inst";
@@ -36,12 +36,12 @@ public class MethodBuilderServiceImpl implements MethodBuilderService {
 
     private EntityManagerService entityManagerService;
     private JPoetHelperService jPoetHelperService;
-    private AttributeBuilderService attributeBuilderService;
+    private AttributeService attributeService;
 
-    public MethodBuilderServiceImpl() {
+    public MethodServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
         this.jPoetHelperService = new JPoetHelperServiceImpl();
-        this.attributeBuilderService = new AttributeBuilderService();
+        this.attributeService = new AttributeService();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MethodBuilderServiceImpl implements MethodBuilderService {
             String injectKeyword = matcher.group(1);
 
             if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
-                List<RelationAttribute> relationAttributes = attributeBuilderService.findRelationAttributes(entity);
+                List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
                 if (!relationAttributes.isEmpty()) {
                     CodeBlock relationFindByIdCodeBlock = jPoetHelperService.buildRelationFindByIdCodeBlock(entity, relationAttributes);
                     cbBuilder.add(relationFindByIdCodeBlock);
@@ -106,7 +106,7 @@ public class MethodBuilderServiceImpl implements MethodBuilderService {
     @Override
     public List<ParameterSpec> getMethodParameters(Entity entity, Method method, String layer) {
         return method.getMethodSignature().getParameters().stream().map(parameter -> {
-            FieldTypeNameWrapper typeNameWrapper = attributeBuilderService.getTypeName(entity.getClassName(),
+            FieldTypeNameWrapper typeNameWrapper = attributeService.getTypeName(entity.getClassName(),
                     parameter.getType(), parameter.getName());
             ParameterSpec.Builder parameterBuilder = ParameterSpec
                     .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName());

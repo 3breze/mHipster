@@ -8,8 +8,8 @@ import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
-import com.oul.mHipster.service.poetic.impl.AttributeBuilderService;
-import com.oul.mHipster.service.poetic.impl.MethodBuilderServiceImpl;
+import com.oul.mHipster.service.poetic.impl.AttributeService;
+import com.oul.mHipster.service.poetic.impl.MethodServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 public class GenerateServiceClassStrategy implements GenerateLayerStrategy {
 
-    private AttributeBuilderService attributeBuilderService;
+    private AttributeService attributeService;
     private MethodBuilderService methodBuilderService;
 
     public GenerateServiceClassStrategy() {
-        this.attributeBuilderService = new AttributeBuilderService();
-        this.methodBuilderService = new MethodBuilderServiceImpl();
+        this.attributeService = new AttributeService();
+        this.methodBuilderService = new MethodServiceImpl();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class GenerateServiceClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getTypeName(entity.getClassName(),
+            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder

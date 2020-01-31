@@ -2,7 +2,7 @@ package com.oul.mHipster.service.poetic;
 
 import com.squareup.javapoet.TypeSpec;
 
-public interface JPoetClassBuilderService {
+public interface JPoetClassService {
 
     TypeSpec buildResourceNotFoundException();
 

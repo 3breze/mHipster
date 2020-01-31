@@ -4,7 +4,7 @@ import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
-import com.oul.mHipster.service.poetic.JPoetClassBuilderService;
+import com.oul.mHipster.service.poetic.JPoetClassService;
 import com.squareup.javapoet.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,11 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JPoetClassBuilderServiceImpl extends JPoetHelperServiceImpl implements JPoetClassBuilderService {
+public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPoetClassService {
 
     private EntityManagerService entityManagerService;
 
-    public JPoetClassBuilderServiceImpl() {
+    public JPoetClassServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
     }
 

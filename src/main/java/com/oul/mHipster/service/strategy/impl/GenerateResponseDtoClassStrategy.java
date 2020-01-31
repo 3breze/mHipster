@@ -6,7 +6,7 @@ import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
-import com.oul.mHipster.service.poetic.impl.AttributeBuilderService;
+import com.oul.mHipster.service.poetic.impl.AttributeService;
 import com.oul.mHipster.service.poetic.impl.JPoetHelperServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.AnnotationSpec;
@@ -22,18 +22,18 @@ import java.util.stream.Stream;
 public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
 
     private JPoetHelperService jPoetHelperService;
-    private AttributeBuilderService attributeBuilderService;
+    private AttributeService attributeService;
 
     public GenerateResponseDtoClassStrategy() {
         this.jPoetHelperService = new JPoetHelperServiceImpl();
-        this.attributeBuilderService = new AttributeBuilderService();
+        this.attributeService = new AttributeService();
     }
 
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<FieldSpec> attributeList = attributeBuilderService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
-        List<FieldSpec> relationAttributeList = attributeBuilderService.getRelationAttributeFieldSpecList(entity);
+        List<FieldSpec> attributeList = attributeService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
+        List<FieldSpec> relationAttributeList = attributeService.getRelationAttributeFieldSpecList(entity);
         List<FieldSpec> allAttributesList = Stream.concat(attributeList.stream(), relationAttributeList.stream())
                 .collect(Collectors.toList());
 

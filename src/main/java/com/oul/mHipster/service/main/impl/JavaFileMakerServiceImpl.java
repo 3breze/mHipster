@@ -2,7 +2,7 @@ package com.oul.mHipster.service.main.impl;
 
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.service.main.JavaFileMakerService;
-import com.oul.mHipster.service.poetic.impl.JPoetClassBuilderServiceImpl;
+import com.oul.mHipster.service.poetic.impl.JPoetClassServiceImpl;
 import com.squareup.javapoet.JavaFile;
 
 import java.io.IOException;
@@ -35,10 +35,10 @@ public class JavaFileMakerServiceImpl implements JavaFileMakerService {
         });
 
         try {
-            JavaFile.builder("paketi.paketi", new JPoetClassBuilderServiceImpl().buildResourceNotFoundException())
+            JavaFile.builder("paketi.paketi", new JPoetClassServiceImpl().buildResourceNotFoundException())
                     .indent("    ")
                     .build().writeTo(System.out);
-            JavaFile.builder("paketi.paketi", new JPoetClassBuilderServiceImpl().buildValidationGroup())
+            JavaFile.builder("paketi.paketi", new JPoetClassServiceImpl().buildValidationGroup())
                     .indent("    ")
                     .build().writeTo(System.out);
         } catch (IOException e) {

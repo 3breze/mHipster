@@ -10,9 +10,9 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
-import com.oul.mHipster.service.poetic.impl.AttributeBuilderService;
+import com.oul.mHipster.service.poetic.impl.AttributeService;
 import com.oul.mHipster.service.poetic.impl.JPoetHelperServiceImpl;
-import com.oul.mHipster.service.poetic.impl.MethodBuilderServiceImpl;
+import com.oul.mHipster.service.poetic.impl.MethodServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.squareup.javapoet.*;
 import org.springframework.stereotype.Service;
@@ -25,19 +25,19 @@ import java.util.stream.Collectors;
 public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
     private JPoetHelperService jPoetHelperService;
-    private AttributeBuilderService attributeBuilderService;
+    private AttributeService attributeService;
     private MethodBuilderService methodBuilderService;
 
     public GenerateServiceImplClassStrategy() {
         this.jPoetHelperService = new JPoetHelperServiceImpl();
-        this.attributeBuilderService = new AttributeBuilderService();
-        this.methodBuilderService = new MethodBuilderServiceImpl();
+        this.attributeService = new AttributeService();
+        this.methodBuilderService = new MethodServiceImpl();
     }
 
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<RelationAttribute> relationAttributes = attributeBuilderService.findRelationAttributes(entity);
+        List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
         List<FieldSpec> fieldSpecList = jPoetHelperService.buildRelationFieldSpecList(relationAttributes);
 
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
@@ -60,7 +60,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE_IMPL.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeBuilderService.getTypeName(entity.getClassName(),
+            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder

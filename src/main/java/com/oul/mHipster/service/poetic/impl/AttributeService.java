@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class AttributeBuilderService extends RelationAttributeService {
+public class AttributeService extends RelationAttributeService {
 
     /**
      * Na top nivou ide provera da li je generic polje, ako jeste radim split, pa za genericType i typeArgument ide
