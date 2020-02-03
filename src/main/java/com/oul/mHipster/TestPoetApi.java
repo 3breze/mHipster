@@ -1,5 +1,6 @@
 package com.oul.mHipster;
 
+import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,7 +140,7 @@ public class TestPoetApi {
                         .addParameter(param)
                         .addStatement(codeBlock2)
                         .addStatement(lombokBuilder.toString())
-                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("java.lang.List"),
+                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("java.util.List"),
                                 responseDtoClass))
 //                        .returns(responseDtoClass)
                         .build())
@@ -162,6 +163,8 @@ public class TestPoetApi {
             e.printStackTrace();
         }
 
+
+        System.out.println(ClassUtils.getCollectionInterface("interface java.util.List"));
 
     }
 }

@@ -39,6 +39,7 @@ public class GenerateRequestDtoClassStrategy implements GenerateLayerStrategy {
         List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(allAttributesList);
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.REQUEST_DTO.toString());
+
         TypeSpec typeSpec = TypeSpec
                 .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)

@@ -59,6 +59,10 @@ public class ModelServiceImpl implements ModelService {
                 ClassName.get("org.springframework.data.domain", "Page"), "page"));
         typeNameMap.put("PageImpl", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
+        typeNameMap.put("Collectors", new FieldTypeNameWrapper(
+                ClassName.get("java.util.stream", "Collectors"), "collectors"));
+        typeNameMap.put("Optional", new FieldTypeNameWrapper(
+                ClassName.get("java.util", "Optional"), "optional"));
         typeNameMap.put("Predicate", new FieldTypeNameWrapper(
                 ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
         typeNameMap.put("ResourceNotFoundException", new FieldTypeNameWrapper(

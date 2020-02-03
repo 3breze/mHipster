@@ -19,7 +19,7 @@ import org.apache.maven.project.MavenProject;
 import javax.xml.bind.JAXBException;
 
 @Mojo(name = "gen")
-public class MyMojo extends AbstractMojo {
+public class GenMojo extends AbstractMojo {
 
     @Component
     private MavenProject project;

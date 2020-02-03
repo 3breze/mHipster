@@ -10,8 +10,8 @@ import com.oul.mHipster.util.Util;
 public interface GenerateLayerStrategy {
 
     LayersConfig layersConfig = Util.getValue();
+
     EntityManagerService entityManagerService = EntityManagerFactory.getInstance();
 
     TypeSpecWrapper generate(Entity entity);
-
 }

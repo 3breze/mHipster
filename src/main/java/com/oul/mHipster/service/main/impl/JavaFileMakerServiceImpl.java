@@ -5,6 +5,7 @@ import com.oul.mHipster.service.main.JavaFileMakerService;
 import com.oul.mHipster.service.poetic.impl.JPoetClassServiceImpl;
 import com.squareup.javapoet.JavaFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -23,12 +24,12 @@ public class JavaFileMakerServiceImpl implements JavaFileMakerService {
                         .indent("    ")
                         .build()).collect(Collectors.toList());
 
-//        File myFile = new File("./src/main/java");
+        File myFile = new File("./src/main/java");
         javaFileList.forEach(javaFile -> {
             try {
-//                javaFile.writeTo(myFile);
-                System.out.println("------------------------");
-                javaFile.writeTo(System.out);
+                javaFile.writeTo(myFile);
+//                System.out.println("------------------------");
+//                javaFile.writeTo(System.out);
             } catch (IOException e) {
                 e.printStackTrace();
             }

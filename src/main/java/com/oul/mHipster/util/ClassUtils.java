@@ -59,6 +59,10 @@ public class ClassUtils {
         return fullyQualifiedName.substring(0, lastDot);
     }
 
+    public static String getCollectionInterface(String interfaceName) {
+        return interfaceName.substring(interfaceName.indexOf("interface") + 10);
+    }
+
     public static String instanceNameBuilder(String className) {
         return className.substring(0, 1).toLowerCase() + className.substring(1);
     }

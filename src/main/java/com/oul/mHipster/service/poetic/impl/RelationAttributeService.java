@@ -6,6 +6,7 @@ import com.oul.mHipster.model.RelationType;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
+import com.oul.mHipster.util.ClassUtils;
 import com.oul.mHipster.util.ReflectionUtil;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -46,9 +47,11 @@ public class RelationAttributeService {
 
         parameterizedPartition.get(true).stream()
                 .map(relationAttribute -> {
-                    FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
-                            relationAttribute.getTypeArgument(), relationAttribute.getFieldName());
-                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(relationAttribute.getType().toString()),
+                    FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                            "domainClass", relationAttribute.getFieldName());
+
+                    String collectionInterfaceExtracted = ClassUtils.getCollectionInterface(relationAttribute.getType().toString());
+                    TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(collectionInterfaceExtracted),
                             fieldSpec.getTypeName());
                     return FieldSpec.
                             builder(parameterized, fieldSpec.getInstanceName())

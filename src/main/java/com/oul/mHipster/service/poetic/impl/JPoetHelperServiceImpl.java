@@ -11,6 +11,7 @@ import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,22 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     public JPoetHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
+    }
+
+    public String injectImports(JavaFile javaFile, List<String> imports) {
+        String rawSource = javaFile.toString();
+
+        List<String> result = new ArrayList<>();
+        for (String s : rawSource.split("\n", -1)) {
+            result.add(s);
+            if (s.startsWith("package ")) {
+                result.add("");
+                for (String i : imports) {
+                    result.add("import " + i + ";");
+                }
+            }
+        }
+        return String.join("\n", result);
     }
 
     @Override
@@ -49,6 +66,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
+        FieldTypeNameWrapper listTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "List", "list");
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         relationAttributes.forEach(relationAttribute -> {
@@ -56,8 +75,10 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     "serviceClass");
             FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "domainClass");
-            cbBuilder.addStatement("List<$T> $L = $L.findByIdIn($L.get$LList())", domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
-                    serviceTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(), ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()));
+            cbBuilder.addStatement("$T<$T> $L = $L.findByIds($L.get$LList())", listTypeNameWrapper.getTypeName(),
+                    domainTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getInstanceName() + "List",
+                    serviceTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(),
+                    ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()));
         });
         return cbBuilder.build();
     }
@@ -79,11 +100,14 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
+        FieldTypeNameWrapper optionalTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "Optional", "optional");
+
         FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
         return CodeBlock.builder()
-                .addStatement("Optional<$T> $L = $L.findOne(id)", domainTypeNameWrapper.getTypeName(),
+                .addStatement("$T<$T> $L = $L.findById(id)", optionalTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getTypeName(),
                         entity.getOptionalName(), daoTypeNameWrapper.getInstanceName())
                 .beginControlFlow("if ($L.isEmpty())", entity.getOptionalName())
                 .addStatement("throw new $T(\"$T $L\")", responseTypeNameWrapper.getTypeName(), responseTypeNameWrapper.getTypeName(), "not found!")

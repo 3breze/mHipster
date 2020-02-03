@@ -22,6 +22,7 @@ com\oul\mHipster\model\wrapper\FieldTypeNameWrapper.class
 com\oul\mHipster\service\model\EntityManagerService.class
 com\oul\mHipster\service\poetic\impl\AttributeService.class
 com\oul\mHipster\layerconfig\LombokSettings.class
+com\oul\mHipster\GenMojo.class
 com\oul\mHipster\service\poetic\MethodBuilderService.class
 com\oul\mHipster\util\ConfigUtil.class
 com\oul\mHipster\model\Entity.class
@@ -42,7 +43,6 @@ com\oul\mHipster\service\poetic\JPoetHelperService.class
 com\oul\mHipster\model\wrapper\MavenInfoWrapper.class
 com\oul\mHipster\exception\JavaPoetErrorException.class
 com\oul\mHipster\model\wrapper\LayerModelWrapper.class
-com\oul\mHipster\MyMojo.class
 com\oul\mHipster\util\ReflectionUtil.class
 com\oul\mHipster\service\main\JavaFileMakerService.class
 com\oul\mHipster\service\strategy\GenerateLayerStrategyFactory$1.class

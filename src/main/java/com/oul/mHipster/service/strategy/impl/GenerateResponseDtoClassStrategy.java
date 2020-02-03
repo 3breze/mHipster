@@ -41,12 +41,13 @@ public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
         List<MethodSpec> setterMethods = jPoetHelperService.buildSetters(allAttributesList);
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.RESPONSE_DTO.toString());
+
         TypeSpec typeSpec = TypeSpec
                 .classBuilder(classNamingInfo.getClassName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec
                         .builder(JsonInclude.class)
-                        .addMember("value", "$L",
+                        .addMember("value", "$L.$L", "Include",
                                 JsonInclude.Include.NON_NULL.name())
                         .build())
                 .addFields(attributeList)

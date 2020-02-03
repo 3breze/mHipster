@@ -35,13 +35,13 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\Attrib
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\AttributeService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\main\impl\LayerGeneratorServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\strategy\GenerateLayerStrategyFactory.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\MyMojo.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\JPoetHelperServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\strategy\impl\GenerateDaoClassStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layerconfig\Method.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\MethodBuilderService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\ClassUtils.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\MavenInfoWrapper.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\GenMojo.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\LayerModelWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\TestPoetApi.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\RelationAttributeService.java
