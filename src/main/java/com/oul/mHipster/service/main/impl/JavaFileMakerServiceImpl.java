@@ -2,7 +2,6 @@ package com.oul.mHipster.service.main.impl;
 
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.service.main.JavaFileMakerService;
-import com.oul.mHipster.service.poetic.impl.JPoetClassServiceImpl;
 import com.squareup.javapoet.JavaFile;
 
 import java.io.File;
@@ -22,28 +21,24 @@ public class JavaFileMakerServiceImpl implements JavaFileMakerService {
                 .map(typeSpecWrapper -> JavaFile
                         .builder(typeSpecWrapper.getPackageName(), typeSpecWrapper.getTypeSpec())
                         .indent("    ")
-                        .build()).collect(Collectors.toList());
+                        .build())
+                .collect(Collectors.toList());
 
-        File myFile = new File("./src/main/java");
+        rootEntityModel.getSharedClasses().stream()
+                .map(typeSpecWrapper -> JavaFile
+                        .builder(typeSpecWrapper.getPackageName(), typeSpecWrapper.getTypeSpec())
+                        .indent("    ")
+                        .build())
+                .forEachOrdered(javaFileList::add);
+
+        File source = new File("./src/main/java");
+
         javaFileList.forEach(javaFile -> {
             try {
-                javaFile.writeTo(myFile);
-//                System.out.println("------------------------");
-//                javaFile.writeTo(System.out);
+                javaFile.writeTo(source);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
-        try {
-            JavaFile.builder("paketi.paketi", new JPoetClassServiceImpl().buildResourceNotFoundException())
-                    .indent("    ")
-                    .build().writeTo(System.out);
-            JavaFile.builder("paketi.paketi", new JPoetClassServiceImpl().buildValidationGroup())
-                    .indent("    ")
-                    .build().writeTo(System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

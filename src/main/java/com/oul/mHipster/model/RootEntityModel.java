@@ -1,11 +1,14 @@
 package com.oul.mHipster.model;
 
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+
 import java.util.List;
 
 public class RootEntityModel {
 
     private String rootPackageName;
     private List<Entity> entities;
+    private List<TypeSpecWrapper> sharedClasses;
 
     public RootEntityModel(String rootPackageName, List<Entity> entities) {
         this.rootPackageName = rootPackageName;
@@ -28,4 +31,11 @@ public class RootEntityModel {
         this.entities = entities;
     }
 
+    public List<TypeSpecWrapper> getSharedClasses() {
+        return sharedClasses;
+    }
+
+    public void setSharedClasses(List<TypeSpecWrapper> sharedClasses) {
+        this.sharedClasses = sharedClasses;
+    }
 }

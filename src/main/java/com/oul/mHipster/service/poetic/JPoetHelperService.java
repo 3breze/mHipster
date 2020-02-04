@@ -13,9 +13,13 @@ public interface JPoetHelperService {
 
     String injectImports(JavaFile javaFile, List<String> imports);
 
-    CodeBlock buildRelationFindByIdCodeBlock(Entity entity, List<RelationAttribute> relationAttributes);
+    CodeBlock buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes);
+
+    CodeBlock buildFindOneRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes);
 
     List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes);
+
+    CodeBlock buildPageResponse(Entity entity);
 
     CodeBlock buildFindByIdCodeBlock(Entity entity);
 

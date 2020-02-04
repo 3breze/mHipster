@@ -79,7 +79,7 @@
                             <parameter type="Pageable">pageable</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);&#xA;return new PageImpl&lt;&gt;(page.stream().map(${responseClass}::new).collect(Collectors.toList()), pageable,page.getTotalElements())</methodBody>
+                    <methodBody>Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);&#xA;return ${pageResInject}</methodBody>
                 </method>
                 <method type="findById">
                     <methodSignature returns="responseClass">
@@ -87,7 +87,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="findOne">
                     <methodSignature returns="domainClass">
@@ -103,7 +103,7 @@
                             <parameter type="List&lt;Long&gt;">ids</parameter>
                         </parameters>
                     </methodSignature>return contents.stream().collect(Collectors.toMap(Content::getId, this::prepareResponse));
-                    <methodBody>List&lt;${domainClass}&gt; ${domainInst}List = ${daoInst}.findByIdIn(ids)&#xA;return ${domainInst}List</methodBody>
+                    <methodBody>List&lt;${domainClass}&gt; ${domainInst}List = ${daoInst}.findByIdIn(ids);&#xA;return ${domainInst}List</methodBody>
                 </method>
                 <method type="save">
                     <methodSignature returns="responseClass">

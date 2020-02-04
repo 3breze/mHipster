@@ -10,7 +10,9 @@ import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.ParameterSpec;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,6 +35,7 @@ public class MethodServiceImpl implements MethodBuilderService {
     private static final String INJECT_BUILDER = "builderInject";
     private static final String INJECT_SETTER_CALLS = "setterCalls";
     private static final String INJECT_OPTIONAL = "optionalInst";
+    private static final String INJECT_PAGE_RES = "pageResInject";
     private static final String CLASS_SUFFIX = "Class";
 
     private EntityManagerService entityManagerService;
@@ -57,10 +61,14 @@ public class MethodServiceImpl implements MethodBuilderService {
             String injectKeyword = matcher.group(1);
 
             if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
-                List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
-                if (!relationAttributes.isEmpty()) {
-                    CodeBlock relationFindByIdCodeBlock = jPoetHelperService.buildRelationFindByIdCodeBlock(entity, relationAttributes);
-                    cbBuilder.add(relationFindByIdCodeBlock);
+                Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
+                if (!relationAttributes.get(true).isEmpty()) {
+                    CodeBlock findManyRelationCodeBlock = jPoetHelperService.buildFindManyRelationCodeBlock(entity, relationAttributes.get(true));
+                    cbBuilder.add(findManyRelationCodeBlock);
+                }
+                if (!relationAttributes.get(false).isEmpty()) {
+                    CodeBlock findOneRelationCodeBlock = jPoetHelperService.buildFindOneRelationCodeBlock(entity, relationAttributes.get(false));
+                    cbBuilder.add(findOneRelationCodeBlock);
                 }
                 matcher.appendReplacement(templateCode, "");
                 continue;
@@ -69,6 +77,12 @@ public class MethodServiceImpl implements MethodBuilderService {
                 CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity);
                 cbBuilder.add(findByIdCodeBlock);
                 matcher.appendReplacement(templateCode, "");
+                continue;
+            }
+            if (injectKeyword.equals(INJECT_PAGE_RES)) {
+                CodeBlock pageResponseCodeBlock = jPoetHelperService.buildPageResponse(entity);
+                matcher.appendReplacement(templateCode, "");
+                cbBuilder.add(pageResponseCodeBlock);
                 continue;
             }
             if (injectKeyword.equals(INJECT_SETTER_CALLS)) {
@@ -134,10 +148,11 @@ public class MethodServiceImpl implements MethodBuilderService {
     @Override
     public ParameterSpec.Builder processMethodSignature(Entity entity, Method method, Parameter parameter,
                                                         ParameterSpec.Builder parameterBuilder) {
-        TypeName saveValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",
-                "Save");
-        TypeName updateValidationGroupTypeName = ClassName.get("com.whatever.whatever.ValidationGroup",
-                "Update");
+
+        FieldTypeNameWrapper updateTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "ValidationGroupUpdate", null);
+        FieldTypeNameWrapper saveTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "ValidationGroupSave", null);
 
         switch (method.getType()) {
             case "findAll":
@@ -168,14 +183,14 @@ public class MethodServiceImpl implements MethodBuilderService {
 
                 parameterBuilder.addAnnotation(AnnotationSpec
                         .builder(Validated.class)
-                        .addMember("value", "$T.$L", saveValidationGroupTypeName, "class")
+                        .addMember("value", "$T.$L", saveTypeNameWrapper.getTypeName(), "class")
                         .build());
                 parameterBuilder.addAnnotation(RequestBody.class);
                 break;
             case "update":
                 parameterBuilder.addAnnotation(AnnotationSpec
                         .builder(Validated.class)
-                        .addMember("value", "$T.$L", updateValidationGroupTypeName, "class")
+                        .addMember("value", "$T.$L", updateTypeNameWrapper.getTypeName(), "class")
                         .build());
                 parameterBuilder.addAnnotation(RequestBody.class);
                 break;

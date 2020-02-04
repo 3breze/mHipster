@@ -36,6 +36,16 @@ public class RelationAttributeService {
                 .collect(Collectors.toList());
     }
 
+    public Map<Boolean, List<RelationAttribute>> partitionParameterizedRelationAttributes(Entity entity) {
+        return entity.getAttributes().parallelStream()
+                .filter(RelationAttribute.class::isInstance)
+                .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
+                        ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
+                                ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
+                .map(attribute -> (RelationAttribute) attribute)
+                .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
+    }
+
     public List<FieldSpec> getRelationAttributeFieldSpecList(Entity entity) {
         Map<Boolean, List<RelationAttribute>> parameterizedPartition = entity.getAttributes().stream()
                 .filter(RelationAttribute.class::isInstance)
@@ -52,9 +62,9 @@ public class RelationAttributeService {
 
                     String collectionInterfaceExtracted = ClassUtils.getCollectionInterface(relationAttribute.getType().toString());
                     TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(collectionInterfaceExtracted),
-                            fieldSpec.getTypeName());
+                            ClassName.get("java.lang", "Long"));
                     return FieldSpec.
-                            builder(parameterized, fieldSpec.getInstanceName())
+                            builder(parameterized, relationAttribute.getFieldName() + "Ids")
                             .addModifiers(Modifier.PRIVATE)
                             .build();
                 }).forEachOrdered(target::add);
@@ -64,7 +74,7 @@ public class RelationAttributeService {
                     FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
                             relationAttribute.getTypeArgument(), relationAttribute.getFieldName());
                     return FieldSpec.
-                            builder(fieldSpec.getTypeName(), fieldSpec.getInstanceName())
+                            builder(ClassName.get("java.lang", "Long"), fieldSpec.getInstanceName() + "Id")
                             .addModifiers(Modifier.PRIVATE)
                             .build();
                 }).forEachOrdered(target::add);

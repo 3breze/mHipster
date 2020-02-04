@@ -5,7 +5,10 @@ import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetClassService;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -35,7 +38,7 @@ public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPo
                 new Attribute(Object.class, "fieldValue"));
 
         List<FieldSpec> fieldSpecList = attributes.stream().map(attribute -> FieldSpec
-                .builder(ClassName.bestGuess(attribute.getType().toString()), attribute.getFieldName())
+                .builder(attribute.getType(), attribute.getFieldName())
                 .addModifiers(Modifier.PRIVATE)
                 .build()).collect(Collectors.toList());
         MethodSpec constructor = buildConstructor(fieldSpecList, "exception");
@@ -69,8 +72,8 @@ public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPo
                 .classBuilder("ValidationGroup")
                 .addModifiers(Modifier.PUBLIC)
                 .addModifiers(Modifier.FINAL)
-                .addType(TypeSpec.interfaceBuilder("Save").addSuperinterface(Default.class).build())
-                .addType(TypeSpec.interfaceBuilder("Update").addSuperinterface(Default.class).build())
+                .addType(TypeSpec.interfaceBuilder("Save").addSuperinterface(Default.class).addModifiers(Modifier.PUBLIC).build())
+                .addType(TypeSpec.interfaceBuilder("Update").addSuperinterface(Default.class).addModifiers(Modifier.PUBLIC).build())
                 .build();
     }
 }

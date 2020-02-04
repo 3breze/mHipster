@@ -5,13 +5,15 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
-import com.oul.mHipster.service.model.EntityManagerFactory;
-import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
-import com.oul.mHipster.service.model.ModelService;
 import com.oul.mHipster.service.main.JavaFileMakerService;
 import com.oul.mHipster.service.main.LayerGeneratorService;
+import com.oul.mHipster.service.model.EntityManagerFactory;
+import com.oul.mHipster.service.model.ModelService;
 import com.oul.mHipster.service.model.impl.ModelServiceImpl;
+import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategyFactory;
+
+import java.util.List;
 
 public class LayerGeneratorServiceImpl implements LayerGeneratorService {
 
@@ -37,6 +39,9 @@ public class LayerGeneratorServiceImpl implements LayerGeneratorService {
             TypeSpecWrapper typeSpecWrapper = generateLayerStrategy.generate(entityModel);
             entityModel.getTypeSpecWrapperList().add(typeSpecWrapper);
         }));
+
+        List<TypeSpecWrapper> sharedClasses = modelService.generateSharedClasses();
+        rootEntityModel.setSharedClasses(sharedClasses);
 
         javaFileMakerService.makeJavaFiles(rootEntityModel);
     }

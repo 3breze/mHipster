@@ -8,11 +8,17 @@ import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
+import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.model.ModelService;
+import com.oul.mHipster.service.poetic.JPoetClassService;
+import com.oul.mHipster.service.poetic.impl.JPoetClassServiceImpl;
 import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeSpec;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -66,16 +72,16 @@ public class ModelServiceImpl implements ModelService {
         typeNameMap.put("Predicate", new FieldTypeNameWrapper(
                 ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
         typeNameMap.put("ResourceNotFoundException", new FieldTypeNameWrapper(
-                ClassName.get(rootEntityModel.getRootPackageName() + ".exceptions", "ResourceNotFoundException"),
+                ClassName.get(rootEntityModel.getRootPackageName() + ".shared.exception.specification", "ResourceNotFoundException"),
                 "ResourceNotFoundException"));
         typeNameMap.put("ValidationGroup", new FieldTypeNameWrapper(
-                ClassName.get(rootEntityModel.getRootPackageName() + ".property", "ValidationGroup"),
+                ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property", "ValidationGroup"),
                 "ValidationGroup"));
         typeNameMap.put("ValidationGroupUpdate", new FieldTypeNameWrapper(
-                ClassName.get(rootEntityModel.getRootPackageName() + ".ValidationGroup.property", "Update"),
+                ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property.ValidationGroup", "Update"),
                 "Update"));
         typeNameMap.put("ValidationGroupSave", new FieldTypeNameWrapper(
-                ClassName.get(rootEntityModel.getRootPackageName() + ".ValidationGroup.property", "Save"),
+                ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property.ValidationGroup", "Save"),
                 "Save"));
         typeNameMap.put("JpaRepository", new FieldTypeNameWrapper(
                 ClassName.get("org.springframework.data.jpa.repository", "JpaRepository"),
@@ -122,5 +128,17 @@ public class ModelServiceImpl implements ModelService {
 
             layerModel.put(entity.getClassName(), typeNameMap);
         });
+    }
+
+    public List<TypeSpecWrapper> generateSharedClasses() {
+        List<TypeSpecWrapper> sharedClasses = new ArrayList<>();
+
+        JPoetClassService jPoetClassService = new JPoetClassServiceImpl();
+        TypeSpec exceptionTypeSpec = jPoetClassService.buildResourceNotFoundException();
+        sharedClasses.add(new TypeSpecWrapper(exceptionTypeSpec, rootEntityModel.getRootPackageName() + ".shared.exception.specification"));
+
+        TypeSpec validationTypeSpec = jPoetClassService.buildValidationGroup();
+        sharedClasses.add(new TypeSpecWrapper(validationTypeSpec, rootEntityModel.getRootPackageName() + ".shared.property"));
+        return sharedClasses;
     }
 }
