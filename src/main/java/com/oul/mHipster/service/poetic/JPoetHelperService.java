@@ -12,8 +12,6 @@ import java.util.Map;
 
 public interface JPoetHelperService {
 
-    String injectImports(JavaFile javaFile, List<String> imports);
-
     CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes);
 
     List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes);

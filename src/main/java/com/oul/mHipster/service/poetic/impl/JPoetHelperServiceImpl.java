@@ -13,7 +13,8 @@ import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,22 +25,6 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     public JPoetHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
-    }
-
-    public String injectImports(JavaFile javaFile, List<String> imports) {
-        String rawSource = javaFile.toString();
-
-        List<String> result = new ArrayList<>();
-        for (String s : rawSource.split("\n", -1)) {
-            result.add(s);
-            if (s.startsWith("package ")) {
-                result.add("");
-                for (String i : imports) {
-                    result.add("import " + i + ";");
-                }
-            }
-        }
-        return String.join("\n", result);
     }
 
     @Override
@@ -148,20 +133,25 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         FieldTypeNameWrapper pageImplTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "PageImpl", "pageImpl");
         FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+        FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "responseClass");
         FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
+
+        Map<Integer, List<String>> statementArgs = new HashMap<>();
+        statementArgs.put(0, Arrays.asList("domainClass", "daoClass"));
+        statementArgs.put(1, Arrays.asList("PageImpl", "responseClass", "Collectors"));
+
         return CodeBlock.builder()
-                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", domainTypeNameWrapper.getTypeName(),
-                        daoTypeNameWrapper.getInstanceName())
+                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", entityManagerService.processStatementArgs(entity.getClassName(), statementArgs.get(0)))
                 .addStatement("return new $T<>(page.stream().map($T::new).collect($T.toList()), pageable, page.getTotalElements())",
-                        pageImplTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getTypeName(), collectorsTypeNameWrapper.getTypeName())
+                        entityManagerService.processStatementArgs(entity.getClassName(), statementArgs.get(1)))
                 .build();
     }
 
     @Override
     public CodeBlock buildFindByIdCodeBlock(Entity entity) {
 
-        FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        FieldTypeNameWrapper exceptionTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
         FieldTypeNameWrapper optionalTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "Optional", "optional");
@@ -173,7 +163,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .addStatement("$T<$T> $L = $L.findById(id)", optionalTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getTypeName(),
                         entity.getOptionalName(), daoTypeNameWrapper.getInstanceName())
                 .beginControlFlow("if ($L.isEmpty())", entity.getOptionalName())
-                .addStatement("throw new $T(\"$T\", \"id\", id)", responseTypeNameWrapper.getTypeName(), responseTypeNameWrapper.getTypeName())
+                .addStatement("throw new $T(\"$T\", \"id\", id)", exceptionTypeNameWrapper.getTypeName(), exceptionTypeNameWrapper.getTypeName())
                 .endControlFlow()
                 .addStatement("$T $L = $L.get()", domainTypeNameWrapper.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
                 .build();

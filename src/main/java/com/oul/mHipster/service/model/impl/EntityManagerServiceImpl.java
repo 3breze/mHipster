@@ -7,8 +7,10 @@ import com.oul.mHipster.service.model.EntityManagerService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
 
@@ -44,7 +46,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
                     TypeName typeName = getPrimitiveTypeName(typeArgument);
                     return new FieldTypeNameWrapper(typeName, instanceName);
                 }
-                if(typeArgument.equals("List")){
+                if (typeArgument.equals("List")) {
                     return new FieldTypeNameWrapper(ClassName.get("java.util", typeArgument), instanceName);
                 }
                 return new FieldTypeNameWrapper(ClassName.get("java.lang", typeArgument), instanceName);
@@ -52,6 +54,16 @@ public class EntityManagerServiceImpl implements EntityManagerService {
             return dependencyBasedClass;
         }
         return entityBasedClass;
+    }
+
+    @Override
+    public Object[] processStatementArgs(String entityName, List<String> statementArgs) {
+        List<FieldTypeNameWrapper> result = statementArgs.stream()
+                .map(arg -> getProperty(entityName, arg, null)).collect(Collectors.toList());
+        Object[] objects = result.stream().map(FieldTypeNameWrapper::getTypeName)
+                .toArray(Object[]::new);
+        System.out.println(objects);
+        return objects;
     }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {
