@@ -44,6 +44,9 @@ public class EntityManagerServiceImpl implements EntityManagerService {
                     TypeName typeName = getPrimitiveTypeName(typeArgument);
                     return new FieldTypeNameWrapper(typeName, instanceName);
                 }
+                if(typeArgument.equals("List")){
+                    return new FieldTypeNameWrapper(ClassName.get("java.util", typeArgument), instanceName);
+                }
                 return new FieldTypeNameWrapper(ClassName.get("java.lang", typeArgument), instanceName);
             }
             return dependencyBasedClass;

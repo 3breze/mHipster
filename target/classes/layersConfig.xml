@@ -79,7 +79,7 @@
                             <parameter type="Pageable">pageable</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>Page&lt;${domainClass}&gt; page = ${daoInst}.findAll(predicate, pageable);&#xA;return ${pageResInject}</methodBody>
+                    <methodBody>${pageResInject}</methodBody>
                 </method>
                 <method type="findById">
                     <methodSignature returns="responseClass">
@@ -87,7 +87,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="findOne">
                     <methodSignature returns="domainClass">
@@ -112,7 +112,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdRelation}${builderInject}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${builderInject}${findByIdRelation}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="update">
                     <methodSignature returns="responseClass">
@@ -121,7 +121,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${findByIdRelation}${findByIdInject}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${findByIdInject}${findByIdRelation}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="delete">
                     <methodSignature returns="void">

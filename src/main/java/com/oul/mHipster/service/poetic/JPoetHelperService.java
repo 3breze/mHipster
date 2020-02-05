@@ -8,14 +8,13 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 
 import java.util.List;
+import java.util.Map;
 
 public interface JPoetHelperService {
 
     String injectImports(JavaFile javaFile, List<String> imports);
 
-    CodeBlock buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes);
-
-    CodeBlock buildFindOneRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes);
+    CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes);
 
     List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes);
 

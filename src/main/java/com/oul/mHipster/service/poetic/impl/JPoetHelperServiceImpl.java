@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
@@ -55,7 +56,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .build()).collect(Collectors.toList());
 
         StringBuffer builderStingBuffer = new StringBuffer();
-        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(").append(requestTypeNameWrapper.getInstanceName()).append(".get")
+        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(")
+                .append(requestTypeNameWrapper.getInstanceName()).append(".get")
                 .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
         return CodeBlock.builder()
                 .addStatement("$T $L = $T.builder()$L.build()", domainTypeNameWrapper.getTypeName(),
@@ -63,8 +65,23 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .build();
     }
 
-    @Override
-    public CodeBlock buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
+
+    public CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes) {
+        CodeBlock.Builder cbBuilder = CodeBlock.builder();
+
+        if (!relationAttributes.get(true).isEmpty()) {
+            CodeBlock.Builder findManyRelationCodeBlock = buildFindManyRelationCodeBlock(entity, relationAttributes.get(true));
+            cbBuilder.add(findManyRelationCodeBlock.build());
+        }
+
+        if (!relationAttributes.get(false).isEmpty()) {
+            CodeBlock.Builder findOneRelationCodeBlock = buildFindOneRelationCodeBlock(entity, relationAttributes.get(false));
+            cbBuilder.add(findOneRelationCodeBlock.build());
+        }
+        return cbBuilder.build();
+    }
+
+    private CodeBlock.Builder buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 
         FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
@@ -83,11 +100,11 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     serviceTypeNameWrapper.getInstanceName(), requestTypeNameWrapper.getInstanceName(),
                     ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()));
         });
-        return cbBuilder.build();
+        return cbBuilder;
     }
 
-    @Override
-    public CodeBlock buildFindOneRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
+
+    private CodeBlock.Builder buildFindOneRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 
         FieldTypeNameWrapper rootTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
         FieldTypeNameWrapper requestTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(),
@@ -109,7 +126,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                             domainTypeNameWrapper.getInstanceName())
                     .endControlFlow();
         });
-        return cbBuilder.build();
+        return cbBuilder;
     }
 
     @Override
@@ -131,9 +148,12 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         FieldTypeNameWrapper pageImplTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "PageImpl", "pageImpl");
         FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
         return CodeBlock.builder()
-                .addStatement("new $T<>(page.stream().map($T::new).collect($T.toList()), pageable,page.getTotalElements())",
+                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", domainTypeNameWrapper.getTypeName(),
+                        daoTypeNameWrapper.getInstanceName())
+                .addStatement("return new $T<>(page.stream().map($T::new).collect($T.toList()), pageable, page.getTotalElements())",
                         pageImplTypeNameWrapper.getTypeName(), domainTypeNameWrapper.getTypeName(), collectorsTypeNameWrapper.getTypeName())
                 .build();
     }

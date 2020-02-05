@@ -3,6 +3,7 @@ package com.oul.mHipster.service.poetic.impl;
 import com.oul.mHipster.layerconfig.Method;
 import com.oul.mHipster.layerconfig.Parameter;
 import com.oul.mHipster.layerconfig.enums.LayerName;
+import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
@@ -62,14 +63,16 @@ public class MethodServiceImpl implements MethodBuilderService {
 
             if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
                 Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
-                if (!relationAttributes.get(true).isEmpty()) {
-                    CodeBlock findManyRelationCodeBlock = jPoetHelperService.buildFindManyRelationCodeBlock(entity, relationAttributes.get(true));
-                    cbBuilder.add(findManyRelationCodeBlock);
-                }
-                if (!relationAttributes.get(false).isEmpty()) {
-                    CodeBlock findOneRelationCodeBlock = jPoetHelperService.buildFindOneRelationCodeBlock(entity, relationAttributes.get(false));
-                    cbBuilder.add(findOneRelationCodeBlock);
-                }
+                CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
+                cbBuilder.add(findRelationCodeBlock);
+//                if (!relationAttributes.get(true).isEmpty()) {
+//                    CodeBlock findManyRelationCodeBlock = jPoetHelperService.buildFindManyRelationCodeBlock(entity, relationAttributes.get(true));
+//                    cbBuilder.add(findManyRelationCodeBlock);
+//                }
+//                if (!relationAttributes.get(false).isEmpty()) {
+//                    CodeBlock findOneRelationCodeBlock = jPoetHelperService.buildFindOneRelationCodeBlock(entity, relationAttributes.get(false));
+//                    cbBuilder.add(findOneRelationCodeBlock);
+//                }
                 matcher.appendReplacement(templateCode, "");
                 continue;
             }
@@ -106,9 +109,13 @@ public class MethodServiceImpl implements MethodBuilderService {
                 injectKeyword = injectKeyword.substring(0, injectKeyword.indexOf(INSTANCE_SUFFIX));
                 injectKeyword += CLASS_SUFFIX;
             }
-
-            FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), injectKeyword);
-            matcher.appendReplacement(templateCode, flag ? typeNameWrapper.getInstanceName() : entity.getClassName());
+            if (injectKeyword.equals("responseClass")) {
+                ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.RESPONSE_DTO.toString());
+                matcher.appendReplacement(templateCode, classNamingInfo.getClassName());
+            } else {
+                FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), injectKeyword);
+                matcher.appendReplacement(templateCode, flag ? typeNameWrapper.getInstanceName() : entity.getClassName());
+            }
             flag = false;
         }
 

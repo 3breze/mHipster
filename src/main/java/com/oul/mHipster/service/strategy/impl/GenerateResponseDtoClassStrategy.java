@@ -47,7 +47,7 @@ public class GenerateResponseDtoClassStrategy implements GenerateLayerStrategy {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec
                         .builder(JsonInclude.class)
-                        .addMember("value", "$L.$L", "Include",
+                        .addMember("value", "$L.$L", "JsonInclude.Include",
                                 JsonInclude.Include.NON_NULL.name())
                         .build())
                 .addFields(attributeList)
