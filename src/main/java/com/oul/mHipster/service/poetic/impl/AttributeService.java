@@ -42,7 +42,7 @@ public class AttributeService extends RelationAttributeService {
         return new TypeWrapper(typeName, instanceName);
     }
 
-    public List<FieldSpec> getAttributeFieldSpecList(Entity entity, String layer) {
+    public List<FieldSpec> getAttributeFieldSpecList(Entity entity, LayerName layerName) {
         TypeWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ValidationGroupUpdate", "update");
 
@@ -52,7 +52,7 @@ public class AttributeService extends RelationAttributeService {
                 .map(attribute -> {
                     FieldSpec.Builder fieldSpecBuilder = FieldSpec.
                             builder(attribute.getType(), attribute.getFieldName());
-                    if (attribute.getFieldName().equals("id") && layer.equals(LayerName.REQUEST_DTO.name())) {
+                    if (attribute.getFieldName().equals("id") && layerName.equals(LayerName.REQUEST_DTO)) {
                         fieldSpecBuilder.addAnnotation(AnnotationSpec
                                 .builder(NotNull.class)
                                 .addMember("groups", "{ $T.$L }", validationGroupTypeNameWrapper.getTypeName(), "class")

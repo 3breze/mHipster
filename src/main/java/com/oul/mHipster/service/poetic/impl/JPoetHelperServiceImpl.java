@@ -9,6 +9,7 @@ import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.util.ClassUtils;
+import com.oul.mHipster.util.ReflectionUtil;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -184,6 +185,53 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         return methodBuilder
                 .addModifiers(Modifier.PUBLIC)
                 .addParameters(parameterSpecList)
+                .addCode(builder.build())
+                .build();
+    }
+
+    @Override
+    public MethodSpec buildResponseConstructor(Entity entity, List<FieldSpec> attributeList) {
+
+        CodeBlock.Builder builder = CodeBlock.builder();
+        attributeList.forEach(field -> builder.addStatement("this.$L = $L.get$L()", field.name,
+                entity.getInstanceName(), ClassUtils.capitalizeField(field.name)));
+
+        Map<Boolean, List<RelationAttribute>> parameterizedPartition = entity.getAttributes().stream()
+                .filter(RelationAttribute.class::isInstance)
+                .map(attribute -> (RelationAttribute) attribute)
+                .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
+
+        parameterizedPartition.get(true).forEach(relationAttribute -> {
+            TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                    "responseClass", relationAttribute.getFieldName());
+            TypeWrapper collectorsType = entityManagerService.getProperty("dependencies",
+                    "Collectors", "collectors");
+
+            builder.addStatement("this.$L = $L.get$L().stream().map().($T::new).collect($T.toList())",
+                    relationAttribute.getFieldName(), entity.getInstanceName(),
+                    ClassUtils.capitalizeField(relationAttribute.getFieldName()),
+                    responseType.getTypeName(), collectorsType.getTypeName());
+        });
+
+        //Objects.isNull(content.getType()) ? null : new TypeResponseDto(content.getType());
+        parameterizedPartition.get(false).forEach(relationAttribute -> {
+            TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                    "responseClass", relationAttribute.getFieldName());
+
+            builder.addStatement("this.$L = Objects.isNull($L.get$L()) ? null : new $T($L.get$L())",
+                    relationAttribute.getFieldName(), entity.getInstanceName(),
+                    ClassUtils.capitalizeField(relationAttribute.getFieldName()),
+                    responseType.getTypeName(), entity.getInstanceName(),
+                    ClassUtils.capitalizeField(relationAttribute.getFieldName()));
+        });
+
+        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
+                "domainClass");
+        ParameterSpec parameterSpec = ParameterSpec.builder(domainType.getTypeName(), domainType.getInstanceName()).build();
+
+        return MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(parameterSpec)
                 .addCode(builder.build())
                 .build();
     }

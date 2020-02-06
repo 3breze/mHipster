@@ -4,7 +4,6 @@ import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 
 import java.util.List;
@@ -23,6 +22,8 @@ public interface JPoetHelperService {
     CodeBlock buildLombokBuilder(Entity entity);
 
     MethodSpec buildConstructor(List<FieldSpec> fieldSpecList, String dependencyClass);
+
+    MethodSpec buildResponseConstructor(Entity entity, List<FieldSpec> attributeList);
 
     CodeBlock buildSetterCallsCodeBlock(Entity entity);
 
