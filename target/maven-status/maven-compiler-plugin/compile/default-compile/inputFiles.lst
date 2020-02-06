@@ -18,9 +18,7 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layerconfig\
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\model\impl\SourceRelationAttributeService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\model\impl\ModelServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\MethodServiceImpl.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\FieldTypeNameWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\ClassNamingInfo.java
-C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layerconfig\LombokSettings.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\main\SourceClassService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\JPoetHelperService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\Entity.java
@@ -31,6 +29,7 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\ConfigU
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\model\ModelService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layerconfig\enums\LayerName.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\exception\ConfigurationErrorException.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\layerconfig\Dependency.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\Attribute.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\AttributeService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\main\impl\LayerGeneratorServiceImpl.java
@@ -46,6 +45,7 @@ C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrappe
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\TestPoetApi.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\RelationAttributeService.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\util\ReflectionUtil.java
+C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\model\wrapper\TypeWrapper.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\poetic\impl\JPoetClassServiceImpl.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\strategy\impl\GenerateServiceClassStrategy.java
 C:\Users\jovan\Documents\mi\mHipster\src\main\java\com\oul\mHipster\service\strategy\GenerateLayerStrategy.java

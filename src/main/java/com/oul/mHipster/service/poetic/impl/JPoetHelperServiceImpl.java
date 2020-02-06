@@ -13,8 +13,6 @@ import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.lang.model.element.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,30 +24,6 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     public JPoetHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
     }
-
-    @Override
-    public CodeBlock buildLombokBuilder(Entity entity) {
-
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
-                "domainClass");
-        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
-                "requestClass");
-
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
-                .builder(attribute.getType(), attribute.getFieldName())
-                .addModifiers(Modifier.PRIVATE)
-                .build()).collect(Collectors.toList());
-
-        StringBuffer builderStingBuffer = new StringBuffer();
-        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(")
-                .append(requestType.getInstanceName()).append(".get")
-                .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
-        return CodeBlock.builder()
-                .addStatement("$T $L = $T.builder()$L.build()", domainType.getTypeName(),
-                        domainType.getInstanceName(), domainType.getTypeName(), builderStingBuffer.toString())
-                .build();
-    }
-
 
     public CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes) {
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
@@ -126,6 +100,29 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
+    public CodeBlock buildLombokBuilder(Entity entity) {
+
+        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
+                "domainClass");
+        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
+                "requestClass");
+
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
+                .builder(attribute.getType(), attribute.getFieldName())
+                .addModifiers(Modifier.PRIVATE)
+                .build()).collect(Collectors.toList());
+
+        StringBuffer builderStingBuffer = new StringBuffer();
+        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(")
+                .append(requestType.getInstanceName()).append(".get")
+                .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
+        return CodeBlock.builder()
+                .addStatement("$T $L = $T.builder()$L.build()", domainType.getTypeName(),
+                        domainType.getInstanceName(), domainType.getTypeName(), builderStingBuffer.toString())
+                .build();
+    }
+
+    @Override
     public CodeBlock buildPageResponse(Entity entity) {
         TypeWrapper collectorsType = entityManagerService.getProperty("dependencies",
                 "Collectors", "collectors");
@@ -135,15 +132,10 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         TypeWrapper responseType = entityManagerService.getProperty(entity.getClassName(), "responseClass");
         TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
-
-        Map<Integer, List<String>> statementArgs = new HashMap<>();
-        statementArgs.put(0, Arrays.asList("domainClass", "daoClass"));
-        statementArgs.put(1, Arrays.asList("PageImpl", "responseClass", "Collectors"));
-
         return CodeBlock.builder()
-                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", entityManagerService.processStatementArgs(entity.getClassName(), statementArgs.get(0)))
+                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", domainType.getTypeName(), daoType.getInstanceName())
                 .addStatement("return new $T<>(page.stream().map($T::new).collect($T.toList()), pageable, page.getTotalElements())",
-                        entityManagerService.processStatementArgs(entity.getClassName(), statementArgs.get(1)))
+                        pageImplType.getTypeName(), responseType.getTypeName(), collectorsType.getTypeName())
                 .build();
     }
 

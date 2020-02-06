@@ -18,10 +18,8 @@ com\oul\mHipster\layerconfig\MethodSignature.class
 com\oul\mHipster\model\Entity$Builder.class
 com\oul\mHipster\TestPoetApi.class
 com\oul\mHipster\model\RootEntityModel.class
-com\oul\mHipster\model\wrapper\FieldTypeNameWrapper.class
 com\oul\mHipster\service\model\EntityManagerService.class
 com\oul\mHipster\service\poetic\impl\AttributeService.class
-com\oul\mHipster\layerconfig\LombokSettings.class
 com\oul\mHipster\GenMojo.class
 com\oul\mHipster\service\poetic\MethodBuilderService.class
 com\oul\mHipster\util\ConfigUtil.class
@@ -37,6 +35,7 @@ com\oul\mHipster\service\model\impl\ModelServiceImpl.class
 com\oul\mHipster\model\ClassNamingInfo.class
 com\oul\mHipster\service\strategy\impl\GenerateResponseDtoClassStrategy.class
 com\oul\mHipster\util\ClassUtils.class
+com\oul\mHipster\model\wrapper\TypeWrapper.class
 com\oul\mHipster\service\strategy\GenerateLayerStrategy.class
 com\oul\mHipster\layerconfig\Method.class
 com\oul\mHipster\service\poetic\JPoetHelperService.class
@@ -49,6 +48,7 @@ com\oul\mHipster\service\strategy\GenerateLayerStrategyFactory$1.class
 com\oul\mHipster\model\Attribute.class
 com\oul\mHipster\model\wrapper\TypeSpecWrapper.class
 com\oul\mHipster\service\strategy\impl\UnknownLayerStrategy.class
+com\oul\mHipster\layerconfig\Dependency.class
 com\oul\mHipster\service\poetic\impl\MethodServiceImpl.class
 com\oul\mHipster\service\poetic\JPoetClassService.class
 com\oul\mHipster\service\main\impl\SourceAttributeServiceImpl.class

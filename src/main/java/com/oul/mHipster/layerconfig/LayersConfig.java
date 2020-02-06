@@ -1,25 +1,30 @@
 package com.oul.mHipster.layerconfig;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
 public class LayersConfig {
 
-    private LombokSettings lombokSettings;
+    @XmlElementWrapper(name = "dependencies")
+    @XmlElement(name = "dependency")
+    private List<Dependency> dependencies = new ArrayList<>();
 
     @XmlElementWrapper(name = "layers")
     @XmlElement(name = "layer")
     private List<Layer> layers = new ArrayList<>();
 
-    public LombokSettings getLombokSettings() {
-        return lombokSettings;
+    public List<Dependency> getDependencies() {
+        return dependencies;
     }
 
     @XmlTransient
-    public void setLombokSettings(LombokSettings lombokSettings) {
-        this.lombokSettings = lombokSettings;
+    public void setDependencies(List<Dependency> dependencies) {
+        this.dependencies = dependencies;
     }
 
     public List<Layer> getLayers() {

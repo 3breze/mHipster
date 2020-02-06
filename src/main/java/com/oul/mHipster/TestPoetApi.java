@@ -3,6 +3,7 @@ package com.oul.mHipster;
 import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.lang.model.element.Modifier;
@@ -140,7 +141,7 @@ public class TestPoetApi {
                         .addParameter(param)
                         .addStatement(codeBlock2)
                         .addStatement(lombokBuilder.toString())
-                        .returns(ParameterizedTypeName.get(ClassName.bestGuess("java.util.List"),
+                        .returns(ParameterizedTypeName.get(ClassName.get(JpaRepository.class),
                                 responseDtoClass))
 //                        .returns(responseDtoClass)
                         .build())

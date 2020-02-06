@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <layersConfig>
-    <lombokSettings active="false">
-    </lombokSettings>
     <layers>
         <layer name="API">
             <packageName>api</packageName>
@@ -23,7 +21,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>return new ${serviceInst}.findById(id)</methodBody>
+                    <methodBody>return ${serviceInst}.findById(id)</methodBody>
                 </method>
                 <method type="save">
                     <methodSignature returns="responseClass">
@@ -187,4 +185,42 @@
             <type>concrete</type>
         </layer>
     </layers>
+    <dependencies>
+        <dependency>
+            <packageName>org.springframework.data.domain</packageName>
+            <simpleName>Pageable</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>org.springframework.data.domain</packageName>
+            <simpleName>Page</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>org.springframework.data.domain</packageName>
+            <simpleName>PageImpl</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>com.querydsl.core.types</packageName>
+            <simpleName>Predicate</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>java.util.stream</packageName>
+            <simpleName>Collectors</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>java.util</packageName>
+            <simpleName>Optional</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>org.springframework.data.jpa.repository</packageName>
+            <simpleName>JpaRepository</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>org.springframework.data.querydsl</packageName>
+            <simpleName>QuerydslPredicateExecutor</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>org.springframework.data.querydsl.binding</packageName>
+            <simpleName>QuerydslBinderCustomizer</simpleName>
+        </dependency>
+    </dependencies>
 </layersConfig>

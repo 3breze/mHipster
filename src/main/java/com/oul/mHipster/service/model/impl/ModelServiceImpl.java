@@ -6,9 +6,9 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RootEntityModel;
-import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.ModelService;
 import com.oul.mHipster.service.poetic.JPoetClassService;
 import com.oul.mHipster.service.poetic.impl.JPoetClassServiceImpl;
@@ -59,18 +59,11 @@ public class ModelServiceImpl implements ModelService {
     private void registerDependenciesTypeNames() {
         Map<String, TypeWrapper> typeNameMap = new HashMap<>();
 
-        typeNameMap.put("Pageable", new TypeWrapper(
-                ClassName.get("org.springframework.data.domain", "Pageable"), "pageable"));
-        typeNameMap.put("Page", new TypeWrapper(
-                ClassName.get("org.springframework.data.domain", "Page"), "page"));
-        typeNameMap.put("PageImpl", new TypeWrapper(
-                ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
-        typeNameMap.put("Collectors", new TypeWrapper(
-                ClassName.get("java.util.stream", "Collectors"), "collectors"));
-        typeNameMap.put("Optional", new TypeWrapper(
-                ClassName.get("java.util", "Optional"), "optional"));
-        typeNameMap.put("Predicate", new TypeWrapper(
-                ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
+        layersConfig.getDependencies().forEach(dependency ->
+                typeNameMap.put(dependency.getSimpleName(),
+                        new TypeWrapper(ClassName.get(dependency.getPackageName(), dependency.getSimpleName()), dependency.getSimpleName().toLowerCase()))
+        );
+
         typeNameMap.put("ResourceNotFoundException", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.exception.specification", "ResourceNotFoundException"),
                 "ResourceNotFoundException"));
@@ -83,15 +76,6 @@ public class ModelServiceImpl implements ModelService {
         typeNameMap.put("ValidationGroupSave", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property.ValidationGroup", "Save"),
                 "Save"));
-        typeNameMap.put("JpaRepository", new TypeWrapper(
-                ClassName.get("org.springframework.data.jpa.repository", "JpaRepository"),
-                "JpaRepository"));
-        typeNameMap.put("QuerydslPredicateExecutor", new TypeWrapper(
-                ClassName.get("org.springframework.data.querydsl", "QuerydslPredicateExecutor"),
-                "QuerydslPredicateExecutor"));
-        typeNameMap.put("QuerydslBinderCustomizer", new TypeWrapper(
-                ClassName.get("org.springframework.data.querydsl.binding", "QuerydslBinderCustomizer"),
-                "QuerydslBinderCustomizer"));
 
         layerModel.put("dependencies", typeNameMap);
     }
