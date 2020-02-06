@@ -4,7 +4,7 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 
@@ -21,7 +21,7 @@ public class AttributeService extends RelationAttributeService {
      * dalja provera -> da li je u modelu (key-evi: classNames ili dependencies) ili je obican field (ne treba nam
      * typeArgument kao u slucaju parametara methoda)
      */
-    public FieldTypeNameWrapper getTypeName(String entityName, String typeArgument, String instanceName) {
+    public TypeWrapper getTypeName(String entityName, String typeArgument, String instanceName) {
         return ClassUtils.isParameterizedField(typeArgument) ? parameterizedTypeTokenSplit(typeArgument, entityName, instanceName) :
                 entityManagerService.getProperty(entityName, typeArgument, instanceName);
     }
@@ -30,20 +30,20 @@ public class AttributeService extends RelationAttributeService {
      * Eg. splitujemo "Page&lt;responseClazz&gt;"
      * ParameterizedTypeName vraca typeName
      */
-    private FieldTypeNameWrapper parameterizedTypeTokenSplit(String genericField, String entityName, String instanceName) {
+    private TypeWrapper parameterizedTypeTokenSplit(String genericField, String entityName, String instanceName) {
         String genericTypeName = ClassUtils.getGenericTypeName(genericField);
         String typeArgumentName = ClassUtils.getTypeArgumentName(genericField);
 
-        FieldTypeNameWrapper genericType = entityManagerService.getProperty(entityName, genericTypeName, null);
-        FieldTypeNameWrapper typeArgument = entityManagerService.getProperty(entityName, typeArgumentName, null);
+        TypeWrapper genericType = entityManagerService.getProperty(entityName, genericTypeName, null);
+        TypeWrapper typeArgument = entityManagerService.getProperty(entityName, typeArgumentName, null);
 
         TypeName typeName = ParameterizedTypeName.get((ClassName) genericType.getTypeName(),
                 typeArgument.getTypeName());
-        return new FieldTypeNameWrapper(typeName, instanceName);
+        return new TypeWrapper(typeName, instanceName);
     }
 
     public List<FieldSpec> getAttributeFieldSpecList(Entity entity, String layer) {
-        FieldTypeNameWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ValidationGroupUpdate", "update");
 
         Predicate<Attribute> predicate = RelationAttribute.class::isInstance;

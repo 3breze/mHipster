@@ -1,7 +1,7 @@
 package com.oul.mHipster.service.poetic.impl;
 
 import com.oul.mHipster.model.Attribute;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetClassService;
@@ -30,7 +30,7 @@ public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPo
     public TypeSpec buildResourceNotFoundException() {
 
         // typeName ide u model za packagename posle
-        FieldTypeNameWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", null);
 
         List<Attribute> attributes = Arrays.asList(new Attribute(String.class, "resourceName"),
@@ -65,7 +65,7 @@ public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPo
     @Override
     public TypeSpec buildValidationGroup() {
 
-        FieldTypeNameWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "ValidationGroup", "exception");
 
         return TypeSpec

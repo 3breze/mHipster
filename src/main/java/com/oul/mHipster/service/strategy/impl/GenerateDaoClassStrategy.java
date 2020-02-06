@@ -5,15 +5,18 @@ import com.oul.mHipster.layerconfig.Layer;
 import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
 import com.oul.mHipster.service.poetic.impl.AttributeService;
 import com.oul.mHipster.service.poetic.impl.MethodServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
+import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import javax.lang.model.element.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +34,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+        TypeWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
 
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream()
                 .filter(layer -> layer.getName().equals("DAO"))
@@ -43,7 +46,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
+            TypeWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder
@@ -53,11 +56,25 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
                     .build();
         }).collect(Collectors.toList());
 
-        FieldTypeNameWrapper jpaTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper jpaTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "JpaRepository", null);
 
-        FieldTypeNameWrapper dslPredicateTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper dslPredicateTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "QuerydslPredicateExecutor", null);
+
+        TypeWrapper dslBinderTypeNameWrapper = entityManagerService.getProperty("dependencies",
+                "QuerydslBinderCustomizer", null);
+
+        List<ParameterSpec> parameterSpecs = Arrays.asList(ParameterSpec.builder(QuerydslBindings.class, "bindings").build(),
+                ParameterSpec.builder(ClassName.bestGuess("A" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName())), "root").build());
+        MethodSpec customizeMethod = MethodSpec.methodBuilder("customize")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.DEFAULT)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.VOID)
+                .addParameters(parameterSpecs)
+                .addStatement("bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::containsIgnoreCase);")
+                .build();
 
         ClassName boxedLong = ClassName.get("java.lang", "Long");
 
@@ -69,8 +86,11 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
                         domainTypeNameWrapper.getTypeName(), boxedLong))
                 .addSuperinterface(ParameterizedTypeName.get((ClassName) dslPredicateTypeNameWrapper.getTypeName(),
                         domainTypeNameWrapper.getTypeName()))
+                .addSuperinterface(ParameterizedTypeName.get((ClassName) dslBinderTypeNameWrapper.getTypeName(),
+                        ClassName.bestGuess("A" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()))))
                 .addModifiers(Modifier.PUBLIC)
                 .addMethods(methods)
+                .addMethod(customizeMethod)
                 .build();
 
         return new TypeSpecWrapper(typeSpec, classNamingInfo.getPackageName());

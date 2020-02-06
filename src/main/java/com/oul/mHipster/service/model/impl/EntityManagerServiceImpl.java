@@ -1,7 +1,7 @@
 package com.oul.mHipster.service.model.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.squareup.javapoet.ClassName;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
 
-    private Map<String, Map<String, FieldTypeNameWrapper>> layerModel;
+    private Map<String, Map<String, TypeWrapper>> layerModel;
 
     @Override
     public void setLayerModel(LayerModelWrapper layerModelWrapper) {
@@ -26,7 +26,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
      * TypeName-ovi klasa iz modela (ne ukljucuje dependencies i javine klase)
      */
     @Override
-    public FieldTypeNameWrapper getProperty(String entityName, String layerName) {
+    public TypeWrapper getProperty(String entityName, String layerName) {
         return Optional.ofNullable(layerModel.get(entityName).get(layerName))
                 .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
     }
@@ -37,19 +37,19 @@ public class EntityManagerServiceImpl implements EntityManagerService {
      * Provera fieldName-a je nad kljucevima nestovanih klasa pod dva kljuca: naziva klase datog entiteta i dependencies.
      */
     @Override
-    public FieldTypeNameWrapper getProperty(String entityName, String typeArgument, String instanceName) {
-        FieldTypeNameWrapper entityBasedClass = layerModel.get(entityName).get(typeArgument);
+    public TypeWrapper getProperty(String entityName, String typeArgument, String instanceName) {
+        TypeWrapper entityBasedClass = layerModel.get(entityName).get(typeArgument);
         if (entityBasedClass == null) {
-            FieldTypeNameWrapper dependencyBasedClass = layerModel.get("dependencies").get(typeArgument);
+            TypeWrapper dependencyBasedClass = layerModel.get("dependencies").get(typeArgument);
             if (dependencyBasedClass == null) {
                 if (Character.isLowerCase(typeArgument.charAt(0))) {
                     TypeName typeName = getPrimitiveTypeName(typeArgument);
-                    return new FieldTypeNameWrapper(typeName, instanceName);
+                    return new TypeWrapper(typeName, instanceName);
                 }
                 if (typeArgument.equals("List")) {
-                    return new FieldTypeNameWrapper(ClassName.get("java.util", typeArgument), instanceName);
+                    return new TypeWrapper(ClassName.get("java.util", typeArgument), instanceName);
                 }
-                return new FieldTypeNameWrapper(ClassName.get("java.lang", typeArgument), instanceName);
+                return new TypeWrapper(ClassName.get("java.lang", typeArgument), instanceName);
             }
             return dependencyBasedClass;
         }
@@ -58,12 +58,10 @@ public class EntityManagerServiceImpl implements EntityManagerService {
 
     @Override
     public Object[] processStatementArgs(String entityName, List<String> statementArgs) {
-        List<FieldTypeNameWrapper> result = statementArgs.stream()
+        List<TypeWrapper> result = statementArgs.stream()
                 .map(arg -> getProperty(entityName, arg, null)).collect(Collectors.toList());
-        Object[] objects = result.stream().map(FieldTypeNameWrapper::getTypeName)
+        return result.stream().map(TypeWrapper::getTypeName)
                 .toArray(Object[]::new);
-        System.out.println(objects);
-        return objects;
     }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {

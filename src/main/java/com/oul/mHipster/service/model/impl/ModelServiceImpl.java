@@ -6,7 +6,7 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RootEntityModel;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.model.ModelService;
@@ -26,7 +26,7 @@ public class ModelServiceImpl implements ModelService {
 
     private LayersConfig layersConfig;
     private RootEntityModel rootEntityModel;
-    private Map<String, Map<String, FieldTypeNameWrapper>> layerModel = new HashMap<>();
+    private Map<String, Map<String, TypeWrapper>> layerModel = new HashMap<>();
 
     public ModelServiceImpl(LayersConfig layersConfig, RootEntityModel rootEntityModel) {
         this.layersConfig = layersConfig;
@@ -57,38 +57,41 @@ public class ModelServiceImpl implements ModelService {
     }
 
     private void registerDependenciesTypeNames() {
-        Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
+        Map<String, TypeWrapper> typeNameMap = new HashMap<>();
 
-        typeNameMap.put("Pageable", new FieldTypeNameWrapper(
+        typeNameMap.put("Pageable", new TypeWrapper(
                 ClassName.get("org.springframework.data.domain", "Pageable"), "pageable"));
-        typeNameMap.put("Page", new FieldTypeNameWrapper(
+        typeNameMap.put("Page", new TypeWrapper(
                 ClassName.get("org.springframework.data.domain", "Page"), "page"));
-        typeNameMap.put("PageImpl", new FieldTypeNameWrapper(
+        typeNameMap.put("PageImpl", new TypeWrapper(
                 ClassName.get("org.springframework.data.domain", "PageImpl"), "pageImpl"));
-        typeNameMap.put("Collectors", new FieldTypeNameWrapper(
+        typeNameMap.put("Collectors", new TypeWrapper(
                 ClassName.get("java.util.stream", "Collectors"), "collectors"));
-        typeNameMap.put("Optional", new FieldTypeNameWrapper(
+        typeNameMap.put("Optional", new TypeWrapper(
                 ClassName.get("java.util", "Optional"), "optional"));
-        typeNameMap.put("Predicate", new FieldTypeNameWrapper(
+        typeNameMap.put("Predicate", new TypeWrapper(
                 ClassName.get("com.querydsl.core.types", "Predicate"), "predicate"));
-        typeNameMap.put("ResourceNotFoundException", new FieldTypeNameWrapper(
+        typeNameMap.put("ResourceNotFoundException", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.exception.specification", "ResourceNotFoundException"),
                 "ResourceNotFoundException"));
-        typeNameMap.put("ValidationGroup", new FieldTypeNameWrapper(
+        typeNameMap.put("ValidationGroup", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property", "ValidationGroup"),
                 "ValidationGroup"));
-        typeNameMap.put("ValidationGroupUpdate", new FieldTypeNameWrapper(
+        typeNameMap.put("ValidationGroupUpdate", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property.ValidationGroup", "Update"),
                 "Update"));
-        typeNameMap.put("ValidationGroupSave", new FieldTypeNameWrapper(
+        typeNameMap.put("ValidationGroupSave", new TypeWrapper(
                 ClassName.get(rootEntityModel.getRootPackageName() + ".shared.property.ValidationGroup", "Save"),
                 "Save"));
-        typeNameMap.put("JpaRepository", new FieldTypeNameWrapper(
+        typeNameMap.put("JpaRepository", new TypeWrapper(
                 ClassName.get("org.springframework.data.jpa.repository", "JpaRepository"),
                 "JpaRepository"));
-        typeNameMap.put("QuerydslPredicateExecutor", new FieldTypeNameWrapper(
+        typeNameMap.put("QuerydslPredicateExecutor", new TypeWrapper(
                 ClassName.get("org.springframework.data.querydsl", "QuerydslPredicateExecutor"),
                 "QuerydslPredicateExecutor"));
+        typeNameMap.put("QuerydslBinderCustomizer", new TypeWrapper(
+                ClassName.get("org.springframework.data.querydsl.binding", "QuerydslBinderCustomizer"),
+                "QuerydslBinderCustomizer"));
 
         layerModel.put("dependencies", typeNameMap);
     }
@@ -97,33 +100,33 @@ public class ModelServiceImpl implements ModelService {
     private void registerDomainLayerTypeNames() {
         this.rootEntityModel.getEntities().forEach(entity -> {
             Map<String, ClassNamingInfo> layerMap = entity.getLayers();
-            Map<String, FieldTypeNameWrapper> typeNameMap = new HashMap<>();
+            Map<String, TypeWrapper> typeNameMap = new HashMap<>();
 
-            typeNameMap.put("domainClass", new FieldTypeNameWrapper(
+            typeNameMap.put("domainClass", new TypeWrapper(
                     ClassName.get(entity.getPackageName(), entity.getClassName()), entity.getInstanceName()));
 
             ClassNamingInfo requestInfo = layerMap.get(LayerName.REQUEST_DTO.toString());
-            typeNameMap.put("requestClass", new FieldTypeNameWrapper(
+            typeNameMap.put("requestClass", new TypeWrapper(
                     ClassName.get(requestInfo.getPackageName(), requestInfo.getClassName()), requestInfo.getInstanceName()));
 
             ClassNamingInfo responseInfo = layerMap.get(LayerName.RESPONSE_DTO.toString());
-            typeNameMap.put("responseClass", new FieldTypeNameWrapper(
+            typeNameMap.put("responseClass", new TypeWrapper(
                     ClassName.get(responseInfo.getPackageName(), responseInfo.getClassName()), responseInfo.getInstanceName()));
 
             ClassNamingInfo daoInfo = layerMap.get(LayerName.DAO.toString());
-            typeNameMap.put("daoClass", new FieldTypeNameWrapper(
+            typeNameMap.put("daoClass", new TypeWrapper(
                     ClassName.get(daoInfo.getPackageName(), daoInfo.getClassName()), daoInfo.getInstanceName()));
 
             ClassNamingInfo apiInfo = layerMap.get(LayerName.API.toString());
-            typeNameMap.put("apiClass", new FieldTypeNameWrapper(
+            typeNameMap.put("apiClass", new TypeWrapper(
                     ClassName.get(apiInfo.getPackageName(), apiInfo.getClassName()), apiInfo.getInstanceName()));
 
             ClassNamingInfo serviceInfo = layerMap.get(LayerName.SERVICE.toString());
-            typeNameMap.put("serviceClass", new FieldTypeNameWrapper(
+            typeNameMap.put("serviceClass", new TypeWrapper(
                     ClassName.get(serviceInfo.getPackageName(), serviceInfo.getClassName()), serviceInfo.getInstanceName()));
 
             ClassNamingInfo serviceImplInfo = layerMap.get(LayerName.SERVICE.toString());
-            typeNameMap.put("serviceImplClass", new FieldTypeNameWrapper(
+            typeNameMap.put("serviceImplClass", new TypeWrapper(
                     ClassName.get(serviceImplInfo.getPackageName(), serviceImplInfo.getClassName()), serviceImplInfo.getInstanceName()));
 
             layerModel.put(entity.getClassName(), typeNameMap);

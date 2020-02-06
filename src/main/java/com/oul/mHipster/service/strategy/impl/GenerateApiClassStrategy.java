@@ -5,7 +5,7 @@ import com.oul.mHipster.layerconfig.Layer;
 import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
@@ -41,7 +41,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
+        TypeWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
         List<FieldSpec> fieldSpecList = new ArrayList<>();
         fieldSpecList.add(FieldSpec
                 .builder(serviceTypeNameWrapper.getTypeName(), serviceTypeNameWrapper.getInstanceName())
@@ -64,7 +64,7 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
 
             String requestMethod = methodBuilderService.getRequestMethod(method.getType());
 
-            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
+            TypeWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder

@@ -6,7 +6,7 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
@@ -65,14 +65,6 @@ public class MethodServiceImpl implements MethodBuilderService {
                 Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
                 CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
                 cbBuilder.add(findRelationCodeBlock);
-//                if (!relationAttributes.get(true).isEmpty()) {
-//                    CodeBlock findManyRelationCodeBlock = jPoetHelperService.buildFindManyRelationCodeBlock(entity, relationAttributes.get(true));
-//                    cbBuilder.add(findManyRelationCodeBlock);
-//                }
-//                if (!relationAttributes.get(false).isEmpty()) {
-//                    CodeBlock findOneRelationCodeBlock = jPoetHelperService.buildFindOneRelationCodeBlock(entity, relationAttributes.get(false));
-//                    cbBuilder.add(findOneRelationCodeBlock);
-//                }
                 matcher.appendReplacement(templateCode, "");
                 continue;
             }
@@ -113,8 +105,8 @@ public class MethodServiceImpl implements MethodBuilderService {
                 ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.RESPONSE_DTO.toString());
                 matcher.appendReplacement(templateCode, classNamingInfo.getClassName());
             } else {
-                FieldTypeNameWrapper typeNameWrapper = entityManagerService.getProperty(entity.getClassName(), injectKeyword);
-                matcher.appendReplacement(templateCode, flag ? typeNameWrapper.getInstanceName() : entity.getClassName());
+                TypeWrapper entityType = entityManagerService.getProperty(entity.getClassName(), injectKeyword);
+                matcher.appendReplacement(templateCode, flag ? entityType.getInstanceName() : entity.getClassName());
             }
             flag = false;
         }
@@ -127,10 +119,10 @@ public class MethodServiceImpl implements MethodBuilderService {
     @Override
     public List<ParameterSpec> getMethodParameters(Entity entity, Method method, String layer) {
         return method.getMethodSignature().getParameters().stream().map(parameter -> {
-            FieldTypeNameWrapper typeNameWrapper = attributeService.getTypeName(entity.getClassName(),
+            TypeWrapper attributeType = attributeService.getTypeName(entity.getClassName(),
                     parameter.getType(), parameter.getName());
             ParameterSpec.Builder parameterBuilder = ParameterSpec
-                    .builder(typeNameWrapper.getTypeName(), typeNameWrapper.getInstanceName());
+                    .builder(attributeType.getTypeName(), attributeType.getInstanceName());
             if (layer.equals(LayerName.API.name())) {
                 parameterBuilder = processMethodSignature(entity, method, parameter, parameterBuilder);
             }
@@ -156,20 +148,20 @@ public class MethodServiceImpl implements MethodBuilderService {
     public ParameterSpec.Builder processMethodSignature(Entity entity, Method method, Parameter parameter,
                                                         ParameterSpec.Builder parameterBuilder) {
 
-        FieldTypeNameWrapper updateTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper updateValidationType = entityManagerService.getProperty("dependencies",
                 "ValidationGroupUpdate", null);
-        FieldTypeNameWrapper saveTypeNameWrapper = entityManagerService.getProperty("dependencies",
+        TypeWrapper saveValidationType = entityManagerService.getProperty("dependencies",
                 "ValidationGroupSave", null);
 
         switch (method.getType()) {
             case "findAll":
-                FieldTypeNameWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
-                FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
+                TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+                TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
                 if (parameter.getType().equals("Predicate")) {
                     parameterBuilder.addAnnotation(AnnotationSpec
                             .builder(QuerydslPredicate.class)
-                            .addMember("root", "$T.$L", domainTypeNameWrapper.getTypeName(), "class")
-                            .addMember("bindings", "$T.$L", daoTypeNameWrapper.getTypeName(), "class")
+                            .addMember("root", "$T.$L", domainType.getTypeName(), "class")
+                            .addMember("bindings", "$T.$L", daoType.getTypeName(), "class")
                             .build());
                     break;
                 }
@@ -190,14 +182,14 @@ public class MethodServiceImpl implements MethodBuilderService {
 
                 parameterBuilder.addAnnotation(AnnotationSpec
                         .builder(Validated.class)
-                        .addMember("value", "$T.$L", saveTypeNameWrapper.getTypeName(), "class")
+                        .addMember("value", "$T.$L", saveValidationType.getTypeName(), "class")
                         .build());
                 parameterBuilder.addAnnotation(RequestBody.class);
                 break;
             case "update":
                 parameterBuilder.addAnnotation(AnnotationSpec
                         .builder(Validated.class)
-                        .addMember("value", "$T.$L", updateTypeNameWrapper.getTypeName(), "class")
+                        .addMember("value", "$T.$L", updateValidationType.getTypeName(), "class")
                         .build());
                 parameterBuilder.addAnnotation(RequestBody.class);
                 break;

@@ -2,11 +2,11 @@ package com.oul.mHipster.model.wrapper;
 
 import com.squareup.javapoet.TypeName;
 
-public class FieldTypeNameWrapper {
+public class TypeWrapper {
     private TypeName typeName;
     private String instanceName;
 
-    public FieldTypeNameWrapper(TypeName typeName, String instanceName) {
+    public TypeWrapper(TypeName typeName, String instanceName) {
         this.typeName = typeName;
         this.instanceName = instanceName;
     }

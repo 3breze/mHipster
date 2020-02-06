@@ -6,7 +6,7 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
@@ -40,7 +40,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
         List<FieldSpec> fieldSpecList = jPoetHelperService.buildRelationFieldSpecList(relationAttributes);
 
-        FieldTypeNameWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
+        TypeWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         fieldSpecList.add(FieldSpec
                 .builder(daoTypeNameWrapper.getTypeName(), daoTypeNameWrapper.getInstanceName())
                 .addModifiers(Modifier.PRIVATE)
@@ -60,7 +60,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE_IMPL.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
+            TypeWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder
@@ -72,7 +72,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
                     .build();
         }).collect(Collectors.toList());
 
-        FieldTypeNameWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
+        TypeWrapper serviceTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "serviceClass");
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.SERVICE_IMPL.toString());
 

@@ -5,7 +5,7 @@ import com.oul.mHipster.layerconfig.Layer;
 import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
 import com.oul.mHipster.service.poetic.impl.AttributeService;
@@ -44,7 +44,7 @@ public class GenerateServiceClassStrategy implements GenerateLayerStrategy {
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE.name());
 
-            FieldTypeNameWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
+            TypeWrapper returnTypeName = attributeService.getTypeName(entity.getClassName(),
                     method.getMethodSignature().getReturns(), null);
 
             return methodBuilder

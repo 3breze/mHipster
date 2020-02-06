@@ -3,7 +3,7 @@ package com.oul.mHipster.service.poetic.impl;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.RelationType;
-import com.oul.mHipster.model.wrapper.FieldTypeNameWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.util.ClassUtils;
@@ -57,7 +57,7 @@ public class RelationAttributeService {
 
         parameterizedPartition.get(true).stream()
                 .map(relationAttribute -> {
-                    FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                    TypeWrapper fieldSpec = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                             "domainClass", relationAttribute.getFieldName());
 
                     String collectionInterfaceExtracted = ClassUtils.getCollectionInterface(relationAttribute.getType().toString());
@@ -71,7 +71,7 @@ public class RelationAttributeService {
 
         parameterizedPartition.get(false).stream()
                 .map(relationAttribute -> {
-                    FieldTypeNameWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
+                    TypeWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
                             relationAttribute.getTypeArgument(), relationAttribute.getFieldName());
                     return FieldSpec.
                             builder(ClassName.get("java.lang", "Long"), fieldSpec.getInstanceName() + "Id")
