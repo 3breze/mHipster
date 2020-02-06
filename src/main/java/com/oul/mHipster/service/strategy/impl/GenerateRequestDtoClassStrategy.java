@@ -31,7 +31,7 @@ public class GenerateRequestDtoClassStrategy implements GenerateLayerStrategy {
     public TypeSpecWrapper generate(Entity entity) {
 
         List<FieldSpec> attributeList = attributeService.getAttributeFieldSpecList(entity, LayerName.REQUEST_DTO.name());
-        List<FieldSpec> relationAttributeList = attributeService.getRelationAttributeFieldSpecList(entity);
+        List<FieldSpec> relationAttributeList = attributeService.getRelationAttributeFieldSpecList(entity, LayerName.REQUEST_DTO);
         List<FieldSpec> allAttributesList = Stream.concat(attributeList.stream(), relationAttributeList.stream())
                 .collect(Collectors.toList());
 

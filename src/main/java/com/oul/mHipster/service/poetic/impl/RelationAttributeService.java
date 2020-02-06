@@ -1,5 +1,6 @@
 package com.oul.mHipster.service.poetic.impl;
 
+import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.RelationType;
@@ -46,7 +47,7 @@ public class RelationAttributeService {
                 .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
     }
 
-    public List<FieldSpec> getRelationAttributeFieldSpecList(Entity entity) {
+    public List<FieldSpec> getRelationAttributeFieldSpecList(Entity entity, LayerName layerName) {
         Map<Boolean, List<RelationAttribute>> parameterizedPartition = entity.getAttributes().stream()
                 .filter(RelationAttribute.class::isInstance)
                 .map(attribute -> (RelationAttribute) attribute)
@@ -57,12 +58,14 @@ public class RelationAttributeService {
 
         parameterizedPartition.get(true).stream()
                 .map(relationAttribute -> {
-                    TypeWrapper fieldSpec = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                            "domainClass", relationAttribute.getFieldName());
-
                     String collectionInterfaceExtracted = ClassUtils.getCollectionInterface(relationAttribute.getType().toString());
+                    TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                            "responseClass", relationAttribute.getFieldName());
+                    boolean flag = false;
+                    if (layerName.equals(LayerName.RESPONSE_DTO)) flag = true;
+
                     TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(collectionInterfaceExtracted),
-                            ClassName.get("java.lang", "Long"));
+                            flag ? responseType.getTypeName() : ClassName.get("java.lang", "Long"));
                     return FieldSpec.
                             builder(parameterized, relationAttribute.getFieldName() + "Ids")
                             .addModifiers(Modifier.PRIVATE)
@@ -73,8 +76,13 @@ public class RelationAttributeService {
                 .map(relationAttribute -> {
                     TypeWrapper fieldSpec = entityManagerService.getProperty(entity.getClassName(),
                             relationAttribute.getTypeArgument(), relationAttribute.getFieldName());
+                    TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                            "responseClass", relationAttribute.getFieldName());
+                    boolean flag = false;
+                    if (layerName.equals(LayerName.RESPONSE_DTO)) flag = true;
                     return FieldSpec.
-                            builder(ClassName.get("java.lang", "Long"), fieldSpec.getInstanceName() + "Id")
+                            builder(flag ? responseType.getTypeName() : ClassName.get("java.lang", "Long"),
+                                    flag ? responseType.getInstanceName() : fieldSpec.getInstanceName() + "Id")
                             .addModifiers(Modifier.PRIVATE)
                             .build();
                 }).forEachOrdered(target::add);
