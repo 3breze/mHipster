@@ -1,8 +1,8 @@
 package com.oul.mHipster.service.model.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;

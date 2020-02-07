@@ -50,10 +50,10 @@ public class MethodServiceImpl implements MethodBuilderService {
     }
 
     @Override
-    public CodeBlock processMethodBody(Entity entity, String methodBody) {
+    public CodeBlock processMethodBody(Entity entity, Method method) {
 
         Pattern pattern = Pattern.compile(REGEX);
-        Matcher matcher = pattern.matcher(methodBody);
+        Matcher matcher = pattern.matcher(method.getMethodBody());
         StringBuffer templateCode = new StringBuffer();
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         boolean flag = false;
@@ -69,7 +69,7 @@ public class MethodServiceImpl implements MethodBuilderService {
                 continue;
             }
             if (injectKeyword.equals(INJECT_FIND_BY_ID)) {
-                CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity);
+                CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity, method.getType());
                 cbBuilder.add(findByIdCodeBlock);
                 matcher.appendReplacement(templateCode, "");
                 continue;

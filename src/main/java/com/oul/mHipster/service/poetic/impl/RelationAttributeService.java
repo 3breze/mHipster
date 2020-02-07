@@ -37,7 +37,7 @@ public class RelationAttributeService {
                 .collect(Collectors.toList());
     }
 
-    public Map<Boolean, List<RelationAttribute>> partitionParameterizedRelationAttributes(Entity entity) {
+    Map<Boolean, List<RelationAttribute>> partitionParameterizedRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
@@ -67,7 +67,7 @@ public class RelationAttributeService {
                     TypeName parameterized = ParameterizedTypeName.get(ClassName.bestGuess(collectionInterfaceExtracted),
                             flag ? responseType.getTypeName() : ClassName.get("java.lang", "Long"));
                     return FieldSpec.
-                            builder(parameterized, relationAttribute.getFieldName() + "Ids")
+                            builder(parameterized, flag ? relationAttribute.getFieldName() : relationAttribute.getFieldName() + "Ids")
                             .addModifiers(Modifier.PRIVATE)
                             .build();
                 }).forEachOrdered(target::add);
@@ -78,11 +78,13 @@ public class RelationAttributeService {
                             relationAttribute.getTypeArgument(), relationAttribute.getFieldName());
                     TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                             "responseClass", relationAttribute.getFieldName());
+                    TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+                            "domainClass", relationAttribute.getFieldName());
                     boolean flag = false;
                     if (layerName.equals(LayerName.RESPONSE_DTO)) flag = true;
                     return FieldSpec.
                             builder(flag ? responseType.getTypeName() : ClassName.get("java.lang", "Long"),
-                                    flag ? responseType.getInstanceName() : fieldSpec.getInstanceName() + "Id")
+                                    flag ? relationDomainType.getInstanceName() : fieldSpec.getInstanceName() + "Id")
                             .addModifiers(Modifier.PRIVATE)
                             .build();
                 }).forEachOrdered(target::add);

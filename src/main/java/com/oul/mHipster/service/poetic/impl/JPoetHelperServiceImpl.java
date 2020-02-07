@@ -1,6 +1,7 @@
 package com.oul.mHipster.service.poetic.impl;
 
 import com.oul.mHipster.layerconfig.enums.LayerName;
+import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.lang.model.element.Modifier;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
@@ -43,6 +46,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     private CodeBlock.Builder buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 
+        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
+                "domainClass");
         TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
         TypeWrapper listType = entityManagerService.getProperty("dependencies",
@@ -59,6 +64,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     relationDomainType.getTypeName(), relationDomainType.getInstanceName(),
                     relationServiceType.getInstanceName(), requestType.getInstanceName(),
                     ClassUtils.capitalizeField(relationDomainType.getInstanceName()));
+            cbBuilder.addStatement("$L.set$LList($LList)", domainType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()),
+                    relationDomainType.getInstanceName());
         });
         return cbBuilder;
     }
@@ -107,11 +114,13 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 "domainClass");
         TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
                 "requestClass");
-
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
-                .builder(attribute.getType(), attribute.getFieldName())
-                .addModifiers(Modifier.PRIVATE)
-                .build()).collect(Collectors.toList());
+        Predicate<Attribute> predicate = RelationAttribute.class::isInstance;
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream()
+                .filter(predicate.negate())
+                .map(attribute -> FieldSpec
+                        .builder(attribute.getType(), attribute.getFieldName())
+                        .addModifiers(Modifier.PRIVATE)
+                        .build()).collect(Collectors.toList());
 
         StringBuffer builderStingBuffer = new StringBuffer();
         fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(")
@@ -141,7 +150,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     }
 
     @Override
-    public CodeBlock buildFindByIdCodeBlock(Entity entity) {
+    public CodeBlock buildFindByIdCodeBlock(Entity entity, String methodType) {
 
         TypeWrapper exceptionType = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
@@ -149,16 +158,28 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 "Optional", "optional");
 
         TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(), "requestClass");
         TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
-        return CodeBlock.builder()
-                .addStatement("$T<$T> $L = $L.findById(id)", optionalType.getTypeName(), domainType.getTypeName(),
-                        entity.getOptionalName(), daoType.getInstanceName())
-                .beginControlFlow("if ($L.isEmpty())", entity.getOptionalName())
-                .addStatement("throw new $T(\"$T\", \"id\", id)", exceptionType.getTypeName(), exceptionType.getTypeName())
-                .endControlFlow()
-                .addStatement("$T $L = $L.get()", domainType.getTypeName(), entity.getInstanceName(), entity.getOptionalName())
-                .build();
+        CodeBlock.Builder cbBuilder = CodeBlock.builder();
+        if (methodType.equals("update")) {
+            cbBuilder.addStatement("$T<$T> $L = $L.findById($L.getId())", optionalType.getTypeName(), domainType.getTypeName(),
+                    entity.getOptionalName(), daoType.getInstanceName(), requestType.getInstanceName());
+        } else {
+            cbBuilder.addStatement("$T<$T> $L = $L.findById(id)", optionalType.getTypeName(), domainType.getTypeName(),
+                    entity.getOptionalName(), daoType.getInstanceName());
+        }
+        cbBuilder.beginControlFlow("if ($L.isEmpty())", entity.getOptionalName());
+        if (methodType.equals("update")) {
+            cbBuilder.addStatement("throw new $T(\"$T\", \"id\", $L.getId())", exceptionType.getTypeName(),
+                    exceptionType.getTypeName(), requestType.getInstanceName());
+        } else {
+            cbBuilder.addStatement("throw new $T(\"$T\", \"id\", id)", exceptionType.getTypeName(), exceptionType.getTypeName());
+        }
+
+        cbBuilder.endControlFlow()
+                .addStatement("$T $L = $L.get()", domainType.getTypeName(), entity.getInstanceName(), entity.getOptionalName());
+        return cbBuilder.build();
     }
 
     @Override
@@ -207,19 +228,18 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
             TypeWrapper collectorsType = entityManagerService.getProperty("dependencies",
                     "Collectors", "collectors");
 
-            builder.addStatement("this.$L = $L.get$L().stream().map().($T::new).collect($T.toList())",
+            builder.addStatement("this.$L = $L.get$L().stream().map($T::new).collect($T.toList())",
                     relationAttribute.getFieldName(), entity.getInstanceName(),
                     ClassUtils.capitalizeField(relationAttribute.getFieldName()),
                     responseType.getTypeName(), collectorsType.getTypeName());
         });
 
-        //Objects.isNull(content.getType()) ? null : new TypeResponseDto(content.getType());
         parameterizedPartition.get(false).forEach(relationAttribute -> {
             TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "responseClass", relationAttribute.getFieldName());
 
-            builder.addStatement("this.$L = Objects.isNull($L.get$L()) ? null : new $T($L.get$L())",
-                    relationAttribute.getFieldName(), entity.getInstanceName(),
+            builder.addStatement("this.$L = $T.isNull($L.get$L()) ? null : new $T($L.get$L())",
+                    relationAttribute.getFieldName(), ClassName.get(Objects.class), entity.getInstanceName(),
                     ClassUtils.capitalizeField(relationAttribute.getFieldName()),
                     responseType.getTypeName(), entity.getInstanceName(),
                     ClassUtils.capitalizeField(relationAttribute.getFieldName()));
@@ -241,10 +261,13 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.REQUEST_DTO.toString());
 
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream().map(attribute -> FieldSpec
-                .builder(attribute.getType(), attribute.getFieldName())
-                .addModifiers(Modifier.PRIVATE)
-                .build()).collect(Collectors.toList());
+        Predicate<Attribute> predicate = RelationAttribute.class::isInstance;
+        List<FieldSpec> fieldSpecList = entity.getAttributes().stream()
+                .filter(predicate.negate())
+                .map(attribute -> FieldSpec
+                        .builder(attribute.getType(), attribute.getFieldName())
+                        .addModifiers(Modifier.PRIVATE)
+                        .build()).collect(Collectors.toList());
 
         CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
         fieldSpecList.forEach(field -> codeBlockBuilder.addStatement("$L.set$N($L.get$N())", entity.getInstanceName(),

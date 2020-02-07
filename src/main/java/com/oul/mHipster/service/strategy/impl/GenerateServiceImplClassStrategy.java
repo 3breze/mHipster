@@ -6,8 +6,8 @@ import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
-import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
+import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
 import com.oul.mHipster.service.poetic.impl.AttributeService;
@@ -56,7 +56,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
         List<MethodSpec> methods = serviceImplLayerOptional.get().getMethods().stream().map(method -> {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
 
-            CodeBlock methodBody = methodBuilderService.processMethodBody(entity, method.getMethodBody());
+            CodeBlock methodBody = methodBuilderService.processMethodBody(entity, method);
 
             List<ParameterSpec> parameters = methodBuilderService.getMethodParameters(entity, method, LayerName.SERVICE_IMPL.name());
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MethodBuilderService {
 
-    CodeBlock processMethodBody(Entity entity, String methodBody);
+    CodeBlock processMethodBody(Entity entity, Method method);
 
     List<ParameterSpec> getMethodParameters(Entity entity, Method method, String layer);
 

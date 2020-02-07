@@ -85,7 +85,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="findOne">
                     <methodSignature returns="domainClass">
