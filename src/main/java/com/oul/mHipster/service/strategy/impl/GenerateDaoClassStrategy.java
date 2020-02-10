@@ -66,7 +66,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
                 "QuerydslBinderCustomizer", null);
 
         List<ParameterSpec> parameterSpecs = Arrays.asList(ParameterSpec.builder(QuerydslBindings.class, "bindings").build(),
-                ParameterSpec.builder(ClassName.bestGuess("A" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName())), "root").build());
+                ParameterSpec.builder(ClassName.bestGuess("Q" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName())), "root").build());
         MethodSpec customizeMethod = MethodSpec.methodBuilder("customize")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.DEFAULT)

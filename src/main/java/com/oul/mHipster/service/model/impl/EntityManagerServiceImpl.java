@@ -1,12 +1,14 @@
 package com.oul.mHipster.service.model.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
+import com.oul.mHipster.layerconfig.wrapper.MethodBodyWrapper;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 public class EntityManagerServiceImpl implements EntityManagerService {
 
     private Map<String, Map<String, TypeWrapper>> layerModel;
+    private static final String REGEX = "\\$\\(L|T)";
 
     @Override
     public void setLayerModel(LayerModelWrapper layerModelWrapper) {
@@ -57,7 +60,12 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     }
 
     @Override
-    public Object[] processStatementArgs(String entityName, List<String> statementArgs) {
+    public Object[] processStatementArgs(String helperName, Long row, List<String> classNames) {
+        Map<String, Map<Integer, MethodBodyWrapper>> methodStatementFactory = new HashMap<>();
+        methodStatementFactory.put("buildFindManyRelationCodeBlock",
+                Map.of(0, new MethodBodyWrapper("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
+                        List.of("List", "domainClass", "domainClass", "serviceClass", "requestClass", "domainClass"))));
+
         List<TypeWrapper> result = statementArgs.stream()
                 .map(arg -> getProperty(entityName, arg, null)).collect(Collectors.toList());
         return result.stream().map(TypeWrapper::getTypeName)
