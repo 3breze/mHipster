@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeName;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
 
@@ -21,6 +22,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     @Override
     public void setLayerModel(LayerModelWrapper layerModelWrapper) {
         this.layerModel = layerModelWrapper.getLayerClassModel();
+        initStatementArgs();
     }
 
     /**
@@ -59,47 +61,48 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     }
 
 
-    public void prepareStatementArgs() {
+    private void initStatementArgs() {
 
         methodStatementFactory.put("buildFindManyRelationCodeBlock",
                 Map.of("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-                        List.of(new StatementArg("List"),
-                                new StatementArg("domainClass"),
-                                new StatementArg("domainClass"),
-                                new StatementArg("serviceClass"),
-                                new StatementArg("requestClass"),
-                                new StatementArg("domainClass", ClassUtils::capitalizeField)),
+                        List.of(new StatementArg("List", "type"),
+                                new StatementArg("domainClass", "type"),
+                                new StatementArg("domainClass", "instance"),
+                                new StatementArg("serviceClass", "instance"),
+                                new StatementArg("requestClass", "instance"),
+                                new StatementArg("domainClass", "instance", ClassUtils::capitalizeField)),
                         "$L.set$LList($LList)",
-                        List.of(new StatementArg("domainClass"),
-                                new StatementArg("domainClass"),
-                                new StatementArg("domainClass", ClassUtils::capitalizeField))));
-
+                        List.of(new StatementArg("domainClass", "instance"),
+                                new StatementArg("domainClass", "instance"),
+                                new StatementArg("domainClass", "instance", ClassUtils::capitalizeField))));
 
     }
 
-    private Object[] helperMethod(List<StatementArg> statementArgs, List<String> classNames) {
-        for (int i = 0; i < statementArgs.size(); i++) {
+    // Prosledjeni parovi statementArgs iz configuracije sa pravim className-ovima
+    private Object[] prepareStatementResponse(List<StatementArg> statementArgs, List<String> classNames) {
+
+        return IntStream.range(0, statementArgs.size()).mapToObj(i -> {
             StatementArg arg = statementArgs.get(i);
             String className = classNames.get(i);
-            TypeWrapper type = getProperty(arg.getClassInfo(), className, null);
-            if
-        }
+            TypeWrapper type = getProperty(className, arg.getClassLayer(), null);
 
+            if (arg.getArgumentType().equals("instance"))
+                return Objects.nonNull(arg.getStringOperationFunc()) ?
+                        arg.getStringOperationFunc().apply(type.getInstanceName()) : type.getInstanceName();
 
+            return type.getTypeName();
+        }).toArray(Object[]::new);
     }
 
-    public Map<String, Object[]> getStatementArgs(String helperName, List<String> classNames) {
-
-        methodStatementFactory.get(helperName).entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue)
-        );
-
-        return methodStatementFactory.get(helperName).entrySet().stream()
-                .map(arg -> getProperty(entityName, arg, null))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, LinkedHashMap::new));
-        return result.stream().map(TypeWrapper::getTypeName)
-                .toArray(Object[]::new);
+    // Key su body za statemente
+    @Override
+    public Map<String, Object[]> getStatementArgs(String helperName, Map<Integer, List<String>> classNames) {
+        return methodStatementFactory.get(helperName)
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, //body metode
+                        e -> prepareStatementResponse(e.getValue(), classNames)) // prepareRes -> dajem classNames sa
+                );
     }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {

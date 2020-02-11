@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
 
@@ -55,7 +56,16 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
 
+        String entityName = entity.getClassName();
+        IntStream.range(0, relationAttributes.size()).mapToObj(i -> {
+            String relationName = relationAttributes.get(i).getTypeArgument();
+            Map<String, Object[]> result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+                    i, List.of("List", relationName, relationName, relationName, entityName, relationName));
+        })
+
         relationAttributes.forEach(relationAttribute -> {
+
+
             TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "serviceClass");
             TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),

@@ -4,6 +4,7 @@ import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EntityManagerService {
 
@@ -13,6 +14,6 @@ public interface EntityManagerService {
 
     TypeWrapper getProperty(String entityName, String typeArgument, String instanceName);
 
-    Object[] processStatementArgs(String entityName, List<String> statementArgs);
+    Map<String, Object[]> getStatementArgs(String helperName, List<String> classNames);
 
 }

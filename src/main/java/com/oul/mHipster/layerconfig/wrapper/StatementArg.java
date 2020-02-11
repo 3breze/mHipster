@@ -1,32 +1,44 @@
 package com.oul.mHipster.layerconfig.wrapper;
 
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class StatementArg {
 
-    private String classInfo;
-    private List<String> types;
-    private boolean instance;
+    private String classLayer;
+    /*
+    Required argument to be of type TypeName or String (instance name)
+     */
+    private String argumentType;
+    private Function<String, String> stringOperationFunc;
 
     @SafeVarargs
-    public StatementArg(String classInfo, Consumer<String>... capitalize) {
-        this.classInfo = classInfo;
+    public StatementArg(String classLayer, String argumentType, Function<String, String>... stringOperations) {
+        this.classLayer = classLayer;
+        this.argumentType = argumentType;
+        this.stringOperationFunc = stringOperations.length != 0 ? stringOperations[0] : null;
     }
 
-    public String getClassInfo() {
-        return classInfo;
+    public String getClassLayer() {
+        return classLayer;
     }
 
-    public void setClassInfo(String classInfo) {
-        this.classInfo = classInfo;
+    public void setClassLayer(String classLayer) {
+        this.classLayer = classLayer;
     }
 
-    public List<String> getTypes() {
-        return types;
+    public String getArgumentType() {
+        return argumentType;
     }
 
-    public void setTypes(List<String> types) {
-        this.types = types;
+    public void setArgumentType(String argumentType) {
+        this.argumentType = argumentType;
+    }
+
+    public Function<String, String> getStringOperationFunc() {
+        return stringOperationFunc;
+    }
+
+    public void setStringOperationFunc(Function<String, String> stringOperationFunc) {
+        this.stringOperationFunc = stringOperationFunc;
     }
 }
