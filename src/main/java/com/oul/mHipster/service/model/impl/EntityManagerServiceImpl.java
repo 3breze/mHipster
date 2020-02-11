@@ -1,22 +1,21 @@
 package com.oul.mHipster.service.model.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
-import com.oul.mHipster.layerconfig.wrapper.MethodBodyWrapper;
+import com.oul.mHipster.layerconfig.wrapper.StatementArg;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.model.EntityManagerService;
+import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
 
     private Map<String, Map<String, TypeWrapper>> layerModel;
+    private Map<String, Map<String, List<StatementArg>>> methodStatementFactory = new HashMap<>();
     private static final String REGEX = "\\$\\(L|T)";
 
     @Override
@@ -59,15 +58,46 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         return entityBasedClass;
     }
 
-    @Override
-    public Object[] processStatementArgs(String helperName, Long row, List<String> classNames) {
-        Map<String, Map<Integer, MethodBodyWrapper>> methodStatementFactory = new HashMap<>();
-        methodStatementFactory.put("buildFindManyRelationCodeBlock",
-                Map.of(0, new MethodBodyWrapper("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-                        List.of("List", "domainClass", "domainClass", "serviceClass", "requestClass", "domainClass"))));
 
-        List<TypeWrapper> result = statementArgs.stream()
-                .map(arg -> getProperty(entityName, arg, null)).collect(Collectors.toList());
+    public void prepareStatementArgs() {
+
+        methodStatementFactory.put("buildFindManyRelationCodeBlock",
+                Map.of("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
+                        List.of(new StatementArg("List"),
+                                new StatementArg("domainClass"),
+                                new StatementArg("domainClass"),
+                                new StatementArg("serviceClass"),
+                                new StatementArg("requestClass"),
+                                new StatementArg("domainClass", ClassUtils::capitalizeField)),
+                        "$L.set$LList($LList)",
+                        List.of(new StatementArg("domainClass"),
+                                new StatementArg("domainClass"),
+                                new StatementArg("domainClass", ClassUtils::capitalizeField))));
+
+
+    }
+
+    private Object[] helperMethod(List<StatementArg> statementArgs, List<String> classNames) {
+        for (int i = 0; i < statementArgs.size(); i++) {
+            StatementArg arg = statementArgs.get(i);
+            String className = classNames.get(i);
+            TypeWrapper type = getProperty(arg.getClassInfo(), className, null);
+            if
+        }
+
+
+    }
+
+    public Map<String, Object[]> getStatementArgs(String helperName, List<String> classNames) {
+
+        methodStatementFactory.get(helperName).entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue)
+        );
+
+        return methodStatementFactory.get(helperName).entrySet().stream()
+                .map(arg -> getProperty(entityName, arg, null))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, LinkedHashMap::new));
         return result.stream().map(TypeWrapper::getTypeName)
                 .toArray(Object[]::new);
     }
