@@ -20,6 +20,7 @@ com\oul\mHipster\TestPoetApi.class
 com\oul\mHipster\model\RootEntityModel.class
 com\oul\mHipster\service\model\EntityManagerService.class
 com\oul\mHipster\service\poetic\impl\AttributeService.class
+com\oul\mHipster\layerconfig\wrapper\StatementArg.class
 com\oul\mHipster\GenMojo.class
 com\oul\mHipster\service\poetic\MethodBuilderService.class
 com\oul\mHipster\util\ConfigUtil.class

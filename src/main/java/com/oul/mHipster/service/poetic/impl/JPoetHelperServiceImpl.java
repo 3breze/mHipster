@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
 
@@ -56,15 +55,14 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
 
-        String entityName = entity.getClassName();
-        IntStream.range(0, relationAttributes.size()).mapToObj(i -> {
-            String relationName = relationAttributes.get(i).getTypeArgument();
-            Map<String, Object[]> result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
-                    i, List.of("List", relationName, relationName, relationName, entityName, relationName));
-        })
+//        String entityName = entity.getClassName();
+//        IntStream.range(0, relationAttributes.size()).mapToObj(i -> {
+//            String relationName = relationAttributes.get(i).getTypeArgument();
+//            Map<String, Object[]> result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+//                    i, List.of("List", relationName, relationName, relationName, entityName, relationName));
+//        })
 
         relationAttributes.forEach(relationAttribute -> {
-
 
             TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "serviceClass");
@@ -85,6 +83,8 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
         TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(), "requestClass");
+        TypeWrapper optionalType = entityManagerService.getProperty("dependencies",
+                "Optional", "optional");
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
 
@@ -93,7 +93,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     "serviceClass");
             TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
                     "domainClass");
-            cbBuilder.beginControlFlow("if (Optional.ofNullable($L.get$LId()).isPresent())", requestType.getInstanceName(),
+            cbBuilder.beginControlFlow("if ($T.ofNullable($L.get$LId()).isPresent())", optionalType.getTypeName(), requestType.getInstanceName(),
                     ClassUtils.capitalizeField(relationDomainType.getInstanceName()))
                     .addStatement("$T $L = $L.findOne($L.get$LId())", relationDomainType.getTypeName(),
                             relationDomainType.getInstanceName(), relationServiceType.getInstanceName(),
@@ -164,31 +164,19 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         TypeWrapper exceptionType = entityManagerService.getProperty("dependencies",
                 "ResourceNotFoundException", "exception");
-        TypeWrapper optionalType = entityManagerService.getProperty("dependencies",
-                "Optional", "optional");
 
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
         TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(), "requestClass");
         TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         if (methodType.equals("update")) {
-            cbBuilder.addStatement("$T<$T> $L = $L.findById($L.getId())", optionalType.getTypeName(), domainType.getTypeName(),
-                    entity.getOptionalName(), daoType.getInstanceName(), requestType.getInstanceName());
-        } else {
-            cbBuilder.addStatement("$T<$T> $L = $L.findById(id)", optionalType.getTypeName(), domainType.getTypeName(),
-                    entity.getOptionalName(), daoType.getInstanceName());
-        }
-        cbBuilder.beginControlFlow("if ($L.isEmpty())", entity.getOptionalName());
-        if (methodType.equals("update")) {
-            cbBuilder.addStatement("throw new $T(\"$T\", \"id\", $L.getId())", exceptionType.getTypeName(),
+            cbBuilder.addStatement("$L.findById($L.getId()).orElseThrow(() -> new $T(\"$T\", \"id\", $L.getId()))",
+                    daoType.getInstanceName(), requestType.getInstanceName(), exceptionType.getTypeName(),
                     exceptionType.getTypeName(), requestType.getInstanceName());
         } else {
-            cbBuilder.addStatement("throw new $T(\"$T\", \"id\", id)", exceptionType.getTypeName(), exceptionType.getTypeName());
+            cbBuilder.addStatement("$L.findById(id).orElseThrow(() -> new $T(\"$T\", \"id\", id))",
+                    daoType.getInstanceName(), exceptionType.getTypeName(), exceptionType.getTypeName());
         }
-
-        cbBuilder.endControlFlow()
-                .addStatement("$T $L = $L.get()", domainType.getTypeName(), entity.getInstanceName(), entity.getOptionalName());
         return cbBuilder.build();
     }
 

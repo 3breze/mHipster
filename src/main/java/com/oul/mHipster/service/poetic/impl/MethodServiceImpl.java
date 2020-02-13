@@ -110,9 +110,9 @@ public class MethodServiceImpl implements MethodBuilderService {
             }
             flag = false;
         }
-
         matcher.appendTail(templateCode);
         cbBuilder.addStatement(templateCode.toString());
+
         return cbBuilder.build();
     }
 

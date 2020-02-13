@@ -95,15 +95,14 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     }
 
     // Key su body za statemente
-    @Override
-    public Map<String, Object[]> getStatementArgs(String helperName, Map<Integer, List<String>> classNames) {
-        return methodStatementFactory.get(helperName)
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, //body metode
-                        e -> prepareStatementResponse(e.getValue(), classNames)) // prepareRes -> dajem classNames sa
-                );
-    }
+//    public Map<String, Object[]> getStatementArgs(String helperName, Map<Integer, List<String>> classNames) {
+//        return methodStatementFactory.get(helperName)
+//                .entrySet().stream()
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey, //body metode
+//                        e -> prepareStatementResponse(e.getValue(), classNames)) // prepareRes -> dajem classNames sa
+//                );
+//    }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {
         TypeName result = null;
