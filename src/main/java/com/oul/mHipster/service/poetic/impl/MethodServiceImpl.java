@@ -62,38 +62,56 @@ public class MethodServiceImpl implements MethodBuilderService {
             String injectKeyword = matcher.group(1);
 
             if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
+                matcher.appendReplacement(templateCode, "");
+                if(templateCode.length() > 0){
+                    matcher.appendTail(templateCode);
+                    cbBuilder.addStatement(templateCode.toString());
+                    templateCode.delete(0, templateCode.length());
+                }
                 Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
                 CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
                 cbBuilder.add(findRelationCodeBlock);
-                matcher.appendReplacement(templateCode, "");
                 continue;
             }
             if (injectKeyword.equals(INJECT_FIND_BY_ID)) {
+                matcher.appendReplacement(templateCode, "");
+                if(templateCode.length() > 0){
+                    cbBuilder.addStatement(templateCode.toString());
+                    templateCode.delete(0, templateCode.length());
+                }
                 CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity, method.getType());
                 cbBuilder.add(findByIdCodeBlock);
-                matcher.appendReplacement(templateCode, "");
                 continue;
             }
             if (injectKeyword.equals(INJECT_PAGE_RES)) {
-                CodeBlock pageResponseCodeBlock = jPoetHelperService.buildPageResponse(entity);
                 matcher.appendReplacement(templateCode, "");
+                if(templateCode.length() > 0){
+                    cbBuilder.addStatement(templateCode.toString());
+                    templateCode.delete(0, templateCode.length());
+                }
+                CodeBlock pageResponseCodeBlock = jPoetHelperService.buildPageResponse(entity);
                 cbBuilder.add(pageResponseCodeBlock);
                 continue;
             }
             if (injectKeyword.equals(INJECT_SETTER_CALLS)) {
+                matcher.appendReplacement(templateCode, "");
+                if(templateCode.length() > 0){
+                    cbBuilder.addStatement(templateCode.toString());
+                    templateCode.delete(0, templateCode.length());
+                }
                 CodeBlock setterCallsCodeBlock = jPoetHelperService.buildSetterCallsCodeBlock(entity);
                 cbBuilder.add(setterCallsCodeBlock);
-                matcher.appendReplacement(templateCode, "");
                 continue;
             }
             if (injectKeyword.equals(INJECT_BUILDER)) {
+                matcher.appendReplacement(templateCode, "");
+                if(templateCode.length() > 0){
+                    cbBuilder.addStatement(templateCode.toString());
+                    templateCode.delete(0, templateCode.length());
+                }
                 CodeBlock lombokBuilderCodeBlock = jPoetHelperService.buildLombokBuilder(entity);
                 cbBuilder.add(lombokBuilderCodeBlock);
-                matcher.appendReplacement(templateCode, "");
-                continue;
-            }
-            if (injectKeyword.equals(INJECT_OPTIONAL)) {
-                matcher.appendReplacement(templateCode, entity.getOptionalName());
+
                 continue;
             }
             if (injectKeyword.endsWith(INSTANCE_SUFFIX)) {

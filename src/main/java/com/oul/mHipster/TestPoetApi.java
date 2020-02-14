@@ -1,13 +1,11 @@
 package com.oul.mHipster;
 
-import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.lang.model.element.Modifier;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,19 +72,19 @@ public class TestPoetApi {
                 "${dao}.save(${domain})\n" +
                 "return new ${responseClazz}(${domain})";
 
-        String regex = "\\$\\{(.*?)}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(methodBody);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, map.get(matcher.group(1)));
-        }
-        matcher.appendTail(sb);
+//        String regex = "\\$\\{(.*?)}";
+//        Pattern pattern = Pattern.compile(regex);
+//        Matcher matcher = pattern.matcher(methodBody);
+//        StringBuffer sb = new StringBuffer();
+//        while (matcher.find()) {
+//            matcher.appendReplacement(sb, map.get(matcher.group(1)));
+//        }
+//        matcher.appendTail(sb);
+//
+//        String codeBlock = sb.toString();
 
-        String codeBlock = sb.toString();
-
-        String codeBlock1 = codeBlock.replaceAll("&lt;", "<");
-        String codeBlock2 = codeBlock1.replaceAll("&gt;", ">");
+//        String codeBlock1 = codeBlock.replaceAll("&lt;", "<");
+//        String codeBlock2 = codeBlock1.replaceAll("&gt;", ">");
 
         // Dao za klasu i m2m i m2o domain service
         List<ParameterSpec> parameterSpecsList = typeToValue.entrySet().stream().map(entry -> ParameterSpec
@@ -139,7 +137,7 @@ public class TestPoetApi {
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .addParameter(param)
-                        .addStatement(codeBlock2)
+//                        .addStatement(codeBlock2)
                         .addStatement(lombokBuilder.toString())
                         .returns(ParameterizedTypeName.get(ClassName.get(JpaRepository.class),
                                 responseDtoClass))
@@ -154,18 +152,18 @@ public class TestPoetApi {
 
 //        ClassName.bestGuess("void");
 
-        String ttt = "Page<responseClazz>";
-        System.out.println(ttt.substring(0, ttt.indexOf("<")));
-        System.out.println(ttt.substring(ttt.indexOf("<") + 1, ttt.indexOf(">")));
+//        String ttt = "Page<responseClazz>";
+//        System.out.println(ttt.substring(0, ttt.indexOf("<")));
+//        System.out.println(ttt.substring(ttt.indexOf("<") + 1, ttt.indexOf(">")));
 
-        try {
-            javaFile.writeTo(System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            javaFile.writeTo(System.out);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
-        System.out.println(ClassUtils.getCollectionInterface("interface java.util.List"));
+//        System.out.println(ClassUtils.getCollectionInterface("interface java.util.List"));
 
     }
 }

@@ -100,7 +100,7 @@
                         <parameters>
                             <parameter type="List&lt;Long&gt;">ids</parameter>
                         </parameters>
-                    </methodSignature>return contents.stream().collect(Collectors.toMap(Content::getId, this::prepareResponse));
+                    </methodSignature>
                     <methodBody>return ${daoInst}.findByIdIn(ids)</methodBody>
                 </method>
                 <method type="save">
