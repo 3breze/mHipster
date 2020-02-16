@@ -27,6 +27,8 @@ public interface JPoetHelperService {
 
     CodeBlock buildSetterCallsCodeBlock(Entity entity);
 
+    MethodSpec buildCustomizeMethod(Entity entity);
+
     List<MethodSpec> buildGetters(List<FieldSpec> fieldSpecList);
 
     List<MethodSpec> buildSetters(List<FieldSpec> fieldSpecList);

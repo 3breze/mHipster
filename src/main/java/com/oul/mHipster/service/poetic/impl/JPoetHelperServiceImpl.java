@@ -13,8 +13,10 @@ import com.oul.mHipster.util.ClassUtils;
 import com.oul.mHipster.util.ReflectionUtil;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import javax.lang.model.element.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -170,14 +172,33 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         if (methodType.equals("update")) {
-            cbBuilder.addStatement("$L.findById($L.getId()).orElseThrow(() -> new $T(\"$T\", \"id\", $L.getId()))",
+            cbBuilder.addStatement("return $L.findById($L.getId()).orElseThrow(() -> new $T(\"$T\", \"id\", $L.getId()))",
                     daoType.getInstanceName(), requestType.getInstanceName(), exceptionType.getTypeName(),
                     exceptionType.getTypeName(), requestType.getInstanceName());
         } else {
-            cbBuilder.addStatement("$L.findById(id).orElseThrow(() -> new $T(\"$T\", \"id\", id))",
+            cbBuilder.addStatement("return $L.findById(id).orElseThrow(() -> new $T(\"$T\", \"id\", id))",
                     daoType.getInstanceName(), exceptionType.getTypeName(), exceptionType.getTypeName());
         }
         return cbBuilder.build();
+    }
+
+    @Override
+    public MethodSpec buildCustomizeMethod(Entity entity) {
+
+        TypeWrapper domainTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "domainClass");
+
+        List<ParameterSpec> parameterSpecs = Arrays.asList(ParameterSpec.builder(QuerydslBindings.class, "bindings").build(),
+                ParameterSpec
+                        .builder(ClassName.bestGuess("Q" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName())), "root")
+                        .build());
+        return MethodSpec.methodBuilder("customize")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.DEFAULT)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.VOID)
+                .addParameters(parameterSpecs)
+                .addStatement("bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::containsIgnoreCase);")
+                .build();
     }
 
     @Override

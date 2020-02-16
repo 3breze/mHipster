@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -35,7 +36,6 @@ public class MethodServiceImpl implements MethodBuilderService {
     private static final String INJECT_FIND_BY_ID = "findByIdInject";
     private static final String INJECT_BUILDER = "builderInject";
     private static final String INJECT_SETTER_CALLS = "setterCalls";
-    private static final String INJECT_OPTIONAL = "optionalInst";
     private static final String INJECT_PAGE_RES = "pageResInject";
     private static final String CLASS_SUFFIX = "Class";
 
@@ -60,58 +60,25 @@ public class MethodServiceImpl implements MethodBuilderService {
 
         while (matcher.find()) {
             String injectKeyword = matcher.group(1);
-
-            if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
+            if (Arrays.asList(INJECT_FIND_BY_ID, INJECT_BUILDER, INJECT_SETTER_CALLS, INJECT_PAGE_RES)
+                    .contains(injectKeyword)) {
+                CodeBlock codeBlock = buildCodeBlock(injectKeyword, entity, method.getType());
+                assert codeBlock != null;
+                cbBuilder.add(codeBlock);
                 matcher.appendReplacement(templateCode, "");
-                if(templateCode.length() > 0){
+                continue;
+            }
+            if (injectKeyword.equals(INJECT_RELATION_FIND_BY_ID)) {
+                if (templateCode.length() > 0) {
                     matcher.appendTail(templateCode);
-                    cbBuilder.addStatement(templateCode.toString());
+                    String returnStatement = templateCode.toString().substring(0, templateCode.toString().indexOf("${"));
+                    cbBuilder.addStatement(returnStatement.trim());
+                    matcher.appendReplacement(templateCode, "");
                     templateCode.delete(0, templateCode.length());
                 }
                 Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
                 CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
                 cbBuilder.add(findRelationCodeBlock);
-                continue;
-            }
-            if (injectKeyword.equals(INJECT_FIND_BY_ID)) {
-                matcher.appendReplacement(templateCode, "");
-                if(templateCode.length() > 0){
-                    cbBuilder.addStatement(templateCode.toString());
-                    templateCode.delete(0, templateCode.length());
-                }
-                CodeBlock findByIdCodeBlock = jPoetHelperService.buildFindByIdCodeBlock(entity, method.getType());
-                cbBuilder.add(findByIdCodeBlock);
-                continue;
-            }
-            if (injectKeyword.equals(INJECT_PAGE_RES)) {
-                matcher.appendReplacement(templateCode, "");
-                if(templateCode.length() > 0){
-                    cbBuilder.addStatement(templateCode.toString());
-                    templateCode.delete(0, templateCode.length());
-                }
-                CodeBlock pageResponseCodeBlock = jPoetHelperService.buildPageResponse(entity);
-                cbBuilder.add(pageResponseCodeBlock);
-                continue;
-            }
-            if (injectKeyword.equals(INJECT_SETTER_CALLS)) {
-                matcher.appendReplacement(templateCode, "");
-                if(templateCode.length() > 0){
-                    cbBuilder.addStatement(templateCode.toString());
-                    templateCode.delete(0, templateCode.length());
-                }
-                CodeBlock setterCallsCodeBlock = jPoetHelperService.buildSetterCallsCodeBlock(entity);
-                cbBuilder.add(setterCallsCodeBlock);
-                continue;
-            }
-            if (injectKeyword.equals(INJECT_BUILDER)) {
-                matcher.appendReplacement(templateCode, "");
-                if(templateCode.length() > 0){
-                    cbBuilder.addStatement(templateCode.toString());
-                    templateCode.delete(0, templateCode.length());
-                }
-                CodeBlock lombokBuilderCodeBlock = jPoetHelperService.buildLombokBuilder(entity);
-                cbBuilder.add(lombokBuilderCodeBlock);
-
                 continue;
             }
             if (injectKeyword.endsWith(INSTANCE_SUFFIX)) {
@@ -128,10 +95,26 @@ public class MethodServiceImpl implements MethodBuilderService {
             }
             flag = false;
         }
-        matcher.appendTail(templateCode);
-        cbBuilder.addStatement(templateCode.toString());
-
+        //da ne bi dodavao prazan statement
+        if (templateCode.length() > 0) {
+            matcher.appendTail(templateCode);
+            cbBuilder.addStatement(templateCode.toString());
+        }
         return cbBuilder.build();
+    }
+
+    private CodeBlock buildCodeBlock(String injectKeyword, Entity entity, String methodType) {
+        switch (injectKeyword) {
+            case INJECT_FIND_BY_ID:
+                return jPoetHelperService.buildFindByIdCodeBlock(entity, methodType);
+            case INJECT_PAGE_RES:
+                return jPoetHelperService.buildPageResponse(entity);
+            case INJECT_SETTER_CALLS:
+                return jPoetHelperService.buildSetterCallsCodeBlock(entity);
+            case INJECT_BUILDER:
+                return jPoetHelperService.buildLombokBuilder(entity);
+        }
+        return null;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class GenerateServiceClassStrategy implements GenerateLayerStrategy {
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream()
                 .filter(layer -> layer.getName().equals("SERVICE_IMPL"))
                 .findFirst();
-        if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
+        if (serviceImplLayerOptional.isEmpty()) throw new ConfigurationErrorException("Service layer not found.");
 
         List<MethodSpec> methods = serviceImplLayerOptional.get().getMethods().stream().map(method -> {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());

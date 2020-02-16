@@ -17,6 +17,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 
 import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.InputStream;
 
 @Mojo(name = "gen")
 public class GenMojo extends AbstractMojo {
@@ -27,10 +29,11 @@ public class GenMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
 
         MavenInfoWrapper mavenInfoWrapper = new MavenInfoWrapper(project);
+        InputStream inputStream = this.getClass().getResourceAsStream("/layersConfig.xml");
 
         try {
             // Read layers config
-            LayersConfig layersConfig = ConfigUtil.readConfig();
+            LayersConfig layersConfig = ConfigUtil.readConfig(inputStream);
             Util.applyLayersConfig(layersConfig, mavenInfoWrapper);
 
             // Partially build entity model based on source project domain classes
@@ -41,7 +44,7 @@ public class GenMojo extends AbstractMojo {
             LayerGeneratorService layerGeneratorService = new LayerGeneratorServiceImpl(layersConfig);
             layerGeneratorService.generateLayers(rootEntityModel);
 
-        } catch (JAXBException e) {
+        } catch (JAXBException | IOException e) {
             throw new ConfigurationErrorException("Reading configuration failed!");
         }
 

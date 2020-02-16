@@ -93,7 +93,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>return ${findByIdInject}</methodBody>
+                    <methodBody>${findByIdInject}</methodBody>
                 </method>
                 <method type="findByIds">
                     <methodSignature returns="List&lt;domainClass&gt;">
@@ -110,7 +110,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId());&#xA;${findByIdRelation}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId())&#xA;${findByIdRelation}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="update">
                     <methodSignature returns="responseClass">
@@ -119,7 +119,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId());&#xA;${findByIdRelation}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId())&#xA;${findByIdRelation}${setterCalls}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="delete">
                     <methodSignature returns="void">
@@ -127,7 +127,7 @@
                             <parameter type="Long">id</parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId());&#xA;${daoInst}.delete(${domainInst})</methodBody>
+                    <methodBody>${domainClass} ${domainInst} = findOne(id);&#xA;${daoInst}.delete(${domainInst})</methodBody>
                 </method>
             </methods>
         </layer>

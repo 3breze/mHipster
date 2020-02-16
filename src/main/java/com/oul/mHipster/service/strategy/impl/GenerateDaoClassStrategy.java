@@ -7,26 +7,28 @@ import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
+import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.service.poetic.MethodBuilderService;
 import com.oul.mHipster.service.poetic.impl.AttributeService;
+import com.oul.mHipster.service.poetic.impl.JPoetHelperServiceImpl;
 import com.oul.mHipster.service.poetic.impl.MethodServiceImpl;
 import com.oul.mHipster.service.strategy.GenerateLayerStrategy;
 import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.*;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import javax.lang.model.element.Modifier;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
 
+    private JPoetHelperService jPoetHelperService;
     private MethodBuilderService methodBuilderService;
     private AttributeService attributeService;
 
     public GenerateDaoClassStrategy() {
+        this.jPoetHelperService = new JPoetHelperServiceImpl();
         this.attributeService = new AttributeService();
         this.methodBuilderService = new MethodServiceImpl();
     }
@@ -39,7 +41,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
         Optional<Layer> serviceImplLayerOptional = layersConfig.getLayers().stream()
                 .filter(layer -> layer.getName().equals("DAO"))
                 .findFirst();
-        if (!serviceImplLayerOptional.isPresent()) throw new ConfigurationErrorException("Service layer not found.");
+        if (serviceImplLayerOptional.isEmpty()) throw new ConfigurationErrorException("Service layer not found.");
 
         List<MethodSpec> methods = serviceImplLayerOptional.get().getMethods().stream().map(method -> {
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getType());
@@ -65,16 +67,8 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
         TypeWrapper dslBinderTypeNameWrapper = entityManagerService.getProperty("dependencies",
                 "QuerydslBinderCustomizer", null);
 
-        List<ParameterSpec> parameterSpecs = Arrays.asList(ParameterSpec.builder(QuerydslBindings.class, "bindings").build(),
-                ParameterSpec.builder(ClassName.bestGuess("Q" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName())), "root").build());
-        MethodSpec customizeMethod = MethodSpec.methodBuilder("customize")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.DEFAULT)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(TypeName.VOID)
-                .addParameters(parameterSpecs)
-                .addStatement("bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::containsIgnoreCase);")
-                .build();
+
+        MethodSpec customizeMethod = jPoetHelperService.buildCustomizeMethod(entity);
 
         ClassName boxedLong = ClassName.get("java.lang", "Long");
 
@@ -87,7 +81,7 @@ public class GenerateDaoClassStrategy implements GenerateLayerStrategy {
                 .addSuperinterface(ParameterizedTypeName.get((ClassName) dslPredicateTypeNameWrapper.getTypeName(),
                         domainTypeNameWrapper.getTypeName()))
                 .addSuperinterface(ParameterizedTypeName.get((ClassName) dslBinderTypeNameWrapper.getTypeName(),
-                        ClassName.bestGuess("A" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()))))
+                        ClassName.bestGuess("Q" + ClassUtils.capitalizeField(domainTypeNameWrapper.getInstanceName()))))
                 .addModifiers(Modifier.PUBLIC)
                 .addMethods(methods)
                 .addMethod(customizeMethod)
