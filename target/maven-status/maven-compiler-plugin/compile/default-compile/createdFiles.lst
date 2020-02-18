@@ -3,10 +3,12 @@ com/oul/mHipster/model/Entity.class
 com/oul/mHipster/service/main/JavaFileMakerService.class
 com/oul/mHipster/layerconfig/enums/LayerName.class
 com/oul/mHipster/model/RootEntityModel.class
+com/oul/mHipster/layerconfig/wrapper/CodeBlockStatement.class
 com/oul/mHipster/service/model/impl/EntityManagerServiceImpl.class
 com/oul/mHipster/service/main/LayerGeneratorService.class
 com/oul/mHipster/model/wrapper/TypeWrapper.class
 com/oul/mHipster/exception/JavaPoetErrorException.class
+com/oul/mHipster/layerconfig/wrapper/HelperMethod.class
 com/oul/mHipster/model/RelationAttribute.class
 com/oul/mHipster/service/model/impl/ModelServiceImpl.class
 com/oul/mHipster/exception/ConfigurationErrorException.class

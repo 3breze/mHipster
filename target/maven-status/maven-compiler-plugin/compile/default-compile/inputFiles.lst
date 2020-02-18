@@ -46,8 +46,10 @@
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/TestPoetApi.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/strategy/impl/GenerateApiClassStrategy.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/poetic/impl/JPoetHelperServiceImpl.java
+/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/layerconfig/wrapper/HelperMethod.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/strategy/impl/GenerateResponseDtoClassStrategy.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/RelationAttribute.java
+/Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/layerconfig/wrapper/CodeBlockStatement.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/exception/JavaPoetErrorException.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/model/RootEntityModel.java
 /Users/mihajlo/Documents/best_in_class/mHipster/src/main/java/com/oul/mHipster/service/poetic/impl/RelationAttributeService.java

@@ -19,7 +19,7 @@ public final class EntityManagerFactory {
         // instance creation logic, same as singleton creation logic
         if (instance == null) {
             instance = new EntityManagerServiceImpl();
-            instance.setLayerModel(layerModelWrapper);
+            instance.setLayerModelFactory(layerModelWrapper);
         }
         return instance;
     }

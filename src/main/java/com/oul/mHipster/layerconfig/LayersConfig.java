@@ -1,5 +1,7 @@
 package com.oul.mHipster.layerconfig;
 
+import com.oul.mHipster.layerconfig.wrapper.HelperMethod;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -18,6 +20,10 @@ public class LayersConfig {
     @XmlElement(name = "layer")
     private List<Layer> layers = new ArrayList<>();
 
+    @XmlElementWrapper(name = "helperMethods")
+    @XmlElement(name = "helperMethod")
+    private List<HelperMethod> helperMethods = new ArrayList<>();
+
     public List<Dependency> getDependencies() {
         return dependencies;
     }
@@ -34,5 +40,14 @@ public class LayersConfig {
     @XmlTransient
     public void setLayers(List<Layer> layers) {
         this.layers = layers;
+    }
+
+    public List<HelperMethod> getHelperMethods() {
+        return helperMethods;
+    }
+
+    @XmlTransient
+    public void setHelperMethods(List<HelperMethod> helperMethods) {
+        this.helperMethods = helperMethods;
     }
 }

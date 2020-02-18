@@ -5,7 +5,6 @@ import com.oul.mHipster.layerconfig.Layer;
 import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
-import com.oul.mHipster.model.RelationAttribute;
 import com.oul.mHipster.model.wrapper.TypeSpecWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
@@ -37,8 +36,7 @@ public class GenerateServiceImplClassStrategy implements GenerateLayerStrategy {
     @Override
     public TypeSpecWrapper generate(Entity entity) {
 
-        List<RelationAttribute> relationAttributes = attributeService.findRelationAttributes(entity);
-        List<FieldSpec> fieldSpecList = jPoetHelperService.buildRelationFieldSpecList(relationAttributes);
+        List<FieldSpec> fieldSpecList = attributeService.buildRelationFieldSpecList(entity);
 
         TypeWrapper daoTypeNameWrapper = entityManagerService.getProperty(entity.getClassName(), "daoClass");
         fieldSpecList.add(FieldSpec

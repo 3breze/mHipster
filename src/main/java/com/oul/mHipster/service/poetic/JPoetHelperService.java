@@ -13,8 +13,6 @@ public interface JPoetHelperService {
 
     CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes);
 
-    List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes);
-
     CodeBlock buildPageResponse(Entity entity);
 
     CodeBlock buildFindByIdCodeBlock(Entity entity, String methodType);

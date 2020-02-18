@@ -1,9 +1,6 @@
 package com.oul.mHipster.service.poetic.impl;
 
 import com.oul.mHipster.model.Attribute;
-import com.oul.mHipster.model.wrapper.TypeWrapper;
-import com.oul.mHipster.service.model.EntityManagerFactory;
-import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetClassService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
@@ -20,18 +17,8 @@ import java.util.stream.Collectors;
 
 public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPoetClassService {
 
-    private EntityManagerService entityManagerService;
-
-    public JPoetClassServiceImpl() {
-        this.entityManagerService = EntityManagerFactory.getInstance();
-    }
-
     @Override
     public TypeSpec buildResourceNotFoundException() {
-
-        // typeName ide u model za packagename posle
-        TypeWrapper responseTypeNameWrapper = entityManagerService.getProperty("dependencies",
-                "ResourceNotFoundException", null);
 
         List<Attribute> attributes = Arrays.asList(new Attribute(String.class, "resourceName"),
                 new Attribute(String.class, "fieldName"),
@@ -64,9 +51,6 @@ public class JPoetClassServiceImpl extends JPoetHelperServiceImpl implements JPo
 
     @Override
     public TypeSpec buildValidationGroup() {
-
-        TypeWrapper validationGroupTypeNameWrapper = entityManagerService.getProperty("dependencies",
-                "ValidationGroup", "exception");
 
         return TypeSpec
                 .classBuilder("ValidationGroup")

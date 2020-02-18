@@ -1,44 +1,68 @@
 package com.oul.mHipster.layerconfig.wrapper;
 
-import java.util.function.Function;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+@XmlRootElement
 public class StatementArg {
 
+    @XmlElement
+    private String entityNameKey;
+    @XmlElement
     private String classLayer;
     /*
     Required argument to be of type TypeName or String (instance name)
      */
-    private String argumentType;
-    private Function<String, String> stringOperationFunc;
+    @XmlElement
+    private Boolean isClazz;
+    @XmlElement
+    private String stringOperation;
 
-    @SafeVarargs
-    public StatementArg(String classLayer, String argumentType, Function<String, String>... stringOperations) {
+    public StatementArg() {
+    }
+
+    public StatementArg(String entityNameKey, String classLayer, Boolean isClazz) {
+        this.entityNameKey = entityNameKey;
         this.classLayer = classLayer;
-        this.argumentType = argumentType;
-        this.stringOperationFunc = stringOperations.length != 0 ? stringOperations[0] : null;
+        this.isClazz = isClazz;
+
+    }
+
+    public String getEntityNameKey() {
+        return entityNameKey;
+    }
+
+    @XmlTransient
+    public void setEntityNameKey(String entityNameKey) {
+        this.entityNameKey = entityNameKey;
     }
 
     public String getClassLayer() {
         return classLayer;
     }
 
+    @XmlTransient
     public void setClassLayer(String classLayer) {
         this.classLayer = classLayer;
     }
 
-    public String getArgumentType() {
-        return argumentType;
+    public Boolean isClazz() {
+        return isClazz;
     }
 
-    public void setArgumentType(String argumentType) {
-        this.argumentType = argumentType;
+    @XmlTransient
+    public void setIsClazz(Boolean isClazz) {
+        this.isClazz = isClazz;
     }
 
-    public Function<String, String> getStringOperationFunc() {
-        return stringOperationFunc;
+    public String getStringOperation() {
+        return stringOperation;
     }
 
-    public void setStringOperationFunc(Function<String, String> stringOperationFunc) {
-        this.stringOperationFunc = stringOperationFunc;
+    @XmlTransient
+    public void setStringOperation(String stringOperation) {
+        this.stringOperation = stringOperation;
     }
+
 }

@@ -21,20 +21,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RelationAttributeService {
+
     EntityManagerService entityManagerService;
 
     RelationAttributeService() {
         this.entityManagerService = EntityManagerFactory.getInstance();
     }
 
-    public List<RelationAttribute> findRelationAttributes(Entity entity) {
-        return entity.getAttributes().parallelStream()
+    public List<FieldSpec> buildRelationFieldSpecList(Entity entity) {
+
+        List<RelationAttribute> relationAttributes = entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
                         ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOMANY) &&
                                 ((RelationAttribute) attribute).getOwner().equals(entity.getClassName()))
                 .map(attribute -> (RelationAttribute) attribute)
                 .collect(Collectors.toList());
+
+        return relationAttributes.stream().map(attribute -> {
+            TypeWrapper serviceType = entityManagerService.getProperty(attribute.getTypeArgument(),
+                    "serviceClass");
+            return FieldSpec
+                    .builder(serviceType.getTypeName(), serviceType.getInstanceName())
+                    .addModifiers(Modifier.PRIVATE)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     Map<Boolean, List<RelationAttribute>> partitionParameterizedRelationAttributes(Entity entity) {

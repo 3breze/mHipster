@@ -1,6 +1,7 @@
 package com.oul.mHipster.service.model.impl;
 
 import com.oul.mHipster.exception.ConfigurationErrorException;
+import com.oul.mHipster.layerconfig.wrapper.CodeBlockStatement;
 import com.oul.mHipster.layerconfig.wrapper.StatementArg;
 import com.oul.mHipster.model.wrapper.LayerModelWrapper;
 import com.oul.mHipster.model.wrapper.TypeWrapper;
@@ -10,19 +11,17 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.function.Function;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
 
-    private Map<String, Map<String, TypeWrapper>> layerModel;
-    private Map<String, Map<String, List<StatementArg>>> methodStatementFactory = new HashMap<>();
-    private static final String REGEX = "\\$\\(L|T)";
+    private Map<String, Map<String, TypeWrapper>> layerModelFactory;
+    private Map<String, Map<Integer, CodeBlockStatement>> methodStatementFactory;
 
     @Override
-    public void setLayerModel(LayerModelWrapper layerModelWrapper) {
-        this.layerModel = layerModelWrapper.getLayerClassModel();
-        initStatementArgs();
+    public void setLayerModelFactory(LayerModelWrapper layerModelWrapper) {
+        this.layerModelFactory = layerModelWrapper.getLayerClassModelMap();
+        this.methodStatementFactory = layerModelWrapper.getMethodStatementMap();
     }
 
     /**
@@ -31,7 +30,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
      */
     @Override
     public TypeWrapper getProperty(String entityName, String layerName) {
-        return Optional.ofNullable(layerModel.get(entityName).get(layerName))
+        return Optional.ofNullable(layerModelFactory.get(entityName).get(layerName))
                 .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
     }
 
@@ -42,9 +41,9 @@ public class EntityManagerServiceImpl implements EntityManagerService {
      */
     @Override
     public TypeWrapper getProperty(String entityName, String typeArgument, String instanceName) {
-        TypeWrapper entityBasedClass = layerModel.get(entityName).get(typeArgument);
+        TypeWrapper entityBasedClass = layerModelFactory.get(entityName).get(typeArgument);
         if (entityBasedClass == null) {
-            TypeWrapper dependencyBasedClass = layerModel.get("dependencies").get(typeArgument);
+            TypeWrapper dependencyBasedClass = layerModelFactory.get("dependencies").get(typeArgument);
             if (dependencyBasedClass == null) {
                 if (Character.isLowerCase(typeArgument.charAt(0))) {
                     TypeName typeName = getPrimitiveTypeName(typeArgument);
@@ -62,47 +61,58 @@ public class EntityManagerServiceImpl implements EntityManagerService {
 
 
     private void initStatementArgs() {
+//        proba.put("buildFindManyRelationCodeBlock",
+//                Map.of(0, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
+//                                new String[][]{{"List", "type"}, {"domainClass", "type"}, {"domainClass", "instance"},
+//                                        {"serviceClass", "instance"}, {"requestClass", "instance"}, {"domainClass", "instance"}}),
+//                        1, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
+//                                new Object[][]{{"mouse", "cheese"}, {"dog", "bone",ClassUtils::capitalizeField}})));
 
-        methodStatementFactory.put("buildFindManyRelationCodeBlock",
-                Map.of("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-                        List.of(new StatementArg("List", "type"),
-                                new StatementArg("domainClass", "type"),
-                                new StatementArg("domainClass", "instance"),
-                                new StatementArg("serviceClass", "instance"),
-                                new StatementArg("requestClass", "instance"),
-                                new StatementArg("domainClass", "instance", ClassUtils::capitalizeField)),
-                        "$L.set$LList($LList)",
-                        List.of(new StatementArg("domainClass", "instance"),
-                                new StatementArg("domainClass", "instance"),
-                                new StatementArg("domainClass", "instance", ClassUtils::capitalizeField))));
+
+//        methodStatementFactory.put("buildFindManyRelationCodeBlock",
+//                Map.of(0, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
+//                                List.of(new StatementArg("type", "List", true),
+//                                        new StatementArg("relation", "domainClass", true),
+//                                        new StatementArg("relation", "domainClass", false),
+//                                        new StatementArg("relation", "serviceClass", false),
+//                                        new StatementArg("entity", "requestClass", false),
+//                                        new StatementArg("relation", "domainClass", false, ClassUtils::capitalizeField))),
+//                        1, new CodeBlockStatement("$L.set$LList($LList)",
+//                                List.of(new StatementArg("entity", "domainClass", false),
+//                                        new StatementArg("relation", "domainClass", false, ClassUtils::capitalizeField),
+//                                        new StatementArg("relation", "domainClass", false)))));
 
     }
 
-    // Prosledjeni parovi statementArgs iz configuracije sa pravim className-ovima
-    private Object[] prepareStatementResponse(List<StatementArg> statementArgs, List<String> classNames) {
+    @Override
+    public CodeBlockStatement getStatementArgs(String helperName, Integer statementIdx, Map<String, String> classNamesMap) {
+        CodeBlockStatement result = methodStatementFactory.get(helperName).get(statementIdx);
+        result.setResponseArgs(prepareStatementResponse(result.getRequestArgs(), classNamesMap));
+        return result;
+    }
 
-        return IntStream.range(0, statementArgs.size()).mapToObj(i -> {
-            StatementArg arg = statementArgs.get(i);
-            String className = classNames.get(i);
-            TypeWrapper type = getProperty(className, arg.getClassLayer(), null);
+    private Object[] prepareStatementResponse(List<StatementArg> statementArgs, Map<String, String> classNames) {
 
-            if (arg.getArgumentType().equals("instance"))
-                return Objects.nonNull(arg.getStringOperationFunc()) ?
-                        arg.getStringOperationFunc().apply(type.getInstanceName()) : type.getInstanceName();
+        return statementArgs.stream().map(statementArg -> {
+            String className = classNames.get(statementArg.getEntityNameKey());
+            TypeWrapper type = getProperty(className, statementArg.getClassLayer(), null);
+
+            if (!statementArg.isClazz())
+                return Objects.nonNull(statementArg.getStringOperation()) ?
+                        getStringOperationFunc(statementArg.getStringOperation())
+                                .apply(type.getInstanceName()) : type.getInstanceName();
 
             return type.getTypeName();
         }).toArray(Object[]::new);
     }
 
-    // Key su body za statemente
-//    public Map<String, Object[]> getStatementArgs(String helperName, Map<Integer, List<String>> classNames) {
-//        return methodStatementFactory.get(helperName)
-//                .entrySet().stream()
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey, //body metode
-//                        e -> prepareStatementResponse(e.getValue(), classNames)) // prepareRes -> dajem classNames sa
-//                );
-//    }
+    private Function<String, String> getStringOperationFunc(String functionName) {
+        switch (functionName) {
+            case "capitalize":
+                return ClassUtils::capitalizeField;
+        }
+        return null;
+    }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {
         TypeName result = null;

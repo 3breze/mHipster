@@ -3,6 +3,7 @@ package com.oul.mHipster.service.model.impl;
 import com.oul.mHipster.layerconfig.Layer;
 import com.oul.mHipster.layerconfig.LayersConfig;
 import com.oul.mHipster.layerconfig.enums.LayerName;
+import com.oul.mHipster.layerconfig.wrapper.CodeBlockStatement;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RootEntityModel;
@@ -20,13 +21,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ModelServiceImpl implements ModelService {
 
     private LayersConfig layersConfig;
     private RootEntityModel rootEntityModel;
     private Map<String, Map<String, TypeWrapper>> layerModel = new HashMap<>();
+    private Map<String, Map<Integer, CodeBlockStatement>> methodStatementFactory = new HashMap<>();
 
     public ModelServiceImpl(LayersConfig layersConfig, RootEntityModel rootEntityModel) {
         this.layersConfig = layersConfig;
@@ -37,7 +41,18 @@ public class ModelServiceImpl implements ModelService {
         generateLayerClassNaming();
         registerDependenciesTypeNames();
         registerDomainLayerTypeNames();
-        return new LayerModelWrapper(layerModel);
+        initStatementArgs();
+        return new LayerModelWrapper(layerModel, methodStatementFactory);
+    }
+
+    private void initStatementArgs() {
+        layersConfig.getHelperMethods().forEach(helperMethod -> {
+            Map<Integer, CodeBlockStatement> statementsMap = IntStream
+                    .range(0, helperMethod.getCodeBlockStatements().size())
+                    .boxed()
+                    .collect(Collectors.toMap(Function.identity(), i -> helperMethod.getCodeBlockStatements().get(i)));
+            methodStatementFactory.put(helperMethod.getName(), statementsMap);
+        });
     }
 
     public void generateLayerClassNaming() {

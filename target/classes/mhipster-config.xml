@@ -185,6 +185,71 @@
             <type>concrete</type>
         </layer>
     </layers>
+    <helperMethods>
+        <helperMethod name="buildFindManyRelationCodeBlock">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>$T&lt;$T&gt; $LList = $L.findByIds($L.get$LListIds())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>type</entityNameKey>
+                            <classLayer>List</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>serviceClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>requestClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+                <codeBlockStatement>
+                    <statementBody>$L.set$LList($LList)</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        <helperMethod name="">
+        </helperMethod>
+    </helperMethods>
     <dependencies>
         <dependency>
             <packageName>org.springframework.data.domain</packageName>

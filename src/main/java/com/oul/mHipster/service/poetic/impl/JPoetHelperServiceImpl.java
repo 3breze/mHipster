@@ -1,6 +1,7 @@
 package com.oul.mHipster.service.poetic.impl;
 
 import com.oul.mHipster.layerconfig.enums.LayerName;
+import com.oul.mHipster.layerconfig.wrapper.CodeBlockStatement;
 import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
@@ -48,36 +49,42 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     private CodeBlock.Builder buildFindManyRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
-                "domainClass");
-        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
-                "requestClass");
-        TypeWrapper listType = entityManagerService.getProperty("dependencies",
-                "List", "list");
-
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
-
-//        String entityName = entity.getClassName();
-//        IntStream.range(0, relationAttributes.size()).mapToObj(i -> {
-//            String relationName = relationAttributes.get(i).getTypeArgument();
-//            Map<String, Object[]> result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
-//                    i, List.of("List", relationName, relationName, relationName, entityName, relationName));
-//        })
+        String entityName = entity.getClassName();
 
         relationAttributes.forEach(relationAttribute -> {
+            String relationName = relationAttribute.getTypeArgument();
 
-            TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "serviceClass");
-            TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "domainClass");
-            cbBuilder.addStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())", listType.getTypeName(),
-                    relationDomainType.getTypeName(), relationDomainType.getInstanceName(),
-                    relationServiceType.getInstanceName(), requestType.getInstanceName(),
-                    ClassUtils.capitalizeField(relationDomainType.getInstanceName()));
-            cbBuilder.addStatement("$L.set$LList($LList)", domainType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()),
-                    relationDomainType.getInstanceName());
+            CodeBlockStatement result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+                    0, Map.of("type", "dependencies", "relation", relationName, "entity", entityName));
+            CodeBlockStatement result2 = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+                    1, Map.of("entity", entityName, "relation", relationName));
+            cbBuilder.addStatement(result.getStatementBody(), result.getResponseArgs());
+            cbBuilder.addStatement(result2.getStatementBody(), result2.getResponseArgs());
         });
+
         return cbBuilder;
+
+        //        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
+//                "domainClass");
+//        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
+//                "requestClass");
+//        TypeWrapper listType = entityManagerService.getProperty("dependencies",
+//                "List", "list");
+//        relationAttributes.forEach(relationAttribute -> {
+//
+//            TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+//                    "serviceClass");
+//            TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
+//                    "domainClass");
+//            cbBuilder.addStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())", listType.getTypeName(),
+//                    relationDomainType.getTypeName(), relationDomainType.getInstanceName(),
+//                    relationServiceType.getInstanceName(), requestType.getInstanceName(),
+//                    ClassUtils.capitalizeField(relationDomainType.getInstanceName()));
+//            cbBuilder.addStatement("$L.set$LList($LList)", domainType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()),
+//                    relationDomainType.getInstanceName());
+//        });
+//        return cbBuilder;
     }
 
 
@@ -105,18 +112,6 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                     .endControlFlow();
         });
         return cbBuilder;
-    }
-
-    @Override
-    public List<FieldSpec> buildRelationFieldSpecList(List<RelationAttribute> relationAttributes) {
-        return relationAttributes.stream().map(attribute -> {
-            TypeWrapper serviceType = entityManagerService.getProperty(attribute.getTypeArgument(),
-                    "serviceClass");
-            return FieldSpec
-                    .builder(serviceType.getTypeName(), serviceType.getInstanceName())
-                    .addModifiers(Modifier.PRIVATE)
-                    .build();
-        }).collect(Collectors.toList());
     }
 
     @Override

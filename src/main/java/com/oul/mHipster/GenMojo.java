@@ -29,7 +29,7 @@ public class GenMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
 
         MavenInfoWrapper mavenInfoWrapper = new MavenInfoWrapper(project);
-        InputStream inputStream = this.getClass().getResourceAsStream("/layersConfig.xml");
+        InputStream inputStream = this.getClass().getResourceAsStream("/mhipster-config.xml");
 
         try {
             // Read layers config
@@ -45,7 +45,8 @@ public class GenMojo extends AbstractMojo {
             layerGeneratorService.generateLayers(rootEntityModel);
 
         } catch (JAXBException | IOException e) {
-            throw new ConfigurationErrorException("Reading configuration failed!");
+            e.printStackTrace();
+//            throw new ConfigurationErrorException("Reading configuration failed!");
         }
 
     }
