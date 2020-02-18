@@ -1,5 +1,6 @@
 package com.oul.mHipster.service.poetic.impl;
 
+import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layerconfig.Method;
 import com.oul.mHipster.layerconfig.Parameter;
 import com.oul.mHipster.layerconfig.enums.LayerName;
@@ -114,7 +115,7 @@ public class MethodServiceImpl implements MethodBuilderService {
             case INJECT_BUILDER:
                 return jPoetHelperService.buildLombokBuilder(entity);
         }
-        return null;
+        throw new ConfigurationErrorException("Unknown code block inject keyword!");
     }
 
     @Override

@@ -247,8 +247,6 @@
                 </codeBlockStatement>
             </codeBlockStatements>
         </helperMethod>
-        <helperMethod name="">
-        </helperMethod>
     </helperMethods>
     <dependencies>
         <dependency>

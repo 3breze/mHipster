@@ -10,7 +10,10 @@ import com.oul.mHipster.util.ClassUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class EntityManagerServiceImpl implements EntityManagerService {
@@ -31,7 +34,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     @Override
     public TypeWrapper getProperty(String entityName, String layerName) {
         return Optional.ofNullable(layerModelFactory.get(entityName).get(layerName))
-                .orElseThrow(() -> new ConfigurationErrorException("Reading configuration failed!"));
+                .orElseThrow(() -> new ConfigurationErrorException("Can't find property for entity name or layer name!"));
     }
 
     /**
@@ -59,31 +62,6 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         return entityBasedClass;
     }
 
-
-    private void initStatementArgs() {
-//        proba.put("buildFindManyRelationCodeBlock",
-//                Map.of(0, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-//                                new String[][]{{"List", "type"}, {"domainClass", "type"}, {"domainClass", "instance"},
-//                                        {"serviceClass", "instance"}, {"requestClass", "instance"}, {"domainClass", "instance"}}),
-//                        1, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-//                                new Object[][]{{"mouse", "cheese"}, {"dog", "bone",ClassUtils::capitalizeField}})));
-
-
-//        methodStatementFactory.put("buildFindManyRelationCodeBlock",
-//                Map.of(0, new CodeBlockStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())",
-//                                List.of(new StatementArg("type", "List", true),
-//                                        new StatementArg("relation", "domainClass", true),
-//                                        new StatementArg("relation", "domainClass", false),
-//                                        new StatementArg("relation", "serviceClass", false),
-//                                        new StatementArg("entity", "requestClass", false),
-//                                        new StatementArg("relation", "domainClass", false, ClassUtils::capitalizeField))),
-//                        1, new CodeBlockStatement("$L.set$LList($LList)",
-//                                List.of(new StatementArg("entity", "domainClass", false),
-//                                        new StatementArg("relation", "domainClass", false, ClassUtils::capitalizeField),
-//                                        new StatementArg("relation", "domainClass", false)))));
-
-    }
-
     @Override
     public CodeBlockStatement getStatementArgs(String helperName, Integer statementIdx, Map<String, String> classNamesMap) {
         CodeBlockStatement result = methodStatementFactory.get(helperName).get(statementIdx);
@@ -108,10 +86,10 @@ public class EntityManagerServiceImpl implements EntityManagerService {
 
     private Function<String, String> getStringOperationFunc(String functionName) {
         switch (functionName) {
-            case "capitalize":
+            case "capitalizeField":
                 return ClassUtils::capitalizeField;
         }
-        return null;
+        throw new ConfigurationErrorException("Unknown string operation keyword from helper method config!");
     }
 
     private TypeName getPrimitiveTypeName(String typeArgument) {
