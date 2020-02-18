@@ -2,7 +2,6 @@ package com.oul.mHipster.service.poetic.impl;
 
 import com.oul.mHipster.layerconfig.enums.LayerName;
 import com.oul.mHipster.layerconfig.wrapper.CodeBlockStatement;
-import com.oul.mHipster.model.Attribute;
 import com.oul.mHipster.model.ClassNamingInfo;
 import com.oul.mHipster.model.Entity;
 import com.oul.mHipster.model.RelationAttribute;
@@ -20,16 +19,16 @@ import javax.lang.model.element.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JPoetHelperServiceImpl implements JPoetHelperService {
 
     private EntityManagerService entityManagerService;
+    private AttributeService attributeService;
 
     public JPoetHelperServiceImpl() {
         this.entityManagerService = EntityManagerFactory.getInstance();
+        this.attributeService = new AttributeService();
     }
 
     public CodeBlock buildFindRelationCodeBlock(Entity entity, Map<Boolean, List<RelationAttribute>> relationAttributes) {
@@ -51,64 +50,37 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
         String entityName = entity.getClassName();
-
         relationAttributes.forEach(relationAttribute -> {
-            String relationName = relationAttribute.getTypeArgument();
 
-            CodeBlockStatement result = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+            String relationName = relationAttribute.getTypeArgument();
+            CodeBlockStatement statement0 = entityManagerService.computeStatement("buildFindManyRelationCodeBlock",
                     0, Map.of("type", "dependencies", "relation", relationName, "entity", entityName));
-            CodeBlockStatement result2 = entityManagerService.getStatementArgs("buildFindManyRelationCodeBlock",
+            CodeBlockStatement statement1 = entityManagerService.computeStatement("buildFindManyRelationCodeBlock",
                     1, Map.of("entity", entityName, "relation", relationName));
-            cbBuilder.addStatement(result.getStatementBody(), result.getResponseArgs());
-            cbBuilder.addStatement(result2.getStatementBody(), result2.getResponseArgs());
+            cbBuilder.addStatement(statement0.getStatementBody(), statement0.getResponseArgs());
+            cbBuilder.addStatement(statement1.getStatementBody(), statement1.getResponseArgs());
         });
 
         return cbBuilder;
-
-        //        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
-//                "domainClass");
-//        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
-//                "requestClass");
-//        TypeWrapper listType = entityManagerService.getProperty("dependencies",
-//                "List", "list");
-//        relationAttributes.forEach(relationAttribute -> {
-//
-//            TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-//                    "serviceClass");
-//            TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-//                    "domainClass");
-//            cbBuilder.addStatement("$T<$T> $LList = $L.findByIds($L.get$LListIds())", listType.getTypeName(),
-//                    relationDomainType.getTypeName(), relationDomainType.getInstanceName(),
-//                    relationServiceType.getInstanceName(), requestType.getInstanceName(),
-//                    ClassUtils.capitalizeField(relationDomainType.getInstanceName()));
-//            cbBuilder.addStatement("$L.set$LList($LList)", domainType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()),
-//                    relationDomainType.getInstanceName());
-//        });
-//        return cbBuilder;
     }
-
 
     private CodeBlock.Builder buildFindOneRelationCodeBlock(Entity entity, List<RelationAttribute> relationAttributes) {
 
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
-        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(), "requestClass");
-        TypeWrapper optionalType = entityManagerService.getProperty("dependencies",
-                "Optional", "optional");
-
         CodeBlock.Builder cbBuilder = CodeBlock.builder();
-
+        String entityName = entity.getClassName();
         relationAttributes.forEach(relationAttribute -> {
-            TypeWrapper relationServiceType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "serviceClass");
-            TypeWrapper relationDomainType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "domainClass");
-            cbBuilder.beginControlFlow("if ($T.ofNullable($L.get$LId()).isPresent())", optionalType.getTypeName(), requestType.getInstanceName(),
-                    ClassUtils.capitalizeField(relationDomainType.getInstanceName()))
-                    .addStatement("$T $L = $L.findOne($L.get$LId())", relationDomainType.getTypeName(),
-                            relationDomainType.getInstanceName(), relationServiceType.getInstanceName(),
-                            requestType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()))
-                    .addStatement("$L.set$L($L)", domainType.getInstanceName(), ClassUtils.capitalizeField(relationDomainType.getInstanceName()),
-                            relationDomainType.getInstanceName())
+            String relationName = relationAttribute.getTypeArgument();
+
+            CodeBlockStatement statement0 = entityManagerService.computeStatement("buildFindOneRelationCodeBlock",
+                    0, Map.of("optional", "dependencies", "relation", relationName, "entity", entityName));
+            CodeBlockStatement statement1 = entityManagerService.computeStatement("buildFindOneRelationCodeBlock",
+                    1, Map.of("relation", relationName, "entity", entityName));
+            CodeBlockStatement statement2 = entityManagerService.computeStatement("buildFindOneRelationCodeBlock",
+                    2, Map.of("relation", relationName, "entity", entityName));
+
+            cbBuilder.beginControlFlow(statement0.getStatementBody(), statement0.getResponseArgs())
+                    .addStatement(statement1.getStatementBody(), statement1.getResponseArgs())
+                    .addStatement(statement2.getStatementBody(), statement2.getResponseArgs())
                     .endControlFlow();
         });
         return cbBuilder;
@@ -117,64 +89,40 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
     @Override
     public CodeBlock buildLombokBuilder(Entity entity) {
 
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
-                "domainClass");
-        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
-                "requestClass");
-        Predicate<Attribute> predicate = RelationAttribute.class::isInstance;
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream()
-                .filter(predicate.negate())
-                .map(attribute -> FieldSpec
-                        .builder(attribute.getType(), attribute.getFieldName())
-                        .addModifiers(Modifier.PRIVATE)
-                        .build()).collect(Collectors.toList());
+        List<FieldSpec> fieldSpecList = attributeService.getNonRelationFieldSpecList(entity);
+        String builderInject = attributeService.getBuilderFields(entity, fieldSpecList);
 
-        StringBuffer builderStingBuffer = new StringBuffer();
-        fieldSpecList.forEach(field -> builderStingBuffer.append(".").append(field.name).append("(")
-                .append(requestType.getInstanceName()).append(".get")
-                .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
+        CodeBlockStatement statement0 = entityManagerService.computeStatement("buildLombokBuilder",
+                0, Map.of("stringbuilder", builderInject, "entity", entity.getClassName()));
+
         return CodeBlock.builder()
-                .addStatement("$T $L = $T.builder()$L.build()", domainType.getTypeName(),
-                        domainType.getInstanceName(), domainType.getTypeName(), builderStingBuffer.toString())
+                .addStatement(statement0.getStatementBody(), statement0.getResponseArgs())
                 .build();
     }
 
     @Override
     public CodeBlock buildPageResponse(Entity entity) {
-        TypeWrapper collectorsType = entityManagerService.getProperty("dependencies",
-                "Collectors", "collectors");
-        TypeWrapper pageImplType = entityManagerService.getProperty("dependencies",
-                "PageImpl", "pageImpl");
-        TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(), "domainClass");
-        TypeWrapper responseType = entityManagerService.getProperty(entity.getClassName(), "responseClass");
-        TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
+
+        String entityName = entity.getClassName();
+        CodeBlockStatement statement0 = entityManagerService.computeStatement("buildPageResponse",
+                0, Map.of("entity", entityName));
+        CodeBlockStatement statement1 = entityManagerService.computeStatement("buildPageResponse",
+                1, Map.of("pageImpl", "dependencies", "collectors", "dependencies", "entity", entityName));
 
         return CodeBlock.builder()
-                .addStatement("Page<$T> page = $L.findAll(predicate, pageable)", domainType.getTypeName(), daoType.getInstanceName())
-                .addStatement("return new $T<>(page.stream().map($T::new).collect($T.toList()), pageable, page.getTotalElements())",
-                        pageImplType.getTypeName(), responseType.getTypeName(), collectorsType.getTypeName())
+                .addStatement(statement0.getStatementBody(), statement0.getResponseArgs())
+                .addStatement(statement1.getStatementBody(), statement1.getResponseArgs())
                 .build();
     }
 
     @Override
-    public CodeBlock buildFindByIdCodeBlock(Entity entity, String methodType) {
+    public CodeBlock buildFindByIdCodeBlock(Entity entity) {
 
-        TypeWrapper exceptionType = entityManagerService.getProperty("dependencies",
-                "ResourceNotFoundException", "exception");
+        String entityName = entity.getClassName();
+        CodeBlockStatement statement0 = entityManagerService.computeStatement("buildFindByIdCodeBlock",
+                0, Map.of("entity", entityName, "exception", "dependencies"));
 
-        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(), "requestClass");
-        TypeWrapper daoType = entityManagerService.getProperty(entity.getClassName(), "daoClass");
-
-        CodeBlock.Builder cbBuilder = CodeBlock.builder();
-        if (methodType.equals("update")) {
-            cbBuilder.addStatement("return $L.findById($L.getId()).orElseThrow(() -> new $T(\"$T\", \"id\", $L.getId()))",
-                    daoType.getInstanceName(), requestType.getInstanceName(), exceptionType.getTypeName(),
-                    exceptionType.getTypeName(), requestType.getInstanceName());
-        } else {
-            cbBuilder.addStatement("return $L.findById(id).orElseThrow(() -> new $T(\"$T\", \"id\", id))",
-                    daoType.getInstanceName(), exceptionType.getTypeName(), exceptionType.getTypeName());
-        }
-        return cbBuilder.build();
+        return CodeBlock.builder().addStatement(statement0.getStatementBody(), statement0.getResponseArgs()).build();
     }
 
     @Override
@@ -237,26 +185,19 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
                 .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
 
         parameterizedPartition.get(true).forEach(relationAttribute -> {
-            TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "responseClass", relationAttribute.getFieldName());
-            TypeWrapper collectorsType = entityManagerService.getProperty("dependencies",
-                    "Collectors", "collectors");
 
-            builder.addStatement("this.$L = $L.get$L().stream().map($T::new).collect($T.toList())",
-                    relationAttribute.getFieldName(), entity.getInstanceName(),
-                    ClassUtils.capitalizeField(relationAttribute.getFieldName()),
-                    responseType.getTypeName(), collectorsType.getTypeName());
+            CodeBlockStatement statement0 = entityManagerService.computeStatement("buildResponseConstructor",
+                    0, Map.of("relation", relationAttribute.getTypeArgument(), "entityName", entity.getInstanceName(),
+                            "collectors", "dependencies", "relationName", relationAttribute.getFieldName()));
+            builder.addStatement(statement0.getStatementBody(), statement0.getResponseArgs());
         });
 
         parameterizedPartition.get(false).forEach(relationAttribute -> {
-            TypeWrapper responseType = entityManagerService.getProperty(relationAttribute.getTypeArgument(),
-                    "responseClass", relationAttribute.getFieldName());
 
-            builder.addStatement("this.$L = $T.isNull($L.get$L()) ? null : new $T($L.get$L())",
-                    relationAttribute.getFieldName(), ClassName.get(Objects.class), entity.getInstanceName(),
-                    ClassUtils.capitalizeField(relationAttribute.getFieldName()),
-                    responseType.getTypeName(), entity.getInstanceName(),
-                    ClassUtils.capitalizeField(relationAttribute.getFieldName()));
+            CodeBlockStatement statement1 = entityManagerService.computeStatement("buildResponseConstructor",
+                    1, Map.of("relation", relationAttribute.getTypeArgument(), "entityName", entity.getInstanceName(),
+                            "relationName", relationAttribute.getFieldName(), "objects", "dependencies"));
+            builder.addStatement(statement1.getStatementBody(), statement1.getResponseArgs());
         });
 
         TypeWrapper domainType = entityManagerService.getProperty(entity.getClassName(),
@@ -275,13 +216,7 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
 
         ClassNamingInfo classNamingInfo = entity.getLayers().get(LayerName.REQUEST_DTO.toString());
 
-        Predicate<Attribute> predicate = RelationAttribute.class::isInstance;
-        List<FieldSpec> fieldSpecList = entity.getAttributes().stream()
-                .filter(predicate.negate())
-                .map(attribute -> FieldSpec
-                        .builder(attribute.getType(), attribute.getFieldName())
-                        .addModifiers(Modifier.PRIVATE)
-                        .build()).collect(Collectors.toList());
+        List<FieldSpec> fieldSpecList = attributeService.getNonRelationFieldSpecList(entity);
 
         CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
         fieldSpecList.forEach(field -> codeBlockBuilder.addStatement("$L.set$N($L.get$N())", entity.getInstanceName(),

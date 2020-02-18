@@ -164,6 +164,22 @@ public class TestPoetApi {
 
 
 //        System.out.println(ClassUtils.getCollectionInterface("interface java.util.List"));
+        /*
+         <helperMethod name="">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>$$$</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        */
 
     }
 }

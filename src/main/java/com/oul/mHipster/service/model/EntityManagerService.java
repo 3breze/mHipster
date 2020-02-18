@@ -15,6 +15,6 @@ public interface EntityManagerService {
 
     TypeWrapper getProperty(String entityName, String typeArgument, String instanceName);
 
-    CodeBlockStatement getStatementArgs(String helperName, Integer statementIdx, Map<String, String> classNamesMap);
+    CodeBlockStatement computeStatement(String helperName, Integer statementIdx, Map<String, String> classNamesMap);
 
 }

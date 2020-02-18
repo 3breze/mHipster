@@ -110,7 +110,7 @@
                             </parameter>
                         </parameters>
                     </methodSignature>
-                    <methodBody>${domainClass} ${domainInst} = findOne(${requestInst}.getId())&#xA;${findByIdRelation}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
+                    <methodBody>${builderInject}${findByIdRelation}${daoInst}.save(${domainInst});&#xA;return new ${responseClass}(${domainInst})</methodBody>
                 </method>
                 <method type="update">
                     <methodSignature returns="responseClass">
@@ -247,6 +247,234 @@
                 </codeBlockStatement>
             </codeBlockStatements>
         </helperMethod>
+        <helperMethod name="buildFindOneRelationCodeBlock">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>if ($T.ofNullable($L.get$LId()).isPresent())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>optional</entityNameKey>
+                            <classLayer>Optional</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>requestClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+                <codeBlockStatement>
+                    <statementBody>$T $L = $L.findOne($L.get$LId())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>serviceClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>requestClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+                <codeBlockStatement>
+                    <statementBody>$L.set$L($L)</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        <helperMethod name="buildLombokBuilder">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>$T $L = $T.builder()$L.build()</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>stringbuilder</entityNameKey>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        <helperMethod name="buildPageResponse">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>Page&lt;$T&gt; page = $L.findAll(predicate, pageable)</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>domainClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>daoClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+                <codeBlockStatement>
+                    <statementBody>return new $T&lt;&gt;(page.stream().map($T::new).collect($T.toList()), pageable, page.getTotalElements())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>pageImpl</entityNameKey>
+                            <classLayer>PageImpl</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>responseClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>collectors</entityNameKey>
+                            <classLayer>Collectors</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        <helperMethod name="buildFindByIdCodeBlock">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>return $L.findById(id).orElseThrow(() -> new $T("$T", "id", id))</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>entity</entityNameKey>
+                            <classLayer>daoClass</classLayer>
+                            <isClazz>false</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>exception</entityNameKey>
+                            <classLayer>ResourceNotFoundException</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>exception</entityNameKey>
+                            <classLayer>ResourceNotFoundException</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
+        <helperMethod name="buildResponseConstructor">
+            <codeBlockStatements>
+                <codeBlockStatement>
+                    <statementBody>this.$L = $L.get$L().stream().map($T::new).collect($T.toList())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>relationName</entityNameKey>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entityName</entityNameKey>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relationName</entityNameKey>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>responseClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>collectors</entityNameKey>
+                            <classLayer>Collectors</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+                <codeBlockStatement>
+                    <statementBody>this.$L = $T.isNull($L.get$L()) ? null : new $T($L.get$L())</statementBody>
+                    <requestArgs>
+                        <statementArg>
+                            <entityNameKey>relationName</entityNameKey>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>objects</entityNameKey>
+                            <classLayer>Objects</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entityName</entityNameKey>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relationName</entityNameKey>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relation</entityNameKey>
+                            <classLayer>responseClass</classLayer>
+                            <isClazz>true</isClazz>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>entityName</entityNameKey>
+                        </statementArg>
+                        <statementArg>
+                            <entityNameKey>relationName</entityNameKey>
+                            <stringOperation>capitalizeField</stringOperation>
+                        </statementArg>
+                    </requestArgs>
+                </codeBlockStatement>
+            </codeBlockStatements>
+        </helperMethod>
     </helperMethods>
     <dependencies>
         <dependency>
@@ -272,6 +500,10 @@
         <dependency>
             <packageName>java.util</packageName>
             <simpleName>Optional</simpleName>
+        </dependency>
+        <dependency>
+            <packageName>java.util</packageName>
+            <simpleName>Objects</simpleName>
         </dependency>
         <dependency>
             <packageName>org.springframework.data.jpa.repository</packageName>

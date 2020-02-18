@@ -63,7 +63,7 @@ public class MethodServiceImpl implements MethodBuilderService {
             String injectKeyword = matcher.group(1);
             if (Arrays.asList(INJECT_FIND_BY_ID, INJECT_BUILDER, INJECT_SETTER_CALLS, INJECT_PAGE_RES)
                     .contains(injectKeyword)) {
-                CodeBlock codeBlock = buildCodeBlock(injectKeyword, entity, method.getType());
+                CodeBlock codeBlock = buildCodeBlock(injectKeyword, entity);
                 assert codeBlock != null;
                 cbBuilder.add(codeBlock);
                 matcher.appendReplacement(templateCode, "");
@@ -76,6 +76,8 @@ public class MethodServiceImpl implements MethodBuilderService {
                     cbBuilder.addStatement(returnStatement.trim());
                     matcher.appendReplacement(templateCode, "");
                     templateCode.delete(0, templateCode.length());
+                }else{
+                    matcher.appendReplacement(templateCode, "");
                 }
                 Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
                 CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
@@ -104,10 +106,10 @@ public class MethodServiceImpl implements MethodBuilderService {
         return cbBuilder.build();
     }
 
-    private CodeBlock buildCodeBlock(String injectKeyword, Entity entity, String methodType) {
+    private CodeBlock buildCodeBlock(String injectKeyword, Entity entity) {
         switch (injectKeyword) {
             case INJECT_FIND_BY_ID:
-                return jPoetHelperService.buildFindByIdCodeBlock(entity, methodType);
+                return jPoetHelperService.buildFindByIdCodeBlock(entity);
             case INJECT_PAGE_RES:
                 return jPoetHelperService.buildPageResponse(entity);
             case INJECT_SETTER_CALLS:

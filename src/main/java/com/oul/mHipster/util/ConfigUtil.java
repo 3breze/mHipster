@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 public class ConfigUtil {
 
@@ -21,7 +22,7 @@ public class ConfigUtil {
     private static File getLayersConfig(InputStream inputStream) throws IOException {
         File tempFile = File.createTempFile(String.valueOf(inputStream.hashCode()), ".tmp");
         tempFile.deleteOnExit();
-
+//        Files.write(tempFile.toPath(), inputStream.readAllBytes());
         FileOutputStream out = new FileOutputStream(tempFile);
         byte[] buffer = new byte[1024];
         int bytesRead;

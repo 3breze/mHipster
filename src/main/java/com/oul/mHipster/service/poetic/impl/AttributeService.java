@@ -64,4 +64,26 @@ public class AttributeService extends RelationAttributeService {
                             .build();
                 }).collect(Collectors.toList());
     }
+
+    List<FieldSpec> getNonRelationFieldSpecList(Entity entity) {
+        Predicate<Attribute> predicate = RelationAttribute.class::isInstance;
+        return entity.getAttributes().stream()
+                .filter(predicate.negate())
+                .map(attribute -> FieldSpec
+                        .builder(attribute.getType(), attribute.getFieldName())
+                        .addModifiers(Modifier.PRIVATE)
+                        .build()).collect(Collectors.toList());
+    }
+
+    String getBuilderFields(Entity entity, List<FieldSpec> fieldSpecList) {
+
+        TypeWrapper requestType = entityManagerService.getProperty(entity.getClassName(),
+                "requestClass");
+
+        StringBuffer sbBuilder = new StringBuffer();
+        fieldSpecList.forEach(field -> sbBuilder.append(".").append(field.name).append("(")
+                .append(requestType.getInstanceName()).append(".get")
+                .append(ClassUtils.fieldGetter(field.name)).append(")\n"));
+        return sbBuilder.toString();
+    }
 }

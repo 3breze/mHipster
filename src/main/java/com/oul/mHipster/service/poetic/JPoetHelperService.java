@@ -15,7 +15,7 @@ public interface JPoetHelperService {
 
     CodeBlock buildPageResponse(Entity entity);
 
-    CodeBlock buildFindByIdCodeBlock(Entity entity, String methodType);
+    CodeBlock buildFindByIdCodeBlock(Entity entity);
 
     CodeBlock buildLombokBuilder(Entity entity);
 

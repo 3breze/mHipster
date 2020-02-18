@@ -62,8 +62,10 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         return entityBasedClass;
     }
 
+    private List<String> keywords = List.of("entityName", "relationName", "stringbuilder");
+
     @Override
-    public CodeBlockStatement getStatementArgs(String helperName, Integer statementIdx, Map<String, String> classNamesMap) {
+    public CodeBlockStatement computeStatement(String helperName, Integer statementIdx, Map<String, String> classNamesMap) {
         CodeBlockStatement result = methodStatementFactory.get(helperName).get(statementIdx);
         result.setResponseArgs(prepareStatementResponse(result.getRequestArgs(), classNamesMap));
         return result;
@@ -72,7 +74,15 @@ public class EntityManagerServiceImpl implements EntityManagerService {
     private Object[] prepareStatementResponse(List<StatementArg> statementArgs, Map<String, String> classNames) {
 
         return statementArgs.stream().map(statementArg -> {
-            String className = classNames.get(statementArg.getEntityNameKey());
+            String entityNameKey = statementArg.getEntityNameKey();
+            String className = classNames.get(entityNameKey);
+
+            if (keywords.contains(entityNameKey)){
+                return Objects.nonNull(statementArg.getStringOperation()) ?
+                        getStringOperationFunc(statementArg.getStringOperation())
+                                .apply(className) : className;
+            }
+
             TypeWrapper type = getProperty(className, statementArg.getClassLayer(), null);
 
             if (!statementArg.isClazz())
