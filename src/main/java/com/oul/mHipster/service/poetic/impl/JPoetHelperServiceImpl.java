@@ -10,7 +10,6 @@ import com.oul.mHipster.service.model.EntityManagerFactory;
 import com.oul.mHipster.service.model.EntityManagerService;
 import com.oul.mHipster.service.poetic.JPoetHelperService;
 import com.oul.mHipster.util.ClassUtils;
-import com.oul.mHipster.util.ReflectionUtil;
 import com.squareup.javapoet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -179,21 +178,16 @@ public class JPoetHelperServiceImpl implements JPoetHelperService {
         attributeList.forEach(field -> builder.addStatement("this.$L = $L.get$L()", field.name,
                 entity.getInstanceName(), ClassUtils.capitalizeField(field.name)));
 
-        Map<Boolean, List<RelationAttribute>> parameterizedPartition = entity.getAttributes().stream()
-                .filter(RelationAttribute.class::isInstance)
-                .map(attribute -> (RelationAttribute) attribute)
-                .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
+        Map<Boolean, List<RelationAttribute>> partition = attributeService.partitionAllParameterizedRelationAttributes(entity);
 
-        parameterizedPartition.get(true).forEach(relationAttribute -> {
-
+        partition.get(true).forEach(relationAttribute -> {
             CodeBlockStatement statement0 = entityManagerService.computeStatement("buildResponseConstructor",
                     0, Map.of("relation", relationAttribute.getTypeArgument(), "entityName", entity.getInstanceName(),
                             "collectors", "dependencies", "relationName", relationAttribute.getFieldName()));
             builder.addStatement(statement0.getStatementBody(), statement0.getResponseArgs());
         });
 
-        parameterizedPartition.get(false).forEach(relationAttribute -> {
-
+        partition.get(false).forEach(relationAttribute -> {
             CodeBlockStatement statement1 = entityManagerService.computeStatement("buildResponseConstructor",
                     1, Map.of("relation", relationAttribute.getTypeArgument(), "entityName", entity.getInstanceName(),
                             "relationName", relationAttribute.getFieldName(), "objects", "dependencies"));

@@ -79,7 +79,7 @@ public class MethodServiceImpl implements MethodBuilderService {
                 }else{
                     matcher.appendReplacement(templateCode, "");
                 }
-                Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionParameterizedRelationAttributes(entity);
+                Map<Boolean, List<RelationAttribute>> relationAttributes = attributeService.partitionOwnedParameterizedRelationAttributes(entity);
                 CodeBlock findRelationCodeBlock = jPoetHelperService.buildFindRelationCodeBlock(entity, relationAttributes);
                 cbBuilder.add(findRelationCodeBlock);
                 continue;

@@ -48,7 +48,7 @@ public class RelationAttributeService {
         }).collect(Collectors.toList());
     }
 
-    Map<Boolean, List<RelationAttribute>> partitionParameterizedRelationAttributes(Entity entity) {
+    Map<Boolean, List<RelationAttribute>> partitionOwnedParameterizedRelationAttributes(Entity entity) {
         return entity.getAttributes().parallelStream()
                 .filter(RelationAttribute.class::isInstance)
                 .filter(attribute -> ((RelationAttribute) attribute).getRelationType().equals(RelationType.MANYTOONE) ||
@@ -58,11 +58,15 @@ public class RelationAttributeService {
                 .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
     }
 
-    public List<FieldSpec> getRelationAttributeFieldSpecList(Entity entity, LayerName layerName) {
-        Map<Boolean, List<RelationAttribute>> parameterizedPartition = entity.getAttributes().stream()
+    Map<Boolean, List<RelationAttribute>> partitionAllParameterizedRelationAttributes(Entity entity){
+        return entity.getAttributes().stream()
                 .filter(RelationAttribute.class::isInstance)
                 .map(attribute -> (RelationAttribute) attribute)
                 .collect(Collectors.partitioningBy(attribute -> ReflectionUtil.isParameterizedType(attribute.getType())));
+    }
+
+    public List<FieldSpec> getRelationAttributeFieldSpecList(Entity entity, LayerName layerName) {
+        Map<Boolean, List<RelationAttribute>> parameterizedPartition = partitionAllParameterizedRelationAttributes(entity);
 
         ArrayList<FieldSpec> target = new ArrayList<>();
         target.ensureCapacity(parameterizedPartition.get(true).size() + parameterizedPartition.get(false).size());
