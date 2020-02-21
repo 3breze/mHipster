@@ -2,8 +2,12 @@ package com.oul.mHipster.util;
 
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
+import javax.persistence.Entity;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -17,8 +21,12 @@ public class ReflectionUtil {
 
     public static Set<Class<?>> loadDomainClasses(MavenInfoWrapper mavenInfoWrapper) {
         URLClassLoader loader = ClassUtils.createCustomClassloader(mavenInfoWrapper.getMavenProject());
-        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(loader.getURLs()).addClassLoader(loader));
-        return reflections.getTypesAnnotatedWith(javax.persistence.Entity.class);
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(loader.getURLs())
+                .addClassLoader(loader)
+                .setScanners(new SubTypesScanner(true), new TypeAnnotationsScanner())
+                .filterInputsBy(new FilterBuilder().include(".*class")));
+        return reflections.getTypesAnnotatedWith(Entity.class);
     }
 
     public static Class<?> resolveParameterizedType(Field field) {

@@ -32,7 +32,7 @@ public class LayerGeneratorServiceImpl implements LayerGeneratorService {
         ModelService modelService = new ModelServiceImpl(layersConfig, rootEntityModel);
         LayerModelWrapper layerModelWrapper = modelService.initLayerModel();
         EntityManagerFactory.createEntityManager(layerModelWrapper);
-
+        System.out.println();
         generateLayerStrategyFactory = new GenerateLayerStrategyFactory();
         rootEntityModel.getEntities().forEach(entityModel -> layersConfig.getLayers().forEach(layer -> {
             GenerateLayerStrategy generateLayerStrategy = generateLayerStrategyFactory.getLayerStrategy(LayerName.valueOf(layer.getName()));

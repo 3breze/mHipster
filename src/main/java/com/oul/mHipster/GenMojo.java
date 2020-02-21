@@ -1,6 +1,5 @@
 package com.oul.mHipster;
 
-import com.oul.mHipster.exception.ConfigurationErrorException;
 import com.oul.mHipster.layerconfig.LayersConfig;
 import com.oul.mHipster.model.RootEntityModel;
 import com.oul.mHipster.model.wrapper.MavenInfoWrapper;

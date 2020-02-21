@@ -20,6 +20,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
 
     private Map<String, Map<String, TypeWrapper>> layerModelFactory;
     private Map<String, Map<Integer, CodeBlockStatement>> methodStatementFactory;
+    private List<String> special_entity_name_keys = List.of("entityName", "relationName", "stringbuilder");
 
     @Override
     public void setLayerModelFactory(LayerModelWrapper layerModelWrapper) {
@@ -62,7 +63,6 @@ public class EntityManagerServiceImpl implements EntityManagerService {
         return entityBasedClass;
     }
 
-    private List<String> keywords = List.of("entityName", "relationName", "stringbuilder");
 
     @Override
     public CodeBlockStatement computeStatement(String helperName, Integer statementIdx, Map<String, String> classNamesMap) {
@@ -77,7 +77,7 @@ public class EntityManagerServiceImpl implements EntityManagerService {
             String entityNameKey = statementArg.getEntityNameKey();
             String className = classNames.get(entityNameKey);
 
-            if (keywords.contains(entityNameKey)){
+            if (special_entity_name_keys.contains(entityNameKey)) {
                 return Objects.nonNull(statementArg.getStringOperation()) ?
                         getStringOperationFunc(statementArg.getStringOperation())
                                 .apply(className) : className;
