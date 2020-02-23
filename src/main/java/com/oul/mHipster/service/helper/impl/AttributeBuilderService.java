@@ -11,6 +11,10 @@ public class AttributeBuilderService extends RelationAttributeService {
 
     private EntityManagerService entityManagerService;
 
+    /**
+     * Jedinstvno instanciranje klase na nivou LayerStrategije bi smanjilo broj njegovih instanciranja na nizim nivoima.
+     * Previse se puta instancira i u methodBuilderu, pa u layerStrategiji, napravio je jaku zavisnost...
+     */
     public AttributeBuilderService() {
         this.entityManagerService = EntityManagerFactory.getInstance();
     }
