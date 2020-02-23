@@ -21,6 +21,16 @@ public class SourceClassAttributeServiceImpl extends RelationAttributeService im
         this.mavenInfoWrapper = mavenInfoWrapper;
     }
 
+    /**
+     * Totalno nebitno za fukcionalnosti ili bilo sta, ali ova klasa nema potrebe da bude stateful.
+     * Posebno jer joj je servisna uloga da skenira i reuseabilna je po prirodi, bice dovoljno samo da ova metoda
+     * prima MavenInfoWrapper.
+     * Uz to, mozda bi bilo intuitivnije da ova klasa u nazivu ima scenner ili nesto sto govori sta ona zapravo radi,
+     * npr SourceClassScannerService ili samo SourceClassScanner a da se metoda umesto build zove scan ili process...
+     * To sam primetio kod springa, oni gde god citaju neke metapodatke kroz refleksiju ili kroz xml fajlove
+     * sve servise ko konvenciji imenuju kao skenere a gde nesto popunjavaju weavere
+     * @return
+     */
     @Override
     public RootEntityModel buildRootEntityModel() {
         Set<Class<?>> annotated = ReflectionUtil.loadDomainClasses(mavenInfoWrapper);

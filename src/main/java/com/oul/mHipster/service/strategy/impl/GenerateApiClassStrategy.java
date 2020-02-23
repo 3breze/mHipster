@@ -35,6 +35,16 @@ public class GenerateApiClassStrategy implements GenerateLayerStrategy {
     private MethodBuilderService methodBuilderService;
 
     public GenerateApiClassStrategy() {
+        /**
+         * Nisam pametan da li bi layersConfig i entityManager trebali da dolaze kao dependency u svakoj od strategija,
+         * cak i ako ti nisu potrebni u svakoj od njih (hleba ne jedu a mozda zatrebaju naknadno :))
+         * https://enterprisecraftsmanship.com/posts/singleton-vs-dependency-injection/
+         * Pokusao sam da googlam i da vidim sta kazu, u principu singleton ima smisla ako ti je nesto rasuto svuda po projektu
+         * i nije povezano jasnim poslovnim procesima, u svakom drugom slucaju trebalo bi forsirati dependency injection.
+         * Ja bih verovatno izvukao AbsractLayerStrategy koja bi primala menadzera i lazer config i instancirala ostale
+         * stvari koje su svima potrebne (JPoetHelperService), ali nmg da tvrdim da bi to bolji pristup od ovog, mozda malo
+         * cistiji ali bi zakomplikovao izgradnju strategija u strategy factory...
+         */
         this.layersConfig = Util.getValue();
         this.entityManagerService = EntityManagerFactory.getInstance();
         this.jPoetHelperService = new JPoetHelperServiceImpl();

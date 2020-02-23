@@ -41,7 +41,6 @@ public abstract class RelationAttributeService {
 
         for (Method method : type.getDeclaredMethods()) {
             Object value = null;
-
             try {
                 value = method.invoke(annotation, (Object[]) null);
             } catch (IllegalAccessException | InvocationTargetException e) {
